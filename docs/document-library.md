@@ -63,3 +63,5 @@ nu certificare pe hardware/Safari. Artefactul HTML temporar de QA a fost elimina
 
 OCR si propunerile AI optionale sunt documentate in document-processing.md.
 Nu se pretinde scanare nativa mobila sau protectie antivirus completa.
+
+Uploadul web este temporar pana la confirmare; drafturile nu apar in biblioteca. Renunta le elimina, iar cele abandonate expira dupa 24h prin coada low. Detalii in document-processing.md.

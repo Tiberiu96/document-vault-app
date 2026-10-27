@@ -105,6 +105,7 @@ class AccountSecurityTest extends TestCase
 
     public function test_sending_many_verification_requests_shows_localized_wait_and_hourly_limit(): void
     {
+        $this->freezeTime();
         Notification::fake();
         $user = User::factory()->unverified()->create();
         $this->actingAs($user);

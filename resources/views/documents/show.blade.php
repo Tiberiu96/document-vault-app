@@ -1,7 +1,8 @@
 @extends('layouts.workspace')
 @section('content')
 <a class="inline-link" href="{{ route('documents.index', $document->trashed() ? ['trash' => 1] : []) }}">← {{ __('documents.back') }}</a>
-<div class="library-heading"><div><span class="eyebrow">{{ $workspace->name }}</span><h1>{{ $document->title }}</h1>@if($document->summary)<p class="document-short-summary">{{ $document->summary }}</p>@endif<span class="stored-status"><i></i>{{ $document->trashed() ? __('documents.trash') : __('documents.stored') }}</span></div><div class="library-actions">@unless($document->trashed())<x-button :href="route('documents.download', ['document' => $document->id])" variant="outline" icon="arrow">{{ __('documents.download') }}</x-button>@can('update', $document)<x-button :href="route('documents.edit', ['document' => $document->id])">{{ __('documents.edit') }}</x-button>@endcan @endunless</div></div>
+<div class="library-heading"><div><span class="eyebrow">{{ $workspace->name }}</span><h1>{{ $document->title }}</h1>@if($document->summary)<p class="document-short-summary">{{ $document->summary }}</p>@endif<span class="stored-status"><i></i>{{ $document->trashed() ? __('documents.trash') : ($document->isDraft() ? __('processing.draft') : __('documents.stored')) }}</span></div><div class="library-actions">@unless($document->trashed())<x-button :href="route('documents.download', ['document' => $document->id])" variant="outline" icon="arrow">{{ __('documents.download') }}</x-button>@can('update', $document)<x-button :href="route('documents.edit', ['document' => $document->id])">{{ __('documents.edit') }}</x-button>@endcan @endunless</div></div>
+@if($document->isDraft())<div class="security-notice"><p>{{ __('processing.draft_notice') }}</p><form method="POST" action="{{ route('documents.discard', ['document' => $document->id]) }}">@csrf @method('DELETE')<button type="submit" class="inline-link">{{ __('documents.cancel') }}</button></form></div>@endif
 @unless($document->trashed()) @include('documents.processing') @endunless
 <div class="document-detail-grid">
     <section class="library-panel document-preview"><div class="panel-heading"><h2>{{ __('documents.preview') }}</h2><span>{{ $document->page_count }} {{ __('documents.pages') }}</span></div>
@@ -27,7 +28,7 @@
             @can('update', $document)<form method="POST" action="{{ route('documents.restore', ['document' => $document->id]) }}">@csrf<x-button type="submit" icon="check">{{ __('documents.restore') }}</x-button></form>@endcan
             @can('manage', [App\Models\Document::class, $workspace])<details class="library-danger"><summary>{{ __('documents.purge') }}</summary><p>{{ __('documents.purge_note') }}</p><form method="POST" action="{{ route('documents.purge', ['document' => $document->id]) }}">@csrf @method('DELETE')<label class="remember"><input type="checkbox" name="confirm" value="1" required>{{ __('documents.confirm_purge') }}</label><button type="submit" class="danger-button">{{ __('documents.purge') }}</button></form></details>@endcan
         @endif
-    @else
+    @elseif(!$document->isDraft())
         @can('delete', $document)<form method="POST" action="{{ route('documents.destroy', ['document' => $document->id]) }}" class="library-danger">@csrf @method('DELETE')<button type="submit" class="danger-button">{{ __('documents.move_trash') }}</button></form>@endcan
     @endif
     </div>

@@ -44,8 +44,10 @@ unei editari mai recente. Utilizatorul poate respinge propunerile.
 Textul OCR este input nefiabil. JSON are schema stricta, categorii si etichete din
 catalogul global. Faptele propuse cer dovezi in text. Datele se normalizeaza numai
 in raport cu date calendaristice prezente in sursa. Duplicate de etichete se elimina.
-Text insuficient, continut nerelevant/incert, informatii fara dovezi, expirare trecuta
+Text insuficient, continut nerelevant/incert, informatii fara dovezi
 sau emitere viitoare produc avertisment si zero campuri pentru precompletare.
+Expirarea in trecut este un avertisment neblocant: propunerile pot fi confirmate.
+Nu se programeaza notificari de expirare pentru date deja trecute; modulul de remindere urmeaza.
 O data de emitere in trecut este normala. AI nu certifica autenticitatea juridica.
 
 Pentru texte de peste 3000 bytes, analiza foloseste un extras de la inceput si final;
@@ -67,3 +69,47 @@ idempotenta, eliberarea rezervarilor, opt-out, limba lantului OCR→AI, criptare
 avertismentele, schema si confirmarea cu versiune. Probele reale locale au verificat
 native_pdf, tesseract si ocrmypdf, precum si JSON Qwen acceptat de regulile de domeniu.
 Nu se logheaza continutul documentelor sau corpurile HTTP.
+
+## Incarcari neconfirmate si anulare
+
+Uploadul web creeaza status=draft, pentru stocare temporara privata si procesare.
+Biblioteca, cautarea si statisticile de documente/pagini includ numai status=stored.
+Spatiul fizic ramane rezervat inclusiv pentru drafturi, prevenind abuzul de stocare.
+Draftul este accesibil numai celui care l-a incarcat, chiar daca workspaceul are alti admini.
+PATCH dupa confirmarea formularului trece atomic in stored; erorile de validare pastreaza draftul.
+Clientul nu poate modifica statusul prin input. Documentele existente nu sunt reinterpretate
+sau sterse automat, pentru ca lipsa editarilor nu dovedeste ca utilizatorul a renuntat.
+
+Renunta trimite DELETE cu CSRF la documents.discard, autorizat si verificat sub lock.
+Nu este un simplu link spre lista. Operatia anuleaza rezervarile procesarilor in asteptare,
+elimina draftul/fisierele si elibereaza spatiul; daca stergerea fizica esueaza, PurgeDocument
+reincearca pe low. Fisierul devine inaccesibil imediat. Joburile tardive nu il pot recrea.
+Consumul OCR/AI deja efectuat nu se ramburseaza prin anularea incarcarii.
+O incercare AI deja pornita ramane consumata la anulare, deoarece apelul remote
+poate fi deja facturat; anularile repetate nu pot ocoli cota.
+
+ExpireDocumentDraft este programat pe low la 24h dupa upload, folosind Redis delayed jobs;
+nu necesita un cron separat. Verifica din nou starea si varsta sub lock si nu sterge
+un document confirmat intre timp. Workerul low trebuie sa functioneze pentru expirare.
+Uploadurile interne folosite pentru importuri/fixtures pot crea direct stored prin serviciu;
+fluxul web impune intotdeauna draft=true.
+
+O analiza succeeded este reutilizata, inclusiv dupa acceptare/respingere sau avertisment.
+Rutele repetate nu lanseaza joburi noi si nu rezerva cota suplimentara. Butonul AI este
+ascuns dupa succes; numai un esec poate fi reincercat explicit. Originalele sunt imuabile.
+
+## Scanner web multipagina
+
+Ruta localizata documents.scan ofera captura, galerie, miniaturi, selectie, rotire si
+crop rectangular manual. Paginile se normalizeaza JPEG in browser, latura maxima1800px,
+cu maximum10 pagini/5MiB cumulat. Fotografiile nu se trimit pana la confirmarea scanarii.
+Conexiunile HTTPS pot folosi getUserMedia video fara audio; pe HTTP camera este ceruta
+prin input capture. Permisiunea camerei ramane la utilizator. Streamul se opreste la
+alegerea unei imagini, captura, submit sau parasirea paginii.
+
+DocumentScanRequest valideaza paginile si drepturile; FileInspector verifica decodarea
+reala si pixelii. ScanPdf reencodeaza imaginile cu GD si creeaza un PDF raster cu FPDF1.9
+in director temporar0700, eliminat in finally. PDF-ul trece prin inspectia si limitele
+obisnuite, este un draft privat si urmeaza OCR/AI. Nu exista detectie automata a marginilor,
+corectie de perspectiva sau scanare nativa Expo in acest checkpoint. Verificarea pe un
+telefon fizic ramane necesara; browserul desktop poate verifica selectia si editarea imaginilor.

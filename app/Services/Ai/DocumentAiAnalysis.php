@@ -151,13 +151,13 @@ class DocumentAiAnalysis
                 $warnings[] = 'inconsistent';
             }
         }
-        if ($warnings) {
+        if (array_diff($warnings, ['expired'])) {
             return ['review_required' => true, 'warnings' => array_values(array_unique($warnings)), 'fields' => [], 'partial' => $partial];
         }
         if ($locale === 'ro' && $data['summary']) {
             $data['summary'] = Str::ascii($data['summary'], 'ro');
         }
 
-        return ['review_required' => false, 'warnings' => [], 'partial' => $partial, 'fields' => array_diff_key($data, array_flip(['document_like', 'readable', 'confident']))];
+        return ['review_required' => false, 'warnings' => array_values(array_unique($warnings)), 'partial' => $partial, 'fields' => array_diff_key($data, array_flip(['document_like', 'readable', 'confident']))];
     }
 }

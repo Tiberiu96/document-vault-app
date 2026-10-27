@@ -10,7 +10,7 @@ class DocumentPolicy
 {
     public function view(User $user, Document $document): bool
     {
-        return (new WorkspacePolicy)->view($user, $document->workspace);
+        return (! in_array($document->status, ['draft', 'discarded'], true) || $document->uploaded_by === $user->id) && (new WorkspacePolicy)->view($user, $document->workspace);
     }
 
     public function create(User $user, Workspace $workspace): bool
@@ -20,7 +20,7 @@ class DocumentPolicy
 
     public function update(User $user, Document $document): bool
     {
-        return $this->create($user, $document->workspace) && ($document->uploaded_by === $user->id || $this->manage($user, $document->workspace));
+        return $this->view($user, $document) && $this->create($user, $document->workspace) && ($document->uploaded_by === $user->id || $this->manage($user, $document->workspace));
     }
 
     public function delete(User $user, Document $document): bool

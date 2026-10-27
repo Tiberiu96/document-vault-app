@@ -1,6 +1,8 @@
 <?php
 
 return [
+    'documents.scan' => 'documente/scaneaza',
+    'draft.discard' => 'renunta-incarcare',
     'home' => '',
     'features' => 'functionalitati',
     'pricing' => 'preturi',

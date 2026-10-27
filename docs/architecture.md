@@ -66,3 +66,5 @@ Checkpoint biblioteca: document-library.md. Integrare Ollama si diagnostic local
 Checkpoint procesare: document-processing.md. Acces temporar de pe telefon: phone-testing.md.
 
 Provider remote optional Groq si configurare: groq.md. Joburile fixeaza providerul la solicitare.
+
+Scanner web multipagina: captura/galerie, rotire, crop manual si PDF privat prin FPDF1.9; flux draft cu confirmare. Nu inlocuieste scannerul nativ Expo sau corectia automata de perspectiva.

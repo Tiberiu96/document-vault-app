@@ -1,6 +1,13 @@
 <?php
 
 return [
+    'camera' => 'Photograph document',
+    'camera_hint' => 'Take a clear photo of one page on your phone, then select Upload and continue. For multiple pages, upload a PDF. No automatic cropping.',
+    'draft' => 'Unconfirmed upload',
+    'draft_notice' => 'The document is held temporarily for processing. It appears in your library only after Confirm and save. Cancel removes the upload; abandoned uploads expire after 24 hours.',
+    'discarded' => 'Upload cancelled. The document was not added to the library.',
+    'already_analyzed' => 'Analysis is already complete. Use the existing result.',
+
     'remote_ai_hint' => 'Extracted text is sent to Groq for AI suggestions. Review suggestions before saving. Uncheck to use local OCR only.',
     'auto_ai_hint' => 'AI suggests information based on the document. Review suggestions before saving. Uncheck for manual entry.',
     'uploading' => 'Uploading the document. Keep this page open.',
@@ -50,7 +57,7 @@ return [
         'low_quality' => 'The text is too short or not readable enough. Try a clearer scan.',
         'not_document' => 'The content does not appear to be a relevant document or cannot be identified reliably.',
         'uncertain' => 'AI could not identify the information with sufficient confidence.',
-        'expired' => 'An expiry date in the past was detected. Review the document manually.',
+        'expired' => 'The document has an expiry date in the past. You can save it; no notifications are scheduled for this date.',
         'future_date' => 'An issue date in the future was detected. Review the document manually.',
         'inconsistent' => 'Some suggested facts lack sufficient evidence in the extracted text.',
     ],

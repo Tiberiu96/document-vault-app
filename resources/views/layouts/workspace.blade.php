@@ -7,7 +7,7 @@
     <link rel="icon" type="image/svg+xml" href="{{ asset('images/favicon.svg') }}">
     <link rel="stylesheet" href="{{ asset('css/app.css') }}?v={{ filemtime(public_path('css/app.css')) }}">
 </head>
-<body class="library-body">
+<body @class(['library-body', 'scanner-body' => ($section ?? '') === 'scan'])>
 <a href="#main" class="skip-link">{{ __('site.a11y.skip') }}</a>
 <div class="library-shell">
     <aside class="library-sidebar">
@@ -40,6 +40,6 @@
         </main>
     </div>
 </div>
-<nav class="library-mobile-nav" aria-label="{{ __('site.nav.menu') }}"><a href="{{ route('dashboard') }}"><x-icon name="home"/><span>{{ __('documents.home') }}</span></a><a href="{{ route('documents.index') }}"><x-icon name="document"/><span>{{ __('documents.title') }}</span></a>@if($workspace && Gate::allows('create', [App\Models\Document::class, $workspace]))<a class="mobile-upload" href="{{ route('documents.create') }}"><x-icon name="upload"/><span>{{ __('documents.upload') }}</span></a>@endif<a href="{{ route('categories.index') }}"><x-icon name="folder"/><span>{{ __('documents.manage') }}</span></a></nav>
+<nav class="library-mobile-nav" aria-label="{{ __('site.nav.menu') }}"><a href="{{ route('dashboard') }}"><x-icon name="home"/><span>{{ __('documents.home') }}</span></a><a href="{{ route('documents.index') }}"><x-icon name="document"/><span>{{ __('documents.title') }}</span></a>@if($workspace && Gate::allows('create', [App\Models\Document::class, $workspace]))<a class="mobile-upload mobile-scan" href="{{ route('documents.scan') }}"><x-icon name="scan"/><span>{{ __('scanner.short_title') }}</span></a>@endif<a href="{{ route('categories.index') }}"><x-icon name="folder"/><span>{{ __('documents.manage') }}</span></a></nav>
 @stack('scripts')
 </body></html>

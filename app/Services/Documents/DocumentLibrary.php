@@ -2,7 +2,9 @@
 
 namespace App\Services\Documents;
 
+use App\Jobs\Documents\ExpireDocumentDraft;
 use App\Jobs\Documents\GenerateDocumentPreview;
+use App\Jobs\Documents\PurgeDocument;
 use App\Models\Category;
 use App\Models\Document;
 use App\Models\ProcessingRun;
@@ -19,14 +21,14 @@ use Illuminate\Validation\ValidationException;
 
 class DocumentLibrary
 {
-    public function upload(User $user, Workspace $workspace, UploadedFile $file, array $data): Document
+    public function upload(User $user, Workspace $workspace, UploadedFile $file, array $data, bool $draft = false): Document
     {
         Gate::forUser($user)->authorize('create', [Document::class, $workspace]);
         $inspection = app(FileInspector::class)->inspect($file);
         $id = (string) Str::uuid();
         $path = 'workspaces/'.$workspace->id.'/documents/'.$id.'/original.'.$inspection['extension'];
         try {
-            return DB::transaction(function () use ($user, $workspace, $file, $data, $inspection, $id, $path) {
+            return DB::transaction(function () use ($user, $workspace, $file, $data, $inspection, $id, $path, $draft) {
                 $locked = Workspace::lockForUpdate()->findOrFail($workspace->id);
                 Gate::forUser($user)->authorize('create', [Document::class, $locked]);
                 if (Document::withTrashed()->where('workspace_id', $locked->id)->where('sha256', $inspection['sha256'])->exists()) {
@@ -39,7 +41,7 @@ class DocumentLibrary
                 $document->forceFill([
                     'id' => $id, 'workspace_id' => $locked->id, 'uploaded_by' => $user->id,
                     'title' => $data['title'], 'original_name' => $name ?: 'document.'.$inspection['extension'],
-                    'ai_requested' => ! empty($data['analyze_with_ai']), 'storage_path' => $path, 'status' => 'stored', 'preview_status' => $inspection['mime_type'] === 'application/pdf' ? 'pending' : 'ready',
+                    'ai_requested' => ! empty($data['analyze_with_ai']), 'storage_path' => $path, 'status' => $draft ? 'draft' : 'stored', 'preview_status' => $inspection['mime_type'] === 'application/pdf' ? 'pending' : 'ready',
                     ...array_diff_key($inspection, ['extension' => true]), ...$metadata,
                 ])->save();
                 $this->syncTags($document, $locked, $data['tags'] ?? [], $data['tag_ids'] ?? []);
@@ -48,6 +50,9 @@ class DocumentLibrary
                     throw ValidationException::withMessages(['file' => __('documents.storage_error')]);
                 }
 
+                if ($draft) {
+                    ExpireDocumentDraft::dispatch($document->id, $document->workspace_id)->delay(now()->addDay());
+                }
                 if ($document->mime_type === 'application/pdf') {
                     GenerateDocumentPreview::dispatch($document->id, $document->workspace_id);
                 }
@@ -84,9 +89,35 @@ class DocumentLibrary
                 throw ValidationException::withMessages(['processing' => __('processing.stale')]);
             }
             $fresh->forceFill(['metadata_version' => $fresh->metadata_version + 1]);
-            $fresh->forceFill(['title' => $data['title'], ...$this->metadata($workspace, $data)])->save();
+            $fresh->forceFill(['status' => 'stored', 'title' => $data['title'], ...$this->metadata($workspace, $data)])->save();
             $this->syncTags($fresh, $workspace, $data['tags'] ?? [], $data['tag_ids'] ?? []);
         }, 3);
+    }
+
+    public function discardDraft(Document $document, bool $expiredOnly = false): bool
+    {
+        $discarded = DB::transaction(function () use ($document, $expiredOnly) {
+            Workspace::lockForUpdate()->findOrFail($document->workspace_id);
+            $record = Document::lockForUpdate()->find($document->id);
+            if (! $record || ! $record->isDraft() || ($expiredOnly && $record->created_at->isAfter(now()->subDay()))) {
+                return false;
+            }
+            app(DocumentProcessingService::class)->cancel($record);
+            $record->forceFill(['status' => 'discarded', 'purge_requested_at' => now()])->save();
+            $record->delete();
+
+            return true;
+        }, 3);
+        if ($discarded) {
+            try {
+                (new PurgeDocument($document->id, $document->workspace_id))->handle();
+            } catch (\Throwable) {
+                // Fisierul ramane inaccesibil; curatarea si eliberarea cotei se reincearca.
+                PurgeDocument::dispatch($document->id, $document->workspace_id);
+            }
+        }
+
+        return $discarded;
     }
 
     private function metadata(Workspace $workspace, array $data): array

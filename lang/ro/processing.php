@@ -1,6 +1,13 @@
 <?php
 
 return [
+    'camera' => 'Fotografiaza documentul',
+    'camera_hint' => 'Fotografiaza o pagina clara cu telefonul, apoi apasa Incarca si continua. Pentru mai multe pagini, incarca un PDF. Fara decupare automata.',
+    'draft' => 'Incarcare neconfirmata',
+    'draft_notice' => 'Documentul este pastrat temporar pentru procesare. Apare in biblioteca numai dupa Confirma si salveaza. Renunta elimina incarcarea; incarcarile abandonate expira dupa 24 de ore.',
+    'discarded' => 'Incarcarea a fost anulata. Documentul nu a fost adaugat in biblioteca.',
+    'already_analyzed' => 'Analiza a fost deja finalizata. Foloseste rezultatul existent.',
+
     'remote_ai_hint' => 'Textul extras este trimis catre Groq pentru propuneri AI. Verifica sugestiile inainte de salvare. Debifeaza pentru a pastra doar procesarea OCR locala.',
     'auto_ai_hint' => 'AI propune informatii pe baza documentului. Verifica sugestiile inainte de salvare. Debifeaza pentru completare manuala.',
     'uploading' => 'Se incarca documentul. Nu inchide pagina.',
@@ -50,7 +57,7 @@ return [
         'low_quality' => 'Text prea putin sau insuficient de lizibil. Incearca o scanare mai clara.',
         'not_document' => 'Continutul nu pare un document relevant sau nu poate fi identificat sigur.',
         'uncertain' => 'AI nu a identificat informatiile cu suficienta certitudine.',
-        'expired' => 'A fost detectata o data de expirare in trecut. Verifica documentul manual.',
+        'expired' => 'Documentul are o data de expirare in trecut. Poate fi salvat; nu se programeaza notificari pentru aceasta data.',
         'future_date' => 'A fost detectata o data de emitere in viitor. Verifica documentul manual.',
         'inconsistent' => 'Unele informatii propuse nu au dovezi suficiente in textul extras.',
     ],

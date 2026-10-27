@@ -1,6 +1,8 @@
 <?php
 
 return [
+    'documents.scan' => 'dokumentumok/szkenneles',
+    'draft.discard' => 'feltoltes-elvetese',
     'home' => '',
     'features' => 'funkciok',
     'pricing' => 'arak',

@@ -3,8 +3,10 @@
 <a class="inline-link" href="{{ $document ? route('documents.show', ['document' => $document->id]) : route('documents.index') }}">← {{ __('documents.back') }}</a>
 <div class="library-heading"><div><span class="eyebrow">{{ $workspace->name }}</span><h1>{{ isset($suggestionRunId) ? __('processing.review') : ($document ? __('documents.edit') : __('documents.upload')) }}</h1><p>{{ __('documents.limit') }}</p></div></div>
 <form class="library-panel library-form auth-form" method="POST" enctype="multipart/form-data" action="{{ $document ? route('documents.update', ['document' => $document->id]) : route('documents.store') }}" data-document-upload>
+    @if($document->isDraft())<div class="security-notice"><p>{{ __('processing.draft_notice') }}</p></div>@endif
     @csrf @if($document)@method('PATCH')<input type="hidden" name="metadata_version" value="{{ $document->metadata_version }}">@endif
     @isset($suggestionRunId)<input type="hidden" name="ai_run_id" value="{{ $suggestionRunId }}"><div class="security-notice"><p>{{ __('processing.review_hint') }} @if($suggestionPartial){{ __('processing.partial') }}@endif</p></div>@endisset
+    @foreach($suggestionWarnings ?? [] as $warning)<div class="security-notice" role="status"><p>{{ __('processing.warnings.'.$warning) }}</p></div>@endforeach
     @if(!isset($suggestionRunId) && (in_array($document->ai_status, ['needs_review', 'failed']) || in_array($document->ocr_status, ['empty', 'failed'])))
     <div class="form-alert" role="status"><strong>{{ __('processing.manual_review') }}</strong><p>{{ __('processing.no_autofill') }}</p>@foreach($document->aiRun?->result['warnings'] ?? [] as $warning)<p>{{ __('processing.warnings.'.$warning) }}</p>@endforeach</div>
     @endif
@@ -20,7 +22,8 @@
         <div class="full-width"><label for="summary">{{ __('documents.summary') }}</label><textarea id="summary" name="summary" maxlength="240" rows="2" aria-describedby="summary-help">{{ is_string(old('summary', $document?->summary)) ? old('summary', $document?->summary) : '' }}</textarea><p id="summary-help" class="field-help">{{ __('documents.summary_hint') }}</p></div>
         <div class="full-width"><label for="description">{{ __('documents.description') }}</label><textarea id="description" name="description" maxlength="3000" rows="4">{{ is_string(old('description', $document?->description)) ? old('description', $document?->description) : '' }}</textarea></div>
     </div>
-    <div class="library-actions"><x-button type="submit" icon="{{ $document ? 'check' : 'upload' }}">{{ isset($suggestionRunId) ? __('processing.confirm') : ($document ? __('documents.save') : __('documents.upload')) }}</x-button><a class="inline-link" href="{{ route('documents.index') }}">{{ __('documents.cancel') }}</a></div>
+    <div class="library-actions"><x-button type="submit" icon="{{ $document ? 'check' : 'upload' }}">{{ isset($suggestionRunId) || $document->isDraft() ? __('processing.confirm') : __('documents.save') }}</x-button>@if($document->isDraft())<button type="submit" form="discard-upload" formnovalidate class="inline-link">{{ __('documents.cancel') }}</button>@else<a class="inline-link" href="{{ route('documents.index') }}">{{ __('documents.cancel') }}</a>@endif</div>
 </form>
+@if($document->isDraft())<form id="discard-upload" method="POST" action="{{ route('documents.discard', ['document' => $document->id]) }}">@csrf @method('DELETE')</form>@endif
 @endsection
 @push('scripts')<script src="{{ asset('js/document-upload.js') }}" defer></script>@endpush

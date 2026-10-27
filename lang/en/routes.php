@@ -1,6 +1,8 @@
 <?php
 
 return [
+    'documents.scan' => 'documents/scan',
+    'draft.discard' => 'discard-upload',
     'home' => '',
     'features' => 'features',
     'pricing' => 'pricing',

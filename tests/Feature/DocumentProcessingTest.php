@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Contracts\Ocr\OcrProviderInterface;
+use App\Jobs\Documents\ExpireDocumentDraft;
 use App\Jobs\Documents\ProcessDocument;
 use App\Jobs\Documents\PurgeDocument;
 use App\Models\Category;
@@ -158,10 +159,10 @@ class DocumentProcessingTest extends TestCase
         $this->get('/ro/documente/'.$this->document->id.'/sugestii')->assertRedirect();
     }
 
-    public function test_uncertain_non_document_and_expired_content_never_offers_autofill(): void
+    public function test_uncertain_or_non_document_content_never_offers_autofill(): void
     {
         $this->readyText($this->text.' Data expirarii: 01.01.2021.');
-        foreach ([['confident' => false], ['document_like' => false], ['readable' => false], ['expires_on' => '2021-01-01'], ['supplier' => 'Unseen supplier']] as $case) {
+        foreach ([['confident' => false], ['document_like' => false], ['readable' => false], ['supplier' => 'Unseen supplier']] as $case) {
             $this->fakeAi($case);
             $result = app(DocumentAiAnalysis::class)->analyze($this->document->fresh(), 'ro');
             $this->assertTrue($result['review_required']);
@@ -170,6 +171,11 @@ class DocumentProcessingTest extends TestCase
         $this->fakeAi();
         $result = app(DocumentAiAnalysis::class)->analyze($this->document->fresh(), 'ro');
         $this->assertFalse($result['review_required']); // Data emiterii veche este normala.
+        $this->fakeAi(['expires_on' => '2021-01-01']);
+        $expired = app(DocumentAiAnalysis::class)->analyze($this->document->fresh(), 'ro');
+        $this->assertFalse($expired['review_required']);
+        $this->assertContains('expired', $expired['warnings']);
+        $this->assertSame('2021-01-01', $expired['fields']['expires_on']);
     }
 
     public function test_structured_suggestions_do_not_change_metadata_until_reviewed(): void
@@ -208,6 +214,7 @@ class DocumentProcessingTest extends TestCase
     public function test_upload_option_is_checked_beside_file_and_can_be_declined(): void
     {
         $page = $this->get('/ro/documente/incarca')->assertOk();
+        $page->assertSee('Scaneaza documentul')->assertSee(route('documents.scan'), false);
         $page->assertSeeInOrder(['id="document-file"', 'name="analyze_with_ai" value="1" checked', 'Incarca si continua'], false);
         $this->assertFalse(str_contains($page->getContent(), 'name="title"'));
         $this->assertFalse(str_contains($page->getContent(), 'name="supplier"'));
@@ -273,6 +280,110 @@ class DocumentProcessingTest extends TestCase
         $this->get('/ro/documente/'.$this->document->id.'/stare-procesare')->assertOk()->assertJsonPath('ready_for_review', true);
         $this->document->refresh()->increment('metadata_version');
         $this->get('/ro/documente/'.$this->document->id.'/stare-procesare')->assertOk()->assertJsonPath('ready_for_review', false);
+    }
+
+    public function test_upload_remains_private_draft_until_explicit_confirmation(): void
+    {
+        $this->post('/ro/documente', ['file' => UploadedFile::fake()->image('private-draft.png', 55, 66), 'analyze_with_ai' => '0'])->assertSessionHasNoErrors();
+        $draft = Document::where('title', 'private-draft')->sole();
+        $this->assertSame('draft', $draft->status);
+        $this->get('/ro/documente')->assertOk()->assertDontSee('private-draft');
+        $this->get('/ro/panou')->assertViewHas('documentCount', 1);
+        Queue::assertPushedOn('low', ExpireDocumentDraft::class);
+        $this->get('/ro/documente/'.$draft->id.'/editeaza')->assertOk()->assertSee('Confirma si salveaza')->assertSee('form="discard-upload"', false);
+        $this->workspace->forceFill(['type' => 'business'])->save();
+        $admin = User::factory()->create();
+        $this->workspace->members()->attach($admin->id, ['role' => 'admin']);
+        $this->actingAs($admin)->get('/ro/documente/'.$draft->id)->assertForbidden();
+        $this->actingAs($this->user)->patch('/ro/documente/'.$draft->id, ['title' => 'Confirmed document', 'metadata_version' => 0])->assertSessionHasNoErrors();
+        $this->assertSame('stored', $draft->fresh()->status);
+        $this->get('/ro/documente')->assertSee('Confirmed document');
+        $this->delete('/ro/documente/'.$draft->id.'/renunta-incarcare')->assertStatus(409);
+        (new ExpireDocumentDraft($draft->id, $this->workspace->id))->handle(app(DocumentLibrary::class));
+        $this->assertNotNull($draft->fresh());
+    }
+
+    public function test_cancel_draft_removes_files_releases_reservations_and_allows_same_upload(): void
+    {
+        $before = $this->workspace->fresh()->storage_used_bytes;
+        $this->post('/ro/documente', ['file' => UploadedFile::fake()->image('cancel-me.png', 66, 77), 'analyze_with_ai' => '1'])->assertSessionHasNoErrors();
+        $draft = Document::where('title', 'cancel-me')->sole();
+        $runId = $draft->ocr_run_id;
+        $this->assertTrue(Storage::disk('local')->exists($draft->storage_path));
+        $this->delete('/ro/documente/'.$draft->id.'/renunta-incarcare')->assertRedirect();
+        $this->assertNull(Document::withTrashed()->find($draft->id));
+        $this->assertFalse(Storage::disk('local')->exists($draft->storage_path));
+        $this->assertSame($before, $this->workspace->fresh()->storage_used_bytes);
+        $this->assertSame(0, (int) ProcessingUsage::sole()->ocr_reserved);
+        app(DocumentProcessingService::class)->complete($runId, $this->workspace->id, ['text' => $this->text, 'engine' => 'fake']);
+        $this->assertNull(Document::withTrashed()->find($draft->id));
+        $this->post('/ro/documente', ['file' => UploadedFile::fake()->image('cancel-me.png', 66, 77), 'analyze_with_ai' => '0'])->assertSessionHasNoErrors();
+    }
+
+    public function test_cancelling_running_ai_does_not_refund_a_potentially_billable_attempt(): void
+    {
+        $this->document->forceFill(['status' => 'draft'])->save();
+        $this->readyText();
+        $service = app(DocumentProcessingService::class);
+        $run = $service->request($this->user, $this->document, 'ai');
+        $service->claim($run->id, $this->workspace->id, 1);
+        app(DocumentLibrary::class)->discardDraft($this->document);
+        $this->assertSame(1, (int) ProcessingUsage::sole()->ai_used);
+        $this->assertSame(0, (int) ProcessingUsage::sole()->ai_reserved);
+        $this->assertNull(Document::withTrashed()->find($this->document->id));
+        Http::assertNothingSent();
+    }
+
+    public function test_expired_abandoned_draft_is_cleaned_without_touching_confirmed_documents(): void
+    {
+        $draft = app(DocumentLibrary::class)->upload($this->user, $this->workspace, UploadedFile::fake()->image('expired-draft.png', 44, 99), ['title' => 'Abandoned upload'], draft: true);
+        $job = new ExpireDocumentDraft($draft->id, $this->workspace->id);
+        $job->handle(app(DocumentLibrary::class));
+        $this->assertNotNull($draft->fresh());
+        $draft->forceFill(['created_at' => now()->subHours(25)])->save();
+        $job->handle(app(DocumentLibrary::class));
+        $this->assertNull(Document::withTrashed()->find($draft->id));
+        $this->assertNotNull($this->document->fresh());
+    }
+
+    public function test_completed_ai_cannot_be_restarted_or_consume_additional_quota(): void
+    {
+        $this->readyText();
+        $this->fakeAi();
+        $service = app(DocumentProcessingService::class);
+        $run = $service->request($this->user, $this->document, 'ai');
+        $this->execute($run);
+        foreach (['ready', 'accepted', 'rejected', 'needs_review'] as $status) {
+            $this->document->refresh()->forceFill(['ai_status' => $status])->save();
+            $this->assertSame($run->id, $service->request($this->user, $this->document, 'ai')->id);
+            $this->get('/ro/documente/'.$this->document->id)->assertOk()->assertDontSee('Analizeaza cu AI');
+        }
+        $this->post('/ro/documente/'.$this->document->id.'/proceseaza/ai')->assertRedirect();
+        $this->assertSame(1, ProcessingRun::where('kind', 'ai')->count());
+        $this->assertSame(1, (int) ProcessingUsage::sole()->ai_used);
+        $this->assertSame(0, (int) ProcessingUsage::sole()->ai_reserved);
+        Http::assertSentCount(1);
+    }
+
+    public function test_scanner_creates_private_multipage_draft_and_rejects_excess_pages(): void
+    {
+        $this->get('/ro/documente/scaneaza')->assertOk()->assertSee('Confirma scanarea');
+        $response = $this->postJson('/ro/documente/scaneaza', ['pages' => [UploadedFile::fake()->image('one.jpg', 150, 210), UploadedFile::fake()->image('two.png', 210, 150)], 'analyze_with_ai' => '0', 'workspace_id' => 999, 'status' => 'stored'])
+            ->assertCreated()->assertJsonStructure(['redirect']);
+        $record = Document::where('mime_type', 'application/pdf')->sole();
+        $this->assertSame('draft', $record->status);
+        $this->assertSame(2, $record->page_count);
+        $this->assertSame($this->workspace->id, $record->workspace_id);
+        $this->assertTrue(Storage::disk('local')->exists($record->storage_path));
+        $this->assertFalse($record->ai_requested);
+        $pages = array_map(fn ($i) => UploadedFile::fake()->image('page-'.$i.'.jpg', 10, 15), range(1, 11));
+        $this->postJson('/ro/documente/scaneaza', ['pages' => $pages])->assertUnprocessable()->assertJsonValidationErrors('pages');
+        $this->postJson('/ro/documente/scaneaza', ['pages' => [UploadedFile::fake()->createWithContent('fake.jpg', '<?php echo 1;')]])->assertUnprocessable();
+        $this->postJson('/ro/documente/scaneaza', ['pages' => [UploadedFile::fake()->image('too-wide.jpg', 3000, 100)]])->assertUnprocessable();
+        $this->workspace->forceFill(['type' => 'business'])->save();
+        $accountant = User::factory()->create();
+        $this->workspace->members()->attach($accountant->id, ['role' => 'accountant']);
+        $this->actingAs($accountant)->get('/ro/documente/scaneaza')->assertForbidden();
     }
 
     public function test_stale_suggestions_and_invalid_category_are_rejected(): void

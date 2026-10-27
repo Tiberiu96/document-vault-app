@@ -1,6 +1,13 @@
 <?php
 
 return [
+    'camera' => 'Dokumentum fényképezése',
+    'camera_hint' => 'Készíts egy olvasható képet egy oldalról a telefonoddal, majd válaszd a Feltöltés és folytatás gombot. Több oldalhoz tölts fel PDF-et. Automatikus körbevágás nincs.',
+    'draft' => 'Nem megerősített feltöltés',
+    'draft_notice' => 'A dokumentumot ideiglenesen tároljuk a feldolgozáshoz. Csak megerősítés és mentés után jelenik meg a könyvtárban. A Mégse eltávolítja a feltöltést; az elhagyott feltöltések 24 óra után lejárnak.',
+    'discarded' => 'Feltöltés megszakítva. A dokumentum nem került a könyvtárba.',
+    'already_analyzed' => 'Az elemzés már elkészült. Használd a meglévő eredményt.',
+
     'remote_ai_hint' => 'A kinyert szöveget a Groq kapja meg AI-javaslatokhoz. Mentés előtt ellenőrizd őket. Csak helyi OCR-hez vedd ki a jelölést.',
     'auto_ai_hint' => 'Az AI a dokumentum alapján javasol adatokat. Mentés előtt ellenőrizd a javaslatokat. Kézi kitöltéshez vedd ki a jelölést.',
     'uploading' => 'A dokumentum feltöltése folyamatban. Ne zárd be az oldalt.',
@@ -50,7 +57,7 @@ return [
         'low_quality' => 'A szöveg túl rövid vagy nem elég olvasható. Próbálj jobb minőségű szkennelést.',
         'not_document' => 'A tartalom nem tűnik releváns dokumentumnak, vagy nem azonosítható megbízhatóan.',
         'uncertain' => 'Az AI nem azonosította kellő bizonyossággal az adatokat.',
-        'expired' => 'Múltbeli lejárati dátumot észleltünk. Ellenőrizd kézzel a dokumentumot.',
+        'expired' => 'A dokumentum lejárati dátuma elmúlt. Elmentheted; erre a dátumra nem ütemezünk értesítést.',
         'future_date' => 'Jövőbeli kiállítási dátumot észleltünk. Ellenőrizd kézzel a dokumentumot.',
         'inconsistent' => 'Egyes javasolt adatokhoz nincs elegendő bizonyíték a kinyert szövegben.',
     ],

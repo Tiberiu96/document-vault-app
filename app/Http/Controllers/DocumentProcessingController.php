@@ -26,9 +26,9 @@ class DocumentProcessingController extends Controller
     {
         $record = $this->document($request, $document);
         Gate::authorize('update', $record);
-        $processing->request($request->user(), $record, $kind);
+        $run = $processing->request($request->user(), $record, $kind);
 
-        return redirect()->route('documents.show', ['document' => $record->id])->with('library_status', __('processing.queued_notice'));
+        return redirect()->route('documents.show', ['document' => $record->id])->with('library_status', __($run->status === 'succeeded' ? 'processing.already_analyzed' : 'processing.queued_notice'));
     }
 
     public function status(Request $request, string $document)
@@ -81,7 +81,7 @@ class DocumentProcessingController extends Controller
             ...app(WebsiteContext::class)->forPage($request, 'documents'), 'section' => 'documents', 'document' => $prefill,
             'workspace' => $workspace, 'workspaces' => $request->user()->workspaces()->get()->filter(fn ($w) => Gate::allows('view', $w)),
             'categories' => Category::forWorkspace($workspace)->get(), 'tags' => Tag::forWorkspace($workspace)->get(),
-            'suggestionRunId' => $run->id, 'suggestionPartial' => $run->result['partial'] ?? false,
+            'suggestionWarnings' => $run->result['warnings'] ?? [], 'suggestionRunId' => $run->id, 'suggestionPartial' => $run->result['partial'] ?? false,
         ]);
     }
 

@@ -24,9 +24,9 @@ class DashboardController extends Controller
             ...app(WebsiteContext::class)->forPage($request, 'dashboard'),
             'workspaces' => $workspaces,
             'activeWorkspace' => $activeWorkspace, 'workspace' => $activeWorkspace, 'section' => 'dashboard',
-            'recentDocuments' => $activeWorkspace ? Document::where('workspace_id', $activeWorkspace->id)->with('category')->latest()->limit(8)->get() : collect(),
-            'documentCount' => $activeWorkspace ? Document::where('workspace_id', $activeWorkspace->id)->count() : 0,
-            'pageCount' => $activeWorkspace ? Document::where('workspace_id', $activeWorkspace->id)->sum('page_count') : 0,
+            'recentDocuments' => $activeWorkspace ? Document::where('workspace_id', $activeWorkspace->id)->where('status', 'stored')->with('category')->latest()->limit(8)->get() : collect(),
+            'documentCount' => $activeWorkspace ? Document::where('workspace_id', $activeWorkspace->id)->where('status', 'stored')->count() : 0,
+            'pageCount' => $activeWorkspace ? Document::where('workspace_id', $activeWorkspace->id)->where('status', 'stored')->sum('page_count') : 0,
         ]);
     }
 }

@@ -64,7 +64,10 @@ class DocumentLibraryTest extends TestCase
     {
         $this->post('/ro/documente', $this->payload($changes))->assertRedirect();
 
-        return Document::latest('created_at')->firstOrFail();
+        $record = Document::latest('created_at')->firstOrFail();
+        $this->patch('/ro/documente/'.$record->id, array_diff_key($this->payload($changes), ['file' => true]))->assertSessionHasNoErrors();
+
+        return $record->fresh();
     }
 
     public function test_pdf_upload_is_private_counted_and_original_is_preserved(): void

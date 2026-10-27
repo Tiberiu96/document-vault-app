@@ -21,6 +21,11 @@ class Document extends Model
         return ['metadata_version' => 'integer', 'ai_requested' => 'boolean', 'ocr_text' => 'encrypted', 'issued_on' => 'date', 'expires_on' => 'date', 'purge_requested_at' => 'datetime', 'size_bytes' => 'integer', 'amount_minor' => 'integer'];
     }
 
+    public function isDraft(): bool
+    {
+        return $this->status === 'draft';
+    }
+
     public function workspace(): BelongsTo
     {
         return $this->belongsTo(Workspace::class);

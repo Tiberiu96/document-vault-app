@@ -26,7 +26,7 @@ class DocumentProcessingService
             $record = Document::lockForUpdate()->findOrFail($document->id);
             Gate::forUser($user)->authorize('update', $record);
             $existing = ProcessingRun::find($record->{$kind.'_run_id'});
-            if ($existing && (in_array($existing->status, ['queued', 'running'], true) || ($kind === 'ocr' && $record->ocr_status === 'ready'))) {
+            if ($existing && (in_array($existing->status, ['queued', 'running', 'succeeded'], true) || ($kind === 'ocr' && $record->ocr_status === 'ready'))) {
                 return [$existing, false];
             }
             if ($kind === 'ai' && ($record->ocr_status !== 'ready' || ! trim($record->ocr_text ?? ''))) {
@@ -77,14 +77,14 @@ class DocumentProcessingService
         }, 3);
     }
 
-    private function settle(ProcessingRun $run, bool $success, ?string $error = null, bool $billable = true): void
+    private function settle(ProcessingRun $run, bool $success, ?string $error = null, bool $billable = true, bool $chargeAttempt = false): void
     {
         if (! in_array($run->status, ['queued', 'running'], true)) {
             return;
         }
         $usage = ProcessingUsage::where('workspace_id', $run->workspace_id)->where('period', $run->period)->lockForUpdate()->firstOrFail();
         $kind = $run->kind;
-        $usage->forceFill([$kind.'_reserved' => max(0, $usage->{$kind.'_reserved'} - $run->units), $kind.'_used' => $usage->{$kind.'_used'} + ($success && $billable ? $run->units : 0)])->save();
+        $usage->forceFill([$kind.'_reserved' => max(0, $usage->{$kind.'_reserved'} - $run->units), $kind.'_used' => $usage->{$kind.'_used'} + (($success && $billable) || $chargeAttempt ? $run->units : 0)])->save();
         $run->forceFill(['status' => $success ? 'succeeded' : 'failed', 'error_code' => $error, 'completed_at' => now(),
             'duration_ms' => $run->started_at ? max(0, (int) abs(now()->diffInMilliseconds($run->started_at))) : 0])->save();
         Document::withTrashed()->whereKey($run->document_id)->where($kind.'_run_id', $run->id)->update([$kind.'_status' => $success ? 'ready' : 'failed']);
@@ -153,7 +153,7 @@ class DocumentProcessingService
     public function cancel(Document $document): void
     {
         foreach (ProcessingRun::where('document_id', $document->id)->whereIn('status', ['queued', 'running'])->get() as $run) {
-            $this->settle($run, false, 'DOCUMENT_DELETED');
+            $this->settle($run, false, 'DOCUMENT_DELETED', chargeAttempt: $run->kind === 'ai' && $run->status === 'running');
         }
     }
 }

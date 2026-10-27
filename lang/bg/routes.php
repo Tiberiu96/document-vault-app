@@ -1,6 +1,8 @@
 <?php
 
 return [
+    'documents.scan' => 'dokumenti/skanirane',
+    'draft.discard' => 'otkaz-kachvane',
     'home' => '',
     'features' => 'funktsii',
     'pricing' => 'tseni',

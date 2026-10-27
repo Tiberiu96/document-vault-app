@@ -5,6 +5,7 @@ use App\Http\Controllers\AuthenticatedSessionController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\DocumentProcessingController;
+use App\Http\Controllers\DocumentScannerController;
 use App\Http\Controllers\LocalAiController;
 use App\Http\Controllers\PublicDiscoveryController;
 use App\Http\Controllers\PublicPageController;
@@ -50,6 +51,8 @@ Route::translate(function () {
             Route::post(Localizer::url('verification.send'), [AccountSecurityController::class, 'resend'])->name('verification.send');
             Route::middleware(['verified', EnsureActiveWorkspace::class])->group(function () {
                 Route::get(Localizer::url('documents'), [DocumentController::class, 'index'])->middleware('throttle:document.search')->name('documents.index');
+                Route::get(Localizer::url('documents.scan'), [DocumentScannerController::class, 'index'])->name('documents.scan');
+                Route::post(Localizer::url('documents.scan'), [DocumentScannerController::class, 'store'])->middleware('throttle:document.upload')->name('documents.scan-store');
                 Route::get(Localizer::url('documents.upload'), [DocumentController::class, 'create'])->name('documents.create');
                 Route::post(Localizer::url('documents'), [DocumentController::class, 'store'])->middleware('throttle:document.upload')->name('documents.store');
                 Route::post(Localizer::url('documents').'/{document}/'.Localizer::url('process').'/{kind}', [DocumentProcessingController::class, 'start'])->whereUuid('document')->where('kind', 'ocr|ai')->middleware('throttle:document.processing')->name('documents.process');
@@ -59,6 +62,7 @@ Route::translate(function () {
                 Route::get(Localizer::url('documents').'/{document}', [DocumentController::class, 'show'])->whereUuid('document')->name('documents.show');
                 Route::get(Localizer::url('documents').'/{document}/'.Localizer::url('edit'), [DocumentController::class, 'edit'])->whereUuid('document')->name('documents.edit');
                 Route::patch(Localizer::url('documents').'/{document}', [DocumentController::class, 'update'])->whereUuid('document')->name('documents.update');
+                Route::delete(Localizer::url('documents').'/{document}/'.Localizer::url('draft.discard'), [DocumentController::class, 'discard'])->whereUuid('document')->name('documents.discard');
                 Route::delete(Localizer::url('documents').'/{document}', [DocumentController::class, 'destroy'])->whereUuid('document')->name('documents.destroy');
                 Route::get(Localizer::url('documents').'/{document}/'.Localizer::url('preview'), [DocumentController::class, 'file'])->whereUuid('document')->name('documents.preview');
                 Route::get(Localizer::url('documents').'/{document}/'.Localizer::url('download'), [DocumentController::class, 'file'])->whereUuid('document')->defaults('download', true)->name('documents.download');
