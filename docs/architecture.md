@@ -1,0 +1,62 @@
+# Arhitectura si checkpoint
+
+Etapa curenta: Laravel 13.39.0 si pachetele sunt integrate, cu migrari executabile pentru users/workspaces/companies/memberships, tokenuri Sanctum si comanda admin. Schema si controalele initiale au teste SQLite; migrarile MySQL, conexiunile MySQL/Redis, constrangerea de unicitate personala si cache/lock Redis sunt verificate local. Interfata publica/demo si login/logout cu panou privat sunt implementate. WorkspacePolicy protejeaza lista spatiilor; inregistrarea PF/PJ, MFA si documentele reale urmeaza.
+
+Monolit Laravel pentru web/API/joburi, cu mobil separat. Folosim conventiile frameworkului si servicii de domeniu pentru operatii complexe. Nu introducem microservicii.
+
+## Structura propusa
+
+```text
+app/
+  Actions/{Auth,Workspaces,Documents,Admin}/
+  Console/Commands/
+  Contracts/{Ocr,Ai,ExchangeRates}/
+  Enums/
+  Http/{Controllers,Middleware,Requests,Resources}/
+  Jobs/{Documents,Notifications,Maintenance}/
+  Livewire/{Public,Workspace,Admin}/
+  Models/
+  Notifications/
+  Policies/
+  Services/{Documents,Quotas,Ocr,Ai,ExchangeRates,Analytics}/
+bootstrap/  config/  database/{factories,migrations,seeders}/
+lang/{ro,en,hu}/
+resources/{css,views/components,views/layouts}/
+routes/{web,admin,api,console}.php
+storage/app/private/
+tests/{Feature,Unit}/
+mobile/                 # creat doar la etapa 9
+docs/
+```
+
+Crearea directoarelor de domeniu se face cand exista cod care le foloseste.
+
+## Migrari initiale implementate
+
+| Tabel | Coloane si constrangeri |
+| --- | --- |
+| users | id bigint PK, name varchar(255), email varchar(255) unique normalizat, email_verified_at nullable, password hash varchar(255), is_super_admin bool default false, remember_token nullable, timestamps |
+| workspaces | id bigint PK, owner_id FK users restrict delete, type enum personal/business, name varchar(255), personal_owner_id generat unique, timestamps; index owner_id/type |
+| companies | id bigint PK, workspace_id FK workspaces unique restrict delete, legal_name, cui normalizat, registration_number, registered_address (date structurate), country_code char(2), timestamps |
+| memberships | id bigint PK, workspace_id FK workspaces cascade, user_id FK users cascade, role enum owner/admin/member/accountant, timestamps; unique(workspace_id,user_id), index(user_id,workspace_id) |
+
+Ordine up: users, workspaces, companies, memberships; down in ordine inversa. Sesiunile, resetarea parolelor, cache/jobs/failed_jobs folosesc migrarile oficiale Laravel adaptate; nu duplica migrarea users a scheletului. Tokenurile Sanctum provin din migrarea pachetului, copiata in proiect.
+
+Unicitatea unui workspace personal per utilizator foloseste personal_owner_id generat din owner_id numai pentru type=personal, cu index unic (testat SQLite si MySQL; testarea concurentei reale urmeaza); nu impune unique(owner_id,type), care ar interzice mai multe firme. Ownerul are membership owner creat in aceeasi tranzactie. Schimbarea proprietarului si iesirea ultimului owner cer workflow atomic. Datele companiei apartin numai unui workspace business; CUI validat server-side, fara integrare ANAF presupusa. Stergerea contului/workspaceului necesita workflow de retentie, nu stergere accidentala a documentelor.
+
+Rolul global nu este mass-assignable. Nu exista bypass global automat pentru accesul la documente private; operatiile suport cer autorizare explicita si audit.
+
+PF: tranzactie user + personal + owner membership. PJ: aceeasi tranzactie plus business + company + owner membership. Idempotenta si rollback complet la eroare.
+
+## Ordinea livrarilor
+
+1. Runtime si servicii confirmate, Laravel/lockfile, migrari, comanda admin, teste fundatie.
+2. Design/Blade/Livewire, localizare si structura limbilor; SEO al primei pagini publice.
+3. Autentificare/PF/PJ/policies/izolare.
+4. Documente private/categorii/cote; apoi OCR, AI optional, notificari, moneda/abonamente, mobil, validare SEO/analytics si hardening.
+
+Nu sunt necesare conturi AI, Firebase, plati, analytics sau hosting la instalarea runtime-ului.
+
+Relatiile Eloquent sunt pregatite; regulile company numai pe business, creare atomica PF/PJ si membership owner sincronizat se vor implementa in actiunile etapei 3. Nu exista inca endpointuri pentru aceste operatii.
+
+Checkpoint web/auth si structura limbilor sunt livrate conform web-foundation.md. Git este autorizat de utilizator pentru commit/push; .env, runtime si dependentele instalate raman excluse.

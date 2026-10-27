@@ -1,0 +1,22 @@
+<?php
+
+return [
+    'welcome' => 'Bine ai venit acasa.',
+    'intro' => 'Lucrurile importante merita un loc al lor. Conecteaza-te pentru a reveni in spatiul tau.',
+    'your_space' => 'SPATIUL TAU, IN ORDINE',
+    'form_intro' => 'Introdu datele contului tau pentru a continua.',
+    'email' => 'Adresa de email',
+    'password' => 'Parola',
+    'remember' => 'Pastreaza-ma conectat',
+    'failed' => 'Datele de autentificare sunt incorecte.',
+    'password_mismatch' => 'Parola este incorecta.',
+    'throttle' => 'Prea multe incercari. Reincearca peste :seconds secunde.',
+    'help' => 'Acces pentru conturile existente. Inregistrarea persoanelor fizice si firmelor va fi disponibila intr-o etapa urmatoare.',
+    'hello' => 'Bine ai venit, :name.',
+    'account_intro' => 'Acesta este spatiul tau. Aici vor fi organizate documentele si activitatile tale.',
+    'no_workspace' => 'Niciun spatiu de lucru, deocamdata.',
+    'empty_text' => 'Contul tau este conectat. Spatiile personale si business vor putea fi create odata cu lansarea inregistrarii. Intre timp, poti explora demo-ul.',
+    'personal' => 'Spatiu personal',
+    'business' => 'Spatiu business',
+    'workspace_note' => 'Gestionarea documentelor va fi disponibila intr-o etapa urmatoare.',
+];
