@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'auto_ai_hint' => 'Az elemzés ezen a laptopon marad. Ha csak OCR-t és kézi adatbevitelt szeretnél, vedd ki a jelölést.',
+    'auto_ai_hint' => 'Az AI a dokumentum alapján javasol adatokat. Mentés előtt ellenőrizd a javaslatokat. Kézi kitöltéshez vedd ki a jelölést.',
     'uploading' => 'A dokumentum feltöltése folyamatban. Ne zárd be az oldalt.',
     'checking' => 'Az eredeti mentve van. Az állapot automatikusan frissül.',
     'slow' => 'A helyi modell több időt igényelhet, különösen az első elemzésnél. Később visszatérhetsz; a feldolgozás folytatódik.',
@@ -21,7 +21,7 @@ return [
     'stale' => 'A dokumentum időközben megváltozott. Töltsd újra az oldalt, és ellenőrizd a mezőket.',
     'queued_notice' => 'A kérés sorba került.',
     'manual_review' => 'Kézi ellenőrzés szükséges',
-    'auto_ai' => 'Helyi AI-elemzés az OCR után (opcionális)',
+    'auto_ai' => 'AI-elemzés az OCR után (opcionális)',
     'review' => 'Javaslatok ellenőrzése',
     'review_hint' => 'Ezek AI-javaslatok, nem megerősített tények. Javítsd őket, és csak a dokumentum ellenőrzése után ments.',
     'partial' => 'Hosszú dokumentum: a javaslatok az elejéről és végéről vett részletekre épülnek, nem a teljes szövegre.',

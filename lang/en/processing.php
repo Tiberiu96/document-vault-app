@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'auto_ai_hint' => 'Analysis stays on this laptop. Uncheck for OCR and manual entry only.',
+    'auto_ai_hint' => 'AI suggests information based on the document. Review suggestions before saving. Uncheck for manual entry.',
     'uploading' => 'Uploading the document. Keep this page open.',
     'checking' => 'Your original is saved. Progress updates automatically.',
     'slow' => 'The local model may take longer, especially on the first analysis. You can return later; processing continues.',
@@ -21,7 +21,7 @@ return [
     'stale' => 'The document changed in the meantime. Reload and review the fields again.',
     'queued_notice' => 'The request has been queued.',
     'manual_review' => 'Manual review required',
-    'auto_ai' => 'Analyse locally with AI after OCR (optional)',
+    'auto_ai' => 'Analyse with AI after OCR (optional)',
     'review' => 'Review suggestions',
     'review_hint' => 'These fields are AI suggestions, not confirmed facts. Correct them and save only after checking the document.',
     'partial' => 'Long document: suggestions use excerpts from the beginning and end, not the full document.',

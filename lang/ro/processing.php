@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'auto_ai_hint' => 'Analiza ramane pe acest laptop. Debifeaza daca doresti doar OCR si completare manuala.',
+    'auto_ai_hint' => 'AI propune informatii pe baza documentului. Verifica sugestiile inainte de salvare. Debifeaza pentru completare manuala.',
     'uploading' => 'Se incarca documentul. Nu inchide pagina.',
     'checking' => 'Originalul este pastrat. Verificam progresul automat.',
     'slow' => 'Modelul local poate avea nevoie de mai mult timp, mai ales la prima analiza. Poti reveni ulterior; procesarea continua.',
@@ -21,7 +21,7 @@ return [
     'stale' => 'Documentul s-a modificat intre timp. Reincarca pagina si verifica din nou campurile.',
     'queued_notice' => 'Cererea a fost pusa in coada.',
     'manual_review' => 'Necesita verificare manuala',
-    'auto_ai' => 'Analizeaza local cu AI dupa OCR (optional)',
+    'auto_ai' => 'Analizeaza cu AI dupa OCR (optional)',
     'review' => 'Verifica sugestiile',
     'review_hint' => 'Aceste campuri sunt propuneri AI, nu date confirmate. Corecteaza-le si salveaza numai dupa verificarea documentului.',
     'partial' => 'Document lung: propunerile folosesc un extras de la inceputul si finalul textului, nu intregul document.',
