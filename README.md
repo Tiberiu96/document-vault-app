@@ -61,3 +61,5 @@ Reguli permanente: [AGENTS.md](AGENTS.md). Arhitectura: [docs/architecture.md](d
 Inregistrare si izolarea spatiilor: [docs/registration.md](docs/registration.md). Autentificare GitHub/push: [docs/github.md](docs/github.md). Pentru documentele private nu executa storage:link.
 
 Bulgara: [pagina publica](http://vaulty.test:8000/bg), [inregistrare](http://vaulty.test:8000/bg/registratsiya), [autentificare](http://vaulty.test:8000/bg/vhod). Textul functional are minimum 16px; antetul mobil are meniu compact si icon de profil. Vizualizarea directa prin instrumentul browser ramane blocata, chiar daca interfata setarilor arata Always allow.
+
+Emailuri de cont: [confirmare/resetare si securitate](docs/account-email.md), [Mailpit si servicii locale](docs/integrations.md). Notificarile folosesc Redis/high si Horizon.

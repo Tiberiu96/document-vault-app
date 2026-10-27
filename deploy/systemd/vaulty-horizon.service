@@ -1,0 +1,18 @@
+[Unit]
+Description=Vaulty local Redis workers (Laravel Horizon)
+After=network.target vaulty-mailpit.service
+
+[Service]
+WorkingDirectory=/var/www/document-vault-app
+ExecStart=/usr/bin/php /var/www/document-vault-app/artisan horizon
+Restart=always
+RestartSec=5
+TimeoutStopSec=330
+KillSignal=SIGTERM
+UMask=0077
+NoNewPrivileges=true
+StandardOutput=null
+StandardError=journal
+
+[Install]
+WantedBy=default.target

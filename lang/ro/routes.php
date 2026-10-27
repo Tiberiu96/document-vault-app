@@ -11,4 +11,9 @@ return [
     'logout' => 'deconectare',
     'register' => 'inregistrare',
     'workspace.switch' => 'spatii/selecteaza',
+    'password.request' => 'parola-uitata',
+    'password.reset' => 'resetare-parola',
+    'verification.notice' => 'verifica-email',
+    'verification.verify' => 'confirmare-email',
+    'verification.send' => 'retrimite-confirmarea',
 ];

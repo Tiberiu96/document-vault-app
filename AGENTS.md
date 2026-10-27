@@ -33,3 +33,5 @@ Referintele vizuale pentru interfata sunt in design-layouts/: citeste README.md 
 Git este autorizat de utilizator pentru acest proiect. Pastreaza composer.json/composer.lock in istoric; ignora .env, vendor, credentiale, DB locale, loguri si runtime storage. Verifica fisierele staged pentru secrete inainte de commit/push.
 
 UI: textul functional trebuie sa aiba minimum 16px (inclusiv navigatie, formulare si butoane). Miniatura ilustrativa a produsului poate pastra text proportional cu scara sa. Antetul mobil foloseste logo, login/profil si meniu compact; accesul la cont este un icon circular discret, cu aria-label si title localizate.
+
+Emailuri de cont (confirmare/resetare/alerta parola): notificari asincrone pe high, afterCommit, payload criptat; linkuri numai din APP_URL si limba pastrata in job. Mailpit exclusiv local, loopback, nu este provider de productie. Nu loga URI/query care contin tokenuri de autentificare.

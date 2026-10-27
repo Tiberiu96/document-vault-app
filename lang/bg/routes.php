@@ -11,4 +11,9 @@ return [
     'logout' => 'izhod',
     'register' => 'registratsiya',
     'workspace.switch' => 'prostranstva/izbor',
+    'password.request' => 'zabravena-parola',
+    'password.reset' => 'nova-parola',
+    'verification.notice' => 'proverka-imeyl',
+    'verification.verify' => 'potvardi-imeyl',
+    'verification.send' => 'izprati-potvarzhdenie',
 ];

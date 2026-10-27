@@ -10,7 +10,7 @@ PJ: denumire, CUI numeric de 2–10 cifre (prefix RO acceptat la introducere), n
 
 RegisterUser creeaza intr-o singura tranzactie user + personal workspace + owner membership. PJ adauga business workspace, company si owner membership in aceeasi tranzactie. Orice esec anuleaza toate aceste inregistrari. Emailul are index unic pentru a preveni duplicate la retry/concurenta; testele nu pretind o proba HTTP simultana. Rolurile, owner_id, is_super_admin si email_verified_at din input sunt ignorate.
 
-Dupa commit se emite Registered, se autentifica userul si se regenereaza sesiunea. Spatiul initial este personal pentru PF si business pentru PJ. Registered nu trimite email in starea actuala: User nu implementeaza inca MustVerifyEmail, iar providerul nu este configurat. email_verified_at ramane null; nu pretindem email verificat sau mesaj trimis.
+Dupa commit se emite Registered, se autentifica userul si se regenereaza sesiunea. Spatiul initial este personal pentru PF si business pentru PJ. User implementeaza MustVerifyEmail; Registered trimite acum notificarea de confirmare in Redis/high. email_verified_at ramane null pana la confirmarea linkului semnat. Mailpit local si workerul Horizon sunt configurate si verificate; vezi account-email.md.
 
 Limitare beta configurabila: 3 cereri POST/ora per IP, comuna limbilor, in config/vault.php. Include input invalid pentru protectie la abuz; honeypot suplimentar, fara CAPTCHA extern. Raspuns 429 cu Retry-After si formular localizat.
 
@@ -26,7 +26,7 @@ Build: composer run css:build. Verificarea vizuala in browser ramane blocata de 
 
 ## Urmatorul pas
 
-Verificarea emailului si resetarea parolei necesita configurarea ghidata a unui transport de email si testarea livrarii. MAIL_MAILER=array ramane local fara livrare. MFA si interfata admin raman in asteptare; documentele reale si limitele lor urmeaza in etapa 4.
+Verificarea emailului si resetarea parolei sunt livrate prin Mailpit local. Providerul real pentru beta necesita configurare ghidata separata. MFA si interfata admin raman in asteptare; documentele reale si limitele lor urmeaza in etapa 4.
 
 Stocarea documentelor va folosi discul local privat in storage/app/private, cu chei de tip workspaces/{id}/documents/{uuid}/original.ext, originalele pastrate si metadata in DB. Fara storage:link pentru documente. Descarcarile vor trece prin auth, selectarea/izolarea workspaceului si Policy. public/storage ar fi doar pentru continut public explicit. Continutul storage si backupurile sunt excluse din Git; doar structura .gitignore este versionata.
 

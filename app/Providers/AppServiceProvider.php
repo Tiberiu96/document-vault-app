@@ -26,6 +26,14 @@ class AppServiceProvider extends ServiceProvider
     {
         // Inchidere explicita inclusiv in local, pana la autentificare + MFA.
         Horizon::auth(fn (Request $request): bool => false);
+        RateLimiter::for('password.email', function (Request $request) {
+            $email = is_string($request->input('email')) ? mb_strtolower(trim($request->input('email'))) : '';
+
+            return [Limit::perHour(3)->by('reset-account:'.hash('sha256', $email)), Limit::perHour(20)->by('reset-ip:'.hash('sha256', (string) $request->ip()))];
+        });
+        RateLimiter::for('password.reset', fn (Request $request) => Limit::perMinute(10)->by($request->ip()));
+        RateLimiter::for('verification.verify', fn (Request $request) => Limit::perMinute(10)->by($request->user()->id));
+        RateLimiter::for('verification.send', fn (Request $request) => [Limit::perMinute(1)->by('resend-minute:'.$request->user()->id), Limit::perHour(6)->by('resend-hour:'.$request->user()->id)]);
         RateLimiter::for('admin', fn (Request $request) => Limit::perMinute(30)->by($request->ip()));
         RateLimiter::for('demo', fn (Request $request) => Limit::perMinute(60)->by($request->ip()));
         RateLimiter::for('registration', fn (Request $request) => Limit::perHour(config('vault.rate_limits.registration_per_hour'))

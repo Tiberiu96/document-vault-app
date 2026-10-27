@@ -6,7 +6,7 @@ Pagina publica si demo-ul pornesc de la cele sase referinte din design-layouts/,
 
 Pagina publica descrie directia produsului si stadiul dezvoltarii. Fara testimoniale, statistici, preturi sau disponibilitate in magazine inventate. Demo-ul foloseste numai patru documente fictive, fara upload si fara scriere de documente in baza. Cautarea foloseste Form Request, escaping si limita de 60/minut per IP. Nu confunda demo-ul cu panoul real.
 
-Loginul este accesibil din antet si prin /ro/autentificare, /en/login, /hu/bejelentkezes. Panoul real este /ro/panou, /en/dashboard, /hu/iranyitopult, cu auth si noindex. Logout numai POST cu CSRF. Inregistrarea PF/PJ a fost adaugata in checkpointul registration.md. Nu exista inca resetare/verificare prin email; providerul de email trebuie configurat ghidat inainte de livrare reala.
+Loginul este accesibil din antet si prin /ro/autentificare, /en/login, /hu/bejelentkezes. Panoul real este /ro/panou, /en/dashboard, /hu/iranyitopult, cu auth si noindex. Logout numai POST cu CSRF. Inregistrarea PF/PJ a fost adaugata in checkpointul registration.md. Resetarea si verificarea emailului sunt acum disponibile, vezi account-email.md. Transportul local Mailpit este verificat; livrarea pe internet necesita configurarea unui provider.
 
 Autentificarea normalizeaza emailul, foloseste hashurile Laravel si regenereaza sesiunea la succes. Limite: 5 esecuri/minut per cont, agregate intre IP-uri, si 20 esecuri/minut per IP; cheile de rate limit contin hashuri, nu emailuri. Lockout HTTP 429 cu Retry-After; mesaj generic pentru credentiale gresite. Parola nu este pastrata in old input. Logout invalideaza sesiunea si regenereaza tokenul CSRF. Panoul arata numai membershipurile autorizate prin WorkspacePolicy; conturile globale nu primesc bypass pentru spatii personale straine.
 
@@ -48,4 +48,4 @@ DM Serif Display si DM Sans sunt gazduite local, cu licente SIL OFL incluse. Sur
 
 Verificarea vizuala automata in browser a ramas blocata de o permisiune salvata a domeniului, inclusiv dupa confirmarea utilizatorului de a repermite accesul. Nu este raportata ca efectuata. Captura furnizata de utilizator a fost folosita pentru identificarea defectului de traduceri. CSS contine breakpoints responsive; verificarea vizuala desktop/mobil ramane necesara dupa deblocarea browserului.
 
-Inregistrarea PF/PJ si actiunile tranzactionale sunt acum livrate (registration.md). Urmeaza verificarea emailului, MFA admin si managementul complet al limbilor/documentelor. Configureaza ghidat emailul inaintea livrarii reale de mesaje; nu afisa credentiale.
+Inregistrarea PF/PJ si actiunile tranzactionale sunt acum livrate (registration.md). Verificarea emailului este livrata; urmeaza MFA admin si managementul complet al limbilor/documentelor. Configureaza ghidat emailul inaintea livrarii reale de mesaje; nu afisa credentiale.

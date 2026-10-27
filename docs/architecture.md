@@ -1,6 +1,6 @@
 # Arhitectura si checkpoint
 
-Etapa curenta: Laravel 13.39.0 si pachetele sunt integrate, cu migrari executabile pentru users/workspaces/companies/memberships, tokenuri Sanctum si comanda admin. Schema si controalele initiale au teste SQLite; migrarile MySQL, conexiunile MySQL/Redis, constrangerea de unicitate personala si cache/lock Redis sunt verificate local. Interfata publica/demo si login/logout cu panou privat sunt implementate. WorkspacePolicy protejeaza lista spatiilor; inregistrarea PF/PJ si selectarea spatiului sunt livrate; verificarea emailului, MFA si documentele reale urmeaza.
+Etapa curenta: Laravel 13.39.0 si pachetele sunt integrate, cu migrari executabile pentru users/workspaces/companies/memberships, tokenuri Sanctum si comanda admin. Schema si controalele initiale au teste SQLite; migrarile MySQL, conexiunile MySQL/Redis, constrangerea de unicitate personala si cache/lock Redis sunt verificate local. Interfata publica/demo si login/logout cu panou privat sunt implementate. WorkspacePolicy protejeaza lista spatiilor; inregistrarea PF/PJ si selectarea spatiului sunt livrate; confirmarea emailului si resetarea parolei sunt implementate prin Redis/high si Mailpit local; MFA si documentele reale urmeaza.
 
 Monolit Laravel pentru web/API/joburi, cu mobil separat. Folosim conventiile frameworkului si servicii de domeniu pentru operatii complexe. Nu introducem microservicii.
 
@@ -20,7 +20,7 @@ app/
   Policies/
   Services/{Documents,Quotas,Ocr,Ai,ExchangeRates,Analytics}/
 bootstrap/  config/  database/{factories,migrations,seeders}/
-lang/{ro,en,hu}/
+lang/{ro,en,hu,bg}/
 resources/{css,views/components,views/layouts}/
 routes/{web,admin,api,console}.php
 storage/app/private/

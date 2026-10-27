@@ -1,0 +1,13 @@
+[Unit]
+Description=Vaulty local Mailpit inbox
+After=network.target
+
+[Service]
+ExecStart=%h/.local/bin/mailpit --listen 127.0.0.1:8025 --smtp 127.0.0.1:1025 --database %h/.local/share/vaulty-mailpit/mailpit.db --max 200
+Restart=on-failure
+RestartSec=5
+UMask=0077
+NoNewPrivileges=true
+
+[Install]
+WantedBy=default.target

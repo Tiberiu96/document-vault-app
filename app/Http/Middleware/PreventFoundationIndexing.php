@@ -16,6 +16,11 @@ class PreventFoundationIndexing
             $response->headers->set('X-Robots-Tag', 'noindex, nofollow');
         }
 
+        if (str_contains((string) $request->route()?->getName(), 'password.') || str_contains((string) $request->route()?->getName(), 'verification.')) {
+            $response->headers->set('Referrer-Policy', 'no-referrer');
+            $response->headers->set('Cache-Control', 'no-store, private');
+        }
+
         return $response;
     }
 }

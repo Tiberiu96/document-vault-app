@@ -5,16 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     @php
         $brand = config('app.name');
-        $title = __('site.seo.'.$page.'.title').' — '.$brand;
-        $description = __('site.seo.'.$page.'.description');
-        $slug = __('routes.'.$page);
+        $title = ($page === 'security' ? __('account_mail.security_title') : __('site.seo.'.$page.'.title')).' — '.$brand;
+        $description = $page === 'security' ? __('account_mail.security_description') : __('site.seo.'.$page.'.description');
+        $slug = $page === 'security' ? '' : __('routes.'.$page);
         $canonical = rtrim(config('app.url'), '/').'/'.app()->getLocale().($slug ? '/'.$slug : '');
         $canIndex = app()->environment('production') && $indexable;
     @endphp
     <title>{{ $title }}</title>
     <meta name="description" content="{{ $description }}">
     <meta name="robots" content="{{ $canIndex ? 'index, follow' : 'noindex, nofollow' }}">
-    <link rel="canonical" href="{{ $canonical }}">
+    @if($page !== 'security')<link rel="canonical" href="{{ $canonical }}">@endif
     @if($indexable)
         @foreach($languages as $language)
             @php($alternateSlug = trans('routes.'.$page, [], $language->locale))
