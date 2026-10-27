@@ -12,6 +12,7 @@ return [
         'login' => 'Log in',
         'account' => 'My account',
         'logout' => 'Log out',
+        'register' => 'Create account',
     ],
     'hero' => [
         'kicker' => 'LESS CLUTTER. MORE PEACE OF MIND.',
@@ -101,13 +102,13 @@ always within reach.',
     'faq' => [
         'title' => 'A few things, explained.',
         'q1' => 'Can I upload documents already?',
-        'a1' => 'Not yet. This version contains the product overview, login for existing accounts and a demo with fictional data. Uploads and registration will arrive in subsequent stages.',
+        'a1' => 'Registration and login are available. Document uploads will arrive in a subsequent stage; the demo uses only fictional data.',
         'q2' => 'Will AI be required?',
         'a2' => 'No. AI analysis will be optional. Suggested information will be available for manual review and correction.',
         'q3' => 'Will there be a mobile app?',
         'a3' => 'Android and iOS apps are planned. For now, explore the responsive web demo, including on your phone.',
         'q4' => 'Which languages are available?',
-        'a4' => 'The public interface is available in Romanian, English and Hungarian. Your document language will remain independent of the interface language.',
+        'a4' => 'The interface is available in Romanian, English, Hungarian and Bulgarian. Document language remains independent of interface language.',
     ],
     'demo' => [
         'title' => 'Your documents',
@@ -165,6 +166,10 @@ always within reach.',
         'dashboard' => [
             'title' => 'My account',
             'description' => 'My account',
+        ],
+        'register' => [
+            'title' => 'Create account',
+            'description' => 'Create your account and a space for the documents that matter. Personal or business, it starts simply.',
         ],
     ],
 ];

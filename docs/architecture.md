@@ -1,6 +1,6 @@
 # Arhitectura si checkpoint
 
-Etapa curenta: Laravel 13.39.0 si pachetele sunt integrate, cu migrari executabile pentru users/workspaces/companies/memberships, tokenuri Sanctum si comanda admin. Schema si controalele initiale au teste SQLite; migrarile MySQL, conexiunile MySQL/Redis, constrangerea de unicitate personala si cache/lock Redis sunt verificate local. Interfata publica/demo si login/logout cu panou privat sunt implementate. WorkspacePolicy protejeaza lista spatiilor; inregistrarea PF/PJ, MFA si documentele reale urmeaza.
+Etapa curenta: Laravel 13.39.0 si pachetele sunt integrate, cu migrari executabile pentru users/workspaces/companies/memberships, tokenuri Sanctum si comanda admin. Schema si controalele initiale au teste SQLite; migrarile MySQL, conexiunile MySQL/Redis, constrangerea de unicitate personala si cache/lock Redis sunt verificate local. Interfata publica/demo si login/logout cu panou privat sunt implementate. WorkspacePolicy protejeaza lista spatiilor; inregistrarea PF/PJ si selectarea spatiului sunt livrate; verificarea emailului, MFA si documentele reale urmeaza.
 
 Monolit Laravel pentru web/API/joburi, cu mobil separat. Folosim conventiile frameworkului si servicii de domeniu pentru operatii complexe. Nu introducem microservicii.
 
@@ -57,6 +57,6 @@ PF: tranzactie user + personal + owner membership. PJ: aceeasi tranzactie plus b
 
 Nu sunt necesare conturi AI, Firebase, plati, analytics sau hosting la instalarea runtime-ului.
 
-Relatiile Eloquent sunt pregatite; regulile company numai pe business, creare atomica PF/PJ si membership owner sincronizat se vor implementa in actiunile etapei 3. Nu exista inca endpointuri pentru aceste operatii.
+RegisterRequest/RegisterUser implementeaza company numai pe business, creare atomica PF/PJ si membership owner sincronizat. Endpointurile localizate de inregistrare si selectare a spatiului sunt livrate; detalii in registration.md.
 
 Checkpoint web/auth si structura limbilor sunt livrate conform web-foundation.md. Git este autorizat de utilizator pentru commit/push; .env, runtime si dependentele instalate raman excluse.

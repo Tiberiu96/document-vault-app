@@ -26,7 +26,7 @@ class PublicPagesTest extends TestCase
 
     public function test_all_public_pages_and_translated_slugs_render_in_their_locale(): void
     {
-        foreach (['ro' => ['functionalitati', 'preturi', 'intrebari-frecvente'], 'en' => ['features', 'pricing', 'faq'], 'hu' => ['funkciok', 'arak', 'gyakori-kerdesek']] as $locale => $slugs) {
+        foreach (['ro' => ['functionalitati', 'preturi', 'intrebari-frecvente'], 'en' => ['features', 'pricing', 'faq'], 'hu' => ['funkciok', 'arak', 'gyakori-kerdesek'], 'bg' => ['funktsii', 'tseni', 'chesto-zadavani-vaprosi']] as $locale => $slugs) {
             foreach (['', ...$slugs] as $slug) {
                 $response = $this->get('/'.$locale.($slug ? '/'.$slug : ''));
                 $response->assertOk()->assertSee('lang="'.$locale.'"', false)->assertSee(config('app.name'));
@@ -75,7 +75,7 @@ class PublicPagesTest extends TestCase
         $response = $this->get('/sitemap.xml')->assertOk()->assertHeader('Content-Type', 'application/xml; charset=UTF-8');
         $xml = simplexml_load_string($response->getContent());
         $this->assertNotFalse($xml);
-        $this->assertCount(12, $xml->url);
+        $this->assertCount(16, $xml->url);
         foreach (['/admin', '/api', '/demo', '/up'] as $private) {
             $response->assertDontSee($private);
         }
@@ -115,7 +115,7 @@ class PublicPagesTest extends TestCase
     {
         Language::where('locale', 'hu')->update(['is_active' => false]);
         $this->seed(LanguageSeeder::class);
-        $this->assertDatabaseCount('languages', 3);
+        $this->assertDatabaseCount('languages', 4);
         $this->assertFalse(Language::where('locale', 'hu')->first()->is_active);
     }
 

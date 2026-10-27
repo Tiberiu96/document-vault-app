@@ -12,6 +12,7 @@ return [
         'login' => 'Autentificare',
         'account' => 'Contul meu',
         'logout' => 'Deconectare',
+        'register' => 'Creeaza cont',
     ],
     'hero' => [
         'kicker' => 'MAI MULTA ORDINE. MAI MULTA LINISTE.',
@@ -101,13 +102,13 @@ intotdeauna la indemana.',
     'faq' => [
         'title' => 'Cateva lucruri, pe scurt.',
         'q1' => 'Pot incarca deja documente?',
-        'a1' => 'Nu inca. Versiunea actuala contine prezentarea produsului, autentificarea conturilor existente si un demo cu date fictive. Incarcarea si inregistrarea vor fi livrate in etapele urmatoare.',
+        'a1' => 'Inregistrarea si autentificarea sunt disponibile. Uploadul documentelor urmeaza intr-o etapa viitoare; demo-ul foloseste doar date fictive.',
         'q2' => 'Va fi obligatorie folosirea AI?',
         'a2' => 'Nu. Analiza AI va fi optionala. Informatiile propuse vor putea fi verificate si corectate manual.',
         'q3' => 'Va exista aplicatie pentru telefon?',
         'a3' => 'Aplicatiile Android si iOS sunt planificate. Deocamdata poti explora demo-ul web, inclusiv de pe telefon.',
         'q4' => 'Ce limbi sunt disponibile?',
-        'a4' => 'Interfata de prezentare este disponibila in romana, engleza si maghiara. Limba documentelor tale va ramane independenta de limba interfetei.',
+        'a4' => 'Interfata este disponibila in romana, engleza, maghiara si bulgara. Limba documentelor ramane independenta de limba interfetei.',
     ],
     'demo' => [
         'title' => 'Documentele tale',
@@ -165,6 +166,10 @@ intotdeauna la indemana.',
         'dashboard' => [
             'title' => 'Contul meu',
             'description' => 'Contul meu',
+        ],
+        'register' => [
+            'title' => 'Creeaza cont',
+            'description' => 'Creeaza-ti contul si un spatiu pentru documentele care conteaza. Personal sau business, totul incepe simplu.',
         ],
     ],
 ];

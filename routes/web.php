@@ -4,6 +4,8 @@ use App\Http\Controllers\AuthenticatedSessionController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PublicDiscoveryController;
 use App\Http\Controllers\PublicPageController;
+use App\Http\Controllers\RegisteredUserController;
+use App\Http\Controllers\SwitchWorkspaceController;
 use App\Http\Middleware\EnsureAvailableLanguage;
 use App\Services\LanguageCatalog;
 use Illuminate\Support\Facades\Route;
@@ -23,10 +25,13 @@ Route::translate(function () {
         Route::middleware('guest')->group(function () {
             Route::get(Localizer::url('login'), [AuthenticatedSessionController::class, 'create'])->name('login');
             Route::post(Localizer::url('login'), [AuthenticatedSessionController::class, 'store'])->name('login.store');
+            Route::get(Localizer::url('register'), [RegisteredUserController::class, 'create'])->name('register');
+            Route::post(Localizer::url('register'), [RegisteredUserController::class, 'store'])->middleware('throttle:registration')->name('register.store');
         });
         Route::middleware('auth')->group(function () {
             Route::get(Localizer::url('dashboard'), DashboardController::class)->name('dashboard');
             Route::post(Localizer::url('logout'), [AuthenticatedSessionController::class, 'destroy'])->name('logout');
+            Route::post(Localizer::url('workspace.switch'), SwitchWorkspaceController::class)->name('workspace.switch');
         });
     });
 });

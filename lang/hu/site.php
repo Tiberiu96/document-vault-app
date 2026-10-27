@@ -12,6 +12,7 @@ return [
         'login' => 'Bejelentkezés',
         'account' => 'Fiókom',
         'logout' => 'Kijelentkezés',
+        'register' => 'Fiók létrehozása',
     ],
     'hero' => [
         'kicker' => 'KEVESEBB KÁOSZ. TÖBB NYUGALOM.',
@@ -101,13 +102,13 @@ mindig kéznél.',
     'faq' => [
         'title' => 'Néhány dolog, röviden.',
         'q1' => 'Már feltölthetek dokumentumokat?',
-        'a1' => 'Még nem. A jelenlegi verzió a termék bemutatását, a meglévő fiókok bejelentkezését és egy fiktív adatokat használó bemutatót tartalmaz. A feltöltés és a regisztráció későbbi szakaszokban érkeznek.',
+        'a1' => 'A regisztráció és a bejelentkezés már elérhető. A dokumentumfeltöltés későbbi szakaszban érkezik; a bemutató csak fiktív adatokat használ.',
         'q2' => 'Kötelező lesz az AI használata?',
         'a2' => 'Nem. Az AI-elemzés választható lesz. A javasolt információk kézzel ellenőrizhetők és javíthatók lesznek.',
         'q3' => 'Lesz mobilalkalmazás?',
         'a3' => 'Android- és iOS-alkalmazásokat tervezünk. Addig a reszponzív webes bemutatót telefonon is felfedezheted.',
         'q4' => 'Milyen nyelvek érhetők el?',
-        'a4' => 'A nyilvános felület románul, angolul és magyarul érhető el. A dokumentumok nyelve független marad a felület nyelvétől.',
+        'a4' => 'A felület románul, angolul, magyarul és bolgárul érhető el. A dokumentumok nyelve független a felület nyelvétől.',
     ],
     'demo' => [
         'title' => 'A dokumentumaid',
@@ -165,6 +166,10 @@ mindig kéznél.',
         'dashboard' => [
             'title' => 'Fiókom',
             'description' => 'Fiókom',
+        ],
+        'register' => [
+            'title' => 'Fiók létrehozása',
+            'description' => 'Hozd létre fiókodat és egy helyet a fontos dokumentumoknak. Személyes vagy üzleti célra, egyszerűen.',
         ],
     ],
 ];

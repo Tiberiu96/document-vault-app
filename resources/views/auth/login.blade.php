@@ -11,7 +11,7 @@
             <label class="remember"><input type="checkbox" name="remember" value="1">{{ __('auth.remember') }}</label>
             <x-button type="submit" icon="arrow">{{ __('site.nav.login') }}</x-button>
         </form>
-        <p class="auth-help">{{ __('auth.help') }}</p><a class="text-link" href="{{ route('demo') }}">{{ __('site.nav.demo') }} <x-icon name="arrow" :size="16"/></a>
+        <p class="auth-help">{{ __('registration.no_account') }} <a class="inline-link" href="{{ route('register') }}">{{ __('registration.create') }}</a></p><a class="text-link" href="{{ route('demo') }}">{{ __('site.nav.demo') }} <x-icon name="arrow" :size="16"/></a>
     </div>
 </section>
 @endsection

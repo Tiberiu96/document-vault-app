@@ -21,7 +21,7 @@ php artisan migrate
 php artisan db:seed --class=LanguageSeeder
 ```
 
-Sunt opt migrari aplicate pe MySQL. Unicitatea workspaceului personal si posibilitatea mai multor firme au fost verificate cu date de proba anulate prin rollback. Seederul initial creeaza numai cele trei limbi, fara conturi; nu reactiveaza limbi dezactivate.
+Sunt opt migrari aplicate pe MySQL. Unicitatea workspaceului personal si posibilitatea mai multor firme au fost verificate cu date de proba anulate prin rollback. Seederul initial creeaza numai cele patru limbi, fara conturi; nu reactiveaza limbi dezactivate.
 
 ## Primul administrator
 
@@ -29,7 +29,7 @@ Sunt opt migrari aplicate pe MySQL. Unicitatea workspaceului personal si posibil
 php artisan vault:admin:create
 ```
 
-Terminal interactiv, nume/email/parola ascunsa/confirmare. Parola: minimum 16 caractere si maximum 72 bytes pentru bcrypt, litere mari/mici, cifre si simboluri. Comanda verifica conexiunea/schema inainte de prompturi, refuza email existent si nu promoveaza conturi implicit. Nu crea un admin prin seeder sau credentiale env. Loginul web este disponibil pentru conturile existente; admin/Horizon raman blocate pana la MFA. Inregistrarea PF/PJ si livrarea/verificarea emailului nu sunt inca implementate.
+Terminal interactiv, nume/email/parola ascunsa/confirmare. Parola: minimum 16 caractere si maximum 72 bytes pentru bcrypt, litere mari/mici, cifre si simboluri. Comanda verifica conexiunea/schema inainte de prompturi, refuza email existent si nu promoveaza conturi implicit. Nu crea un admin prin seeder sau credentiale env. Loginul web este disponibil pentru conturile existente; admin/Horizon raman blocate pana la MFA. Inregistrarea PF/PJ si selectarea spatiului sunt livrate; livrarea/verificarea emailului nu este inca implementata.
 
 ## Web si verificare
 
@@ -40,7 +40,7 @@ php artisan serve --host=127.0.0.1 --port=8000
 
 Pagina: http://vaulty.test:8000/ro; login: /ro/autentificare; demo: /ro/demo; cont: /ro/panou. Domeniul fara port necesita activarea Nginx din local-hosting.md. APP_URL este http://vaulty.test; paginile servite pe 8000 sunt numai pentru verificare locala. Fonturile sunt locale si CSS se construieste cu binarul Tailwind ignorat din .tools (instructiuni/checksum in web-foundation.md).
 
-52 teste / 667 asertiuni au trecut inclusiv cu route cache; nu exista apeluri AI platite. Pentru verificare: composer test, Pint --test, composer validate, composer check-platform-reqs, route:cache, php artisan test --compact, route:clear. Testele standard folosesc SQLite in memorie si mocks externe; nu executa migrate:fresh pe baza reala.
+75 teste / 1038 asertiuni au trecut inclusiv cu route cache; nu exista apeluri AI platite. Pentru verificare: composer test, Pint --test, composer validate, composer check-platform-reqs, route:cache, php artisan test --compact, route:clear. Testele standard folosesc SQLite in memorie si mocks externe; nu executa migrate:fresh pe baza reala.
 
 ## Windows 10 fara Docker
 

@@ -2,7 +2,7 @@
 @section('content')
 <section class="hero wrap">
     <div class="hero-copy"><span class="eyebrow">{{ __('site.hero.kicker') }}</span><h1>{{ __('site.hero.line1') }}<br>{{ __('site.hero.line2') }}<br><em>{{ __('site.hero.line3') }}</em></h1><p class="hero-description">{{ __('site.hero.description') }}</p>
-        <div class="hero-actions"><x-button :href="route('demo')" icon="arrow">{{ __('site.hero.cta') }}</x-button><a class="text-link" href="#features">{{ __('site.hero.secondary') }} <span>↓</span></a></div>
+        <div class="hero-actions"><x-button :href="auth()->check() ? route('dashboard') : route('register')" icon="arrow">{{ auth()->check() ? __('site.nav.account') : __('registration.create') }}</x-button><a class="text-link" href="{{ route('demo') }}">{{ __('site.nav.demo') }} <span>↗</span></a></div>
         <p class="hero-note"><span class="live-dot"></span>{{ __('site.hero.note') }}</p>
     </div>
     <div class="hero-visual"><div class="visual-label"><span>01 / {{ __('site.common.preview') }}</span><span>{{ __('site.common.demo') }}</span></div>@include('partials.product-preview')<div class="floating-note"><span class="floating-icon"><x-icon name="check" :size="19"/></span><div>{{ __('site.footer.line') }}<small>{{ __('site.common.preview') }}</small></div></div></div>

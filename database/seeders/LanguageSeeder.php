@@ -12,7 +12,7 @@ class LanguageSeeder extends Seeder
     {
         DB::transaction(function (): void {
             $hasDefault = Language::where('is_default', true)->exists();
-            foreach ([['ro', 'Romanian', 'Romana', 'RON'], ['en', 'English', 'English', 'EUR'], ['hu', 'Hungarian', 'Magyar', 'HUF']] as [$locale, $name, $native, $currency]) {
+            foreach ([['ro', 'Romanian', 'Romana', 'RON'], ['en', 'English', 'English', 'EUR'], ['hu', 'Hungarian', 'Magyar', 'HUF'], ['bg', 'Bulgarian', 'Български', 'EUR']] as [$locale, $name, $native, $currency]) {
                 if (! Language::where('locale', $locale)->exists()) {
                     $language = new Language;
                     $language->forceFill([

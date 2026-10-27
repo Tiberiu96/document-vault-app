@@ -28,16 +28,29 @@ class TranslationTest extends TestCase
     {
         $root = dirname(__DIR__, 2).'/lang/';
         $romanian = require $root.'ro/site.php';
-        foreach (['en', 'hu'] as $locale) {
+        foreach (['en', 'hu', 'bg'] as $locale) {
             $this->assertSame($this->keys($romanian), $this->keys(require $root.$locale.'/site.php'));
         }
         $translator = new Translator(new FileLoader(new Filesystem, $root), 'ro');
-        foreach (['ro', 'en', 'hu'] as $locale) {
+        foreach (['ro', 'en', 'hu', 'bg'] as $locale) {
             foreach ($this->keys($romanian) as $key) {
                 $this->assertTrue($translator->has('site.'.$key, $locale, false), $locale.': site.'.$key);
             }
         }
         $this->assertDoesNotMatchRegularExpression('/[ăâîșşțţĂÂÎȘŞȚŢ]/u', file_get_contents($root.'ro/site.php'));
         $this->assertStringContainsString('dokumentumok', file_get_contents($root.'hu/site.php'));
+    }
+
+    public function test_auth_and_registration_have_complete_bulgarian_translations(): void
+    {
+        $root = dirname(__DIR__, 2).'/lang/';
+        $translator = new Translator(new FileLoader(new Filesystem, $root), 'bg');
+        foreach (['auth', 'registration', 'routes'] as $group) {
+            $english = require $root.'en/'.$group.'.php';
+            $this->assertSame($this->keys($english), $this->keys(require $root.'bg/'.$group.'.php'));
+            foreach ($this->keys($english) as $key) {
+                $this->assertTrue($translator->has($group.'.'.$key, 'bg', false));
+            }
+        }
     }
 }

@@ -4,15 +4,15 @@ Platforma pentru documente personale si business, dezvoltata incremental cu Lara
 
 ## Disponibil acum
 
-- Pagina publica, functionalitati, planuri si FAQ in romana fara diacritice, engleza si maghiara.
+- Pagina publica, functionalitati, planuri si FAQ in romana fara diacritice, engleza, maghiara si bulgara.
 - Demo cu date fictive, cautare si filtre; nu incarca sau proceseaza fisiere reale.
-- Login/logout pentru conturi existente, sesiuni regenerate si rate limiting pe cont/IP.
-- Panou privat cu spatiile accesibile utilizatorului, autorizate prin WorkspacePolicy.
+- Inregistrare PF/PJ cu creare atomica user/workspaces/company, login/logout, sesiuni regenerate si rate limiting.
+- Panou privat si selectare de workspace, autorizate prin membership si WorkspacePolicy.
 - Structura limbilor, activare/dezactivare si schimbare sigura a defaultului prin serviciu intern autorizat.
 - Canonical, hreflang, Open Graph/social card, sitemap, robots pe medii si llms.txt.
 - Comanda interactiva pentru primul administrator; accesul administrativ/Horizon ramane blocat pana la MFA.
 
-Inregistrarea PF/PJ, verificarea emailului, interfata admin pentru limbi, documentele reale, OCR/AI, reminderele si platile urmeaza in etapele urmatoare. Nu exista conturi implicite sau credentiale in surse.
+Verificarea emailului, interfata admin pentru limbi, documentele reale, OCR/AI, reminderele si platile urmeaza in etapele urmatoare. Nu exista conturi implicite sau credentiale in surse.
 
 ## Rulare locala
 
@@ -28,7 +28,7 @@ php artisan serve --host=127.0.0.1 --port=8000
 
 Binarul Tailwind trebuie instalat local in `.tools/` conform [docs/web-foundation.md](docs/web-foundation.md), inainte de build. Fara Node/Vite.
 
-Pe serverul de dezvoltare: [pagina publica](http://vaulty.test:8000/ro), [autentificare](http://vaulty.test:8000/ro/autentificare), [demo](http://vaulty.test:8000/ro/demo). Nginx/hosts pentru `http://vaulty.test` sunt documentate separat in [docs/local-hosting.md](docs/local-hosting.md).
+Pe serverul de dezvoltare: [pagina publica](http://vaulty.test:8000/ro), [autentificare](http://vaulty.test:8000/ro/autentificare), [inregistrare](http://vaulty.test:8000/ro/inregistrare), [demo](http://vaulty.test:8000/ro/demo). Nginx/hosts pentru `http://vaulty.test` sunt documentate separat in [docs/local-hosting.md](docs/local-hosting.md).
 
 Primul administrator se creeaza in terminal, cu parola ascunsa:
 
@@ -50,10 +50,14 @@ php artisan test --compact
 php artisan route:clear
 ```
 
-52 teste / 667 asertiuni trecute, inclusiv cu rutele in cache. Serviciile externe sunt mockuite; testele folosesc SQLite in memorie. Probele locale MySQL/Redis sunt descrise in setup. Testul de traduceri verifica existenta fiecarei chei prin translator, nu doar paritatea dictionarelor.
+75 teste / 1038 asertiuni trecute, inclusiv cu rutele in cache. Serviciile externe sunt mockuite; testele folosesc SQLite in memorie. Probele locale MySQL/Redis sunt descrise in setup. Testul de traduceri verifica existenta fiecarei chei prin translator, nu doar paritatea dictionarelor.
 
 ## Git si configurare privata
 
 Repository: Tiberiu96/document-vault-app. `composer.json` si `composer.lock` se versioneaza. `.env`, credentialele, `vendor/`, `.tools/`, cache-urile, logurile si continutul `storage/` sunt ignorate; doar fisierele `.gitignore` pentru structura runtime se pastreaza. CSS generat se construieste la instalare/deployment. Fonturile locale si licentele lor sunt versionate.
 
 Reguli permanente: [AGENTS.md](AGENTS.md). Arhitectura: [docs/architecture.md](docs/architecture.md). Design: [docs/design-system.md](docs/design-system.md). Checkpoint UI/auth: [docs/web-foundation.md](docs/web-foundation.md).
+
+Inregistrare si izolarea spatiilor: [docs/registration.md](docs/registration.md). Autentificare GitHub/push: [docs/github.md](docs/github.md). Pentru documentele private nu executa storage:link.
+
+Bulgara: [pagina publica](http://vaulty.test:8000/bg), [inregistrare](http://vaulty.test:8000/bg/registratsiya), [autentificare](http://vaulty.test:8000/bg/vhod). Textul functional are minimum 16px; antetul mobil are meniu compact si icon de profil. Vizualizarea directa prin instrumentul browser ramane blocata, chiar daca interfata setarilor arata Always allow.

@@ -6,13 +6,13 @@ Pagina publica si demo-ul pornesc de la cele sase referinte din design-layouts/,
 
 Pagina publica descrie directia produsului si stadiul dezvoltarii. Fara testimoniale, statistici, preturi sau disponibilitate in magazine inventate. Demo-ul foloseste numai patru documente fictive, fara upload si fara scriere de documente in baza. Cautarea foloseste Form Request, escaping si limita de 60/minut per IP. Nu confunda demo-ul cu panoul real.
 
-Loginul este accesibil din antet si prin /ro/autentificare, /en/login, /hu/bejelentkezes. Panoul real este /ro/panou, /en/dashboard, /hu/iranyitopult, cu auth si noindex. Logout numai POST cu CSRF. Nu exista inca inregistrare sau resetare/verificare prin email; providerul de email trebuie configurat ghidat inainte de livrare reala.
+Loginul este accesibil din antet si prin /ro/autentificare, /en/login, /hu/bejelentkezes. Panoul real este /ro/panou, /en/dashboard, /hu/iranyitopult, cu auth si noindex. Logout numai POST cu CSRF. Inregistrarea PF/PJ a fost adaugata in checkpointul registration.md. Nu exista inca resetare/verificare prin email; providerul de email trebuie configurat ghidat inainte de livrare reala.
 
 Autentificarea normalizeaza emailul, foloseste hashurile Laravel si regenereaza sesiunea la succes. Limite: 5 esecuri/minut per cont, agregate intre IP-uri, si 20 esecuri/minut per IP; cheile de rate limit contin hashuri, nu emailuri. Lockout HTTP 429 cu Retry-After; mesaj generic pentru credentiale gresite. Parola nu este pastrata in old input. Logout invalideaza sesiunea si regenereaza tokenul CSRF. Panoul arata numai membershipurile autorizate prin WorkspacePolicy; conturile globale nu primesc bypass pentru spatii personale straine.
 
 ## Limbi si rutare
 
-Migratia languages si LanguageSeeder livreaza ro/en/hu, valute RON/EUR/HUF. Seederul este idempotent si nu reactiveaza limbi dezactivate. DatabaseSeeder nu creeaza conturi.
+Migratia languages si LanguageSeeder livreaza ro/en/hu/bg, valute RON/EUR/HUF/EUR. Seederul este idempotent si nu reactiveaza limbi dezactivate. DatabaseSeeder nu creeaza conturi.
 
 Pachetul niels-numbers/laravel-localizer 1.4.1 inregistreaza rute traduse statice, cu prefix inclusiv ro. Numele interne home/features/pricing/faq/demo/login/dashboard/logout raman stabile. SetLocale/RedirectLocale ruleaza in web inainte de bindings; admin si API nu sunt traduse. Root redirectioneaza catre defaultul activ din baza, independent de browser.
 
@@ -44,8 +44,8 @@ DM Serif Display si DM Sans sunt gazduite local, cu licente SIL OFL incluse. Sur
 
 ## Verificari si limitari
 
-52 teste / 667 asertiuni trecute cu si fara route cache, Pint si composer validate. Teste pentru sluguri, head metadata, XML, noindex, limbi inactive, default idempotent, 429, XSS/input invalid, login/logout, sesiune si izolarea spatiilor. Nicio cerere AI platita. MySQL local are opt migrari aplicate si trei limbi seeduite.
+52 teste / 667 asertiuni trecute cu si fara route cache, Pint si composer validate. Teste pentru sluguri, head metadata, XML, noindex, limbi inactive, default idempotent, 429, XSS/input invalid, login/logout, sesiune si izolarea spatiilor. Nicio cerere AI platita. MySQL local are opt migrari aplicate si patru limbi seeduite.
 
 Verificarea vizuala automata in browser a ramas blocata de o permisiune salvata a domeniului, inclusiv dupa confirmarea utilizatorului de a repermite accesul. Nu este raportata ca efectuata. Captura furnizata de utilizator a fost folosita pentru identificarea defectului de traduceri. CSS contine breakpoints responsive; verificarea vizuala desktop/mobil ramane necesara dupa deblocarea browserului.
 
-Urmeaza inregistrarea PF/PJ, actiunile tranzactionale de creare a spatiilor, verificarea emailului, MFA admin si apoi managementul complet al limbilor/documentelor. Configureaza ghidat emailul inaintea livrarii reale de mesaje; nu afisa credentiale.
+Inregistrarea PF/PJ si actiunile tranzactionale sunt acum livrate (registration.md). Urmeaza verificarea emailului, MFA admin si managementul complet al limbilor/documentelor. Configureaza ghidat emailul inaintea livrarii reale de mesaje; nu afisa credentiale.

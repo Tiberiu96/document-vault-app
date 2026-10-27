@@ -5,7 +5,7 @@
 3. Backend: conventii Laravel, actiuni/servicii pentru operatii de domeniu, Form Requests, API Resources, Policies. Evita abstractizari premature.
 4. Web: Blade, Livewire, Tailwind CSS 4 standalone; Alpine numai cand este necesar. Fara Vite/Node pentru frontend daca nu exista un motiv documentat.
 5. Mobil: React Native, Expo development builds, TypeScript, Expo Router, SecureStore, TanStack Query. Fara Flutter. Nu genera aplicatia mobila in etapa fundatiei.
-6. Exact trei limbi initiale: ro (implicit), en, hu. Toate textele romanesti scrise de aplicatie, inclusiv documentatia, sunt FARA diacritice. Pastreaza diacriticele maghiare si continutul utilizatorilor/documentelor/OCR.
+6. Patru limbi cerute: ro (implicit), en, hu, bg. Toate textele romanesti scrise de aplicatie, inclusiv documentatia, sunt FARA diacritice. Pastreaza diacriticele maghiare, alfabetul chirilic bulgar si continutul utilizatorilor/documentelor/OCR.
 7. Rutele web pentru utilizatori au prefix de limba inclusiv ro si sluguri traduse; numele interne sunt stabile. API: /api/v1, fara sluguri traduse. Evalueaza niels-numbers/laravel-localizer si verifica route:cache.
 8. Admin: /admin, fara prefix de limba; middleware ro, autorizare globala, MFA obligatoriu in productie, rate limiting. Rolul admin al unui workspace NU confera super_admin.
 9. O identitate poate apartine mai multor workspaces. PF creeaza personal; PJ creeaza personal si business. Accesul la orice resursa cere apartenenta si Policy; testeaza izolarea intre workspaces.
@@ -15,7 +15,7 @@
 13. Rate limits configurabile, specifice operatiilor, server-side; protejeaza autentificarea, upload, cautare, invitatii, OCR/AI si admin. Raspunsuri 429 stabile.
 14. Redis: high, default, ocr, ai, low. Workeri separati pentru OCR/AI si high; auto-balancing nu garanteaza prioritate stricta. Horizon cere pcntl/posix, deci Linux/WSL2 pentru workeri pe Windows.
 15. Joburi: timeout, incercari limitate, backoff, jitter/Retry-After cand este cazul, idempotenta. Nu reincerca erori permanente. Monitorizare fara secrete/continut privat; retry administrativ autorizat.
-16. Preturi abonamente in bani RON intregi; fara FLOAT. Display ro=RON, en=EUR, hu=HUF; aproximativ pentru conversii, plata RON. Pastreaza suma/moneda originala a documentului. Frankfurter zilnic, istoric MySQL, cache Redis; fara rate inventate.
+16. Preturi abonamente in bani RON intregi; fara FLOAT. Display ro=RON, en=EUR, hu=HUF, bg=EUR; aproximativ pentru conversii, plata RON. Pastreaza suma/moneda originala a documentului. Frankfurter zilnic, istoric MySQL, cache Redis; fara rate inventate.
 17. Notificari prin Laravel, email si FCM configurate separat. Deduplicare, tokenuri sincronizate, oprire dupa rezolvare; amanarea/reinnoirea sunt tranzitii explicite.
 18. SEO de la prima pagina publica: metadata localizata, canonical, hreflang doar limbi active si pregatite, HTML semantic. Auth, admin, documente si pagini interne: noindex plus autentificare/autorizare.
 19. Sitemap numai pagini publice indexabile si limbi active; invalideaza la schimbari. robots.txt diferit pentru productie si medii interne; nu este control de acces.
@@ -31,3 +31,5 @@ Scripturile Bash temporare pentru instalare/verificare se sterg dupa utilizare. 
 Referintele vizuale pentru interfata sunt in design-layouts/: citeste README.md si inspecteaza imaginile relevante inainte de implementarea UI. Sunt prevazute 01-desktop-dashboard.png, 02-mobile-dashboard.png, 03-landing-page.png, 04-desktop-documents.png, 05-mobile-document-details.png si 06-mobile-reminders.png. Pastreaza aceste artefacte la integrare/curatenie; nu pretinde ca le-ai inspectat daca lipsesc.
 
 Git este autorizat de utilizator pentru acest proiect. Pastreaza composer.json/composer.lock in istoric; ignora .env, vendor, credentiale, DB locale, loguri si runtime storage. Verifica fisierele staged pentru secrete inainte de commit/push.
+
+UI: textul functional trebuie sa aiba minimum 16px (inclusiv navigatie, formulare si butoane). Miniatura ilustrativa a produsului poate pastra text proportional cu scara sa. Antetul mobil foloseste logo, login/profil si meniu compact; accesul la cont este un icon circular discret, cu aria-label si title localizate.

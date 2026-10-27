@@ -28,7 +28,7 @@
     <meta property="og:title" content="{{ $title }}">
     <meta property="og:description" content="{{ $description }}">
     <meta property="og:url" content="{{ $canonical }}">
-    <meta property="og:locale" content="{{ ['ro' => 'ro_RO', 'en' => 'en_GB', 'hu' => 'hu_HU'][app()->getLocale()] }}">
+    <meta property="og:locale" content="{{ ['ro' => 'ro_RO', 'en' => 'en_GB', 'hu' => 'hu_HU', 'bg' => 'bg_BG'][app()->getLocale()] }}">
     <meta property="og:image" content="{{ rtrim(config('app.url'), '/') }}/images/social-card.png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
@@ -38,7 +38,7 @@
     <meta name="twitter:description" content="{{ $description }}">
     <meta name="twitter:image" content="{{ rtrim(config('app.url'), '/') }}/images/social-card.png">
     <link rel="icon" type="image/svg+xml" href="{{ asset('images/favicon.svg') }}">
-    <link rel="preload" href="{{ asset('fonts/dm-serif-display.ttf') }}" as="font" type="font/ttf" crossorigin>
+    <link rel="preload" href="{{ asset(app()->getLocale() === 'bg' ? 'fonts/noto-serif-bg.woff2' : 'fonts/dm-serif-display.ttf') }}" as="font" type="{{ app()->getLocale() === 'bg' ? 'font/woff2' : 'font/ttf' }}" crossorigin>
     <link rel="stylesheet" href="{{ asset('css/app.css') }}?v={{ filemtime(public_path('css/app.css')) }}">
     @if($indexable)
     <script type="application/ld+json">{!! json_encode(['@context' => 'https://schema.org', '@type' => 'WebPage', 'name' => $title, 'description' => $description, 'url' => $canonical, 'inLanguage' => app()->getLocale()], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}</script>
@@ -57,23 +57,28 @@
         <div class="header-actions">
             <x-language-switcher :languages="$languages"/>
             @auth
-                <a class="auth-link" href="{{ route('dashboard') }}">{{ __('site.nav.account') }}</a>
+                <a class="auth-link" href="{{ route('demo') }}">{{ __('site.nav.demo') }}</a>
             @else
                 <a class="auth-link" href="{{ route('login') }}">{{ __('site.nav.login') }}</a>
             @endauth
-            <x-button :href="route('demo')" icon="arrow" class="header-demo">{{ __('site.nav.demo') }}</x-button>
+            @auth
+                <x-account-link :active="$page === 'dashboard'"/>
+            @else
+                <x-button :href="route('register')" icon="arrow" class="header-primary">{{ __('registration.create') }}</x-button>
+            @endauth
+        </div>
+        <div class="mobile-header-actions">
+            @auth<x-account-link :active="$page === 'dashboard'"/>@else<a class="auth-link" href="{{ route('login') }}">{{ __('site.nav.login') }}</a>@endauth
+            <x-mobile-menu :languages="$languages" :page="$page"/>
         </div>
     </header>
-    <nav class="mobile-nav wrap" aria-label="{{ __('site.nav.menu') }}">
-        @foreach(['features', 'pricing', 'faq'] as $item)<a href="{{ route($item) }}">{{ __('site.nav.'.$item) }}</a>@endforeach
-    </nav>
     @endif
     <main id="main" tabindex="-1">@yield('content')</main>
     @if($page !== 'demo')
     <footer class="site-footer wrap">
         <div><x-brand/><p>{{ __('site.footer.line') }}</p></div>
         <div class="footer-links"><a href="{{ route('faq') }}">{{ __('site.nav.faq') }}</a><a href="#top">{{ __('site.footer.top') }} ↑</a><span class="status-note"><i></i>{{ __('site.footer.status') }}</span></div>
-        <div class="footer-bottom"><span>© {{ date('Y') }} {{ $brand }}</span><span>RO · EN · HU</span></div>
+        <div class="footer-bottom"><span>© {{ date('Y') }} {{ $brand }}</span><span>{{ $languages->pluck('locale')->map(fn ($code) => strtoupper($code))->implode(' · ') }}</span></div>
     </footer>
     @endif
 </body>
