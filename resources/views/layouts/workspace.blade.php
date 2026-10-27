@@ -40,6 +40,10 @@
         </main>
     </div>
 </div>
-<nav class="library-mobile-nav" aria-label="{{ __('site.nav.menu') }}"><a href="{{ route('dashboard') }}"><x-icon name="home"/><span>{{ __('documents.home') }}</span></a><a href="{{ route('documents.index') }}"><x-icon name="document"/><span>{{ __('documents.title') }}</span></a>@if($workspace && Gate::allows('create', [App\Models\Document::class, $workspace]))<a class="mobile-upload mobile-scan" href="{{ route('documents.scan') }}"><x-icon name="scan"/><span>{{ __('scanner.short_title') }}</span></a>@endif<a href="{{ route('categories.index') }}"><x-icon name="folder"/><span>{{ __('documents.manage') }}</span></a></nav>
+<nav class="library-mobile-nav" aria-label="{{ __('site.nav.menu') }}">
+    <a href="{{ route('dashboard') }}"><x-icon name="home"/><span>{{ __('documents.home') }}</span></a>
+    @if($workspace && Gate::allows('create', [App\Models\Document::class, $workspace]))<a class="mobile-upload mobile-scan" href="{{ route('documents.scan') }}"><x-icon name="scan"/><span>{{ __('scanner.short_title') }}</span></a>@endif
+    <a href="{{ route('documents.index') }}"><x-icon name="document"/><span>{{ __('documents.title') }}</span></a>
+</nav>
 @stack('scripts')
 </body></html>

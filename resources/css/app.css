@@ -682,7 +682,6 @@
  .library-mobile-nav { padding-left:max(6px,env(safe-area-inset-left)); padding-right:max(6px,env(safe-area-inset-right)); }
  .library-mobile-nav a { min-height:48px; }
  .library-mobile-nav a span { max-width:100%; overflow-wrap:anywhere; }
- .library-mobile-nav a:last-child { max-width:26%; }
  .library-actions .button { max-width:100%; }
  .document-dropzone { padding:24px 14px; }
 }

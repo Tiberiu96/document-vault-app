@@ -44,3 +44,6 @@ __pycache__/
 .DS_Store
 /.idea/
 /.vscode/
+
+# Atasamente locale ale conversatiilor, fara publicare in Git.
+.codex-attachments/
