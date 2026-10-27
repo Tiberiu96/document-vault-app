@@ -26,4 +26,8 @@ return [
     'restore' => 'visszaallitas',
     'purge' => 'vegleges-torles',
     'ai.test' => 'helyi-ai-teszt',
+    'process' => 'feldolgozas',
+    'processing.status' => 'feldolgozasi-allapot',
+    'suggestions' => 'javaslatok',
+    'suggestions.reject' => 'javaslatok-elutasitasa',
 ];

@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Contracts\Ocr\OcrProviderInterface;
 use App\Jobs\Documents\GenerateDocumentPreview;
 use App\Jobs\Documents\PurgeDocument;
 use App\Models\Category;
@@ -33,6 +34,13 @@ class DocumentLibraryTest extends TestCase
         parent::setUp();
         $this->seed([LanguageSeeder::class, CategorySeeder::class, TagSeeder::class]);
         Storage::fake('local');
+        $this->app->bind(OcrProviderInterface::class, fn () => new class implements OcrProviderInterface
+        {
+            public function extract(Document $document): array
+            {
+                return ['text' => 'Factura demonstrativa pentru servicii. Furnizor demonstrativ. Total 149.99 RON. Data 27.10.2026.', 'engine' => 'fake'];
+            }
+        });
         $this->owner = User::factory()->create();
         $this->workspace = $this->makeWorkspace($this->owner);
         $this->actingAs($this->owner)->withSession(['active_workspace_id' => $this->workspace->id]);

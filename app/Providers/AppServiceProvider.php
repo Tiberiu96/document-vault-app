@@ -3,7 +3,9 @@
 namespace App\Providers;
 
 use App\Contracts\Ai\AiProviderInterface;
+use App\Contracts\Ocr\OcrProviderInterface;
 use App\Services\Ai\OllamaProvider;
+use App\Services\Ocr\LocalOcrProvider;
 use App\Services\WebsiteContext;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
@@ -19,6 +21,7 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->bind(AiProviderInterface::class, OllamaProvider::class);
+        $this->app->bind(OcrProviderInterface::class, LocalOcrProvider::class);
     }
 
     /**
@@ -37,6 +40,7 @@ class AppServiceProvider extends ServiceProvider
         RateLimiter::for('verification.verify', fn (Request $request) => Limit::perMinute(20)->by($request->ip()));
         RateLimiter::for('local.ai', fn (Request $request) => Limit::perMinute(3)->by($request->user()->id));
         RateLimiter::for('local.ai.status', fn (Request $request) => Limit::perMinute(60)->by($request->user()->id));
+        RateLimiter::for('document.processing', fn (Request $request) => Limit::perMinute(3)->by($request->user()->id));
         RateLimiter::for('document.upload', fn (Request $request) => Limit::perMinute(10)->by($request->user()->id));
         RateLimiter::for('document.search', fn (Request $request) => Limit::perMinute(60)->by($request->user()->id));
         RateLimiter::for('taxonomy', fn (Request $request) => Limit::perMinute(30)->by($request->user()->id));

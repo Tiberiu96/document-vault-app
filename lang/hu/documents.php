@@ -75,7 +75,7 @@ return [
     'choose' => 'Fájl kiválasztása',
     'no_category' => 'Nincs kategória',
     'original' => 'Az eredeti privát tárhelyen',
-    'ocr_note' => 'A fájl tárolva. Az OCR és az AI későbbi szakaszban lesz elérhető.',
+    'ocr_note' => 'A szöveg kinyerése a háttérben fut. Az AI-javaslatok opcionálisak és ellenőrzést igényelnek.',
     'private' => 'Privát hozzáférés',
     'free_plan' => 'Free csomag',
     'total_pages' => 'Tárolt oldalak',

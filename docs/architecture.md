@@ -1,6 +1,6 @@
 # Arhitectura si checkpoint
 
-Etapa curenta: Laravel 13.39.0 si pachetele sunt integrate, cu migrari executabile pentru users/workspaces/companies/memberships, tokenuri Sanctum si comanda admin. Schema si controalele initiale au teste SQLite; migrarile MySQL, conexiunile MySQL/Redis, constrangerea de unicitate personala si cache/lock Redis sunt verificate local. Interfata publica/demo si login/logout cu panou privat sunt implementate. WorkspacePolicy protejeaza lista spatiilor; inregistrarea PF/PJ si selectarea spatiului sunt livrate; confirmarea emailului si resetarea parolei sunt implementate prin Redis/high si Mailpit local; biblioteca privata de documente si conexiunea Ollama sunt livrate; OCR, analiza documentelor si MFA urmeaza.
+Etapa curenta: Laravel 13.39.0 si pachetele sunt integrate, cu migrari executabile pentru users/workspaces/companies/memberships, tokenuri Sanctum si comanda admin. Schema si controalele initiale au teste SQLite; migrarile MySQL, conexiunile MySQL/Redis, constrangerea de unicitate personala si cache/lock Redis sunt verificate local. Interfata publica/demo si login/logout cu panou privat sunt implementate. WorkspacePolicy protejeaza lista spatiilor; inregistrarea PF/PJ si selectarea spatiului sunt livrate; confirmarea emailului si resetarea parolei sunt implementate prin Redis/high si Mailpit local; biblioteca privata de documente si conexiunea Ollama sunt livrate; OCR local si propuneri AI cu confirmare sunt implementate; MFA si administrarea platformei urmeaza.
 
 Monolit Laravel pentru web/API/joburi, cu mobil separat. Folosim conventiile frameworkului si servicii de domeniu pentru operatii complexe. Nu introducem microservicii.
 
@@ -62,3 +62,5 @@ RegisterRequest/RegisterUser implementeaza company numai pe business, creare ato
 Checkpoint web/auth si structura limbilor sunt livrate conform web-foundation.md. Git este autorizat de utilizator pentru commit/push; .env, runtime si dependentele instalate raman excluse.
 
 Checkpoint biblioteca: document-library.md. Integrare Ollama si diagnostic local: local-ai.md.
+
+Checkpoint procesare: document-processing.md. Acces temporar de pe telefon: phone-testing.md.

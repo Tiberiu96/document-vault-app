@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use App\Services\PlanLimitsService;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class DocumentRequest extends FormRequest
 {
@@ -22,6 +23,9 @@ class DocumentRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'ai_run_id' => ['nullable', 'uuid'],
+            'metadata_version' => ['nullable', 'integer', 'min:0'],
+            'analyze_with_ai' => ['nullable', 'boolean', Rule::prohibitedIf(! config('ai.enabled'))],
             'file' => [$this->isMethod('POST') ? 'required' : 'prohibited', 'file', 'max:'.intdiv(app(PlanLimitsService::class)->free()['max_file_bytes'], 1024)],
             'title' => ['required', 'string', 'max:160'],
             'category_id' => ['nullable', 'integer'],

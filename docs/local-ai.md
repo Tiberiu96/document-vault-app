@@ -18,7 +18,7 @@ Documentatie: https://docs.ollama.com/faq si https://docs.ollama.com/linux
 
 .env local: AI_ENABLED=true, AI_PROVIDER=ollama,
 OLLAMA_BASE_URL=http://127.0.0.1:11434, OLLAMA_MODEL=qwen3.5:4b,
-OLLAMA_TIMEOUT=90, OLLAMA_NUM_CTX=4096. .env.example ramane AI_ENABLED=false.
+OLLAMA_TIMEOUT=90, OLLAMA_NUM_CTX=8192. .env.example ramane AI_ENABLED=false.
 Dupa schimbare: php artisan config:clear si systemctl --user restart vaulty-horizon.
 
 AiProviderInterface separa transportul. OllamaProvider accepta numai IP loopback,
@@ -42,8 +42,10 @@ Erorile de provider sunt sanitizate; prompturile/corpurile HTTP nu apar in excep
 ## Verificare hardware
 
 Dupa restart, NVIDIA GTX 1650 este detectata corect, 4096 MiB VRAM.
-Proba reala a primit JSON validat; ollama ps a raportat aproximativ 40% CPU / 60% GPU
-cu context 4096. Nu se presupune incarcare integrala pe GPU. Prima incarcare rece
+Proba reala a primit JSON validat; ollama ps a raportat aproximativ 35% CPU / 65% GPU
+cu context 8192. Nu se presupune incarcare integrala pe GPU. Prima incarcare rece
 a depasit timeoutul clientului; dupa incarcarea runnerului, proba a reusit.
 Modelele se descarca de pe internet, dar inferenta locala nu necesita trimiterea
-prompturilor catre un provider extern. Nu este activata analiza automata a documentelor.
+prompturilor catre un provider extern. Analiza documentelor este locala si optionala, cu propuneri validate si confirmate explicit.
+Optiunea de upload este bifata implicit la cererea utilizatorului si poate fi debifata.
+Clientul pastreaza modelul incarcat 10 minute dupa analiza, pentru a reduce reincarcarile.

@@ -1,0 +1,17 @@
+[Unit]
+Description=Vaulty temporary phone preview (local development)
+After=network.target
+
+[Service]
+WorkingDirectory=/var/www/document-vault-app/public
+EnvironmentFile=%h/.config/vaulty/phone-preview.env
+ExecStart=/usr/bin/php -d upload_max_filesize=5M -d post_max_size=6M -d memory_limit=256M -d display_errors=Off -S ${VAULT_PHONE_HOST}:8080 -t /var/www/document-vault-app/public /var/www/document-vault-app/vendor/laravel/framework/src/Illuminate/Foundation/resources/server.php
+Restart=on-failure
+RestartSec=5
+UMask=0077
+NoNewPrivileges=true
+StandardOutput=null
+StandardError=null
+
+[Install]
+WantedBy=default.target

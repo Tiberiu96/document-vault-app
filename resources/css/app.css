@@ -693,3 +693,26 @@
 .ai-result p { font-size:16px; line-height:1.7; color:#77766f; margin-top:20px; }
 .ai-reply { white-space:pre-wrap; font-size:16px; line-height:1.8; margin-top:20px; overflow-wrap:anywhere; }
 [data-ai-form] textarea { font:inherit; font-size:16px; border:1px solid #e6e2da; border-radius:6px; padding:16px; }
+.processing-panel { margin-top:24px; padding:26px; }
+.processing-panel dl>div { display:flex; flex-wrap:wrap; justify-content:space-between; gap:14px; margin:18px 0; font-size:16px; }
+.processing-panel dt { color:#77766f; }
+.processing-panel p { margin-top:16px; font-size:16px; line-height:1.6; }
+.processing-panel .library-actions { margin:22px 0; }
+.ocr-text { margin-top:22px; font-size:16px; }
+.ocr-text pre { margin-top:18px; padding:16px; background:#f7f5f0; white-space:pre-wrap; overflow-wrap:anywhere; font:inherit; max-height:400px; overflow:auto; }
+.library-form>label.remember { display:flex; align-items:flex-start; gap:12px; line-height:1.6; }
+.library-form>label.remember input { width:20px; height:20px; padding:0; flex:none; margin-top:3px; }
+
+.upload-ai-option { padding:18px; background:#f7f5f0; border:1px solid #e6e2da; border-radius:6px; }
+.upload-ai-option .remember { display:flex; align-items:flex-start; gap:12px; font-size:16px; line-height:1.6; margin:0; }
+.upload-ai-option input[type=checkbox] { width:20px; height:20px; padding:0; flex:none; margin-top:3px; accent-color:#8b7355; }
+.upload-ai-option .field-help { margin-top:8px; }
+.processing-progress,.upload-progress:not([hidden]) { display:flex; align-items:flex-start; gap:16px; background:#f7f5f0; border-radius:6px; padding:20px; margin:20px 0; font-size:16px; }
+.processing-progress p { margin-top:8px; }
+.processing-progress [data-processing-elapsed] { display:block; margin-top:10px; font-variant-numeric:tabular-nums; color:#77766f; }
+.processing-spinner { display:inline-block; flex:none; width:24px; height:24px; border:3px solid #e6e2da; border-top-color:#8b7355; border-radius:50%; animation:processing-spin 1s linear infinite; }
+.processing-spinner.is-paused { animation-play-state:paused; }
+.processing-panel { margin-bottom:24px; }
+.processing-refresh { display:inline-block; margin:8px 0; }
+@keyframes processing-spin { to { transform:rotate(360deg); } }
+@media(prefers-reduced-motion:reduce){.processing-spinner{animation:none;border-color:#8b7355;border-right-color:#e6e2da}}

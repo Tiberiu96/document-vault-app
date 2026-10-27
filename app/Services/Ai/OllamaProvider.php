@@ -62,14 +62,14 @@ class OllamaProvider implements AiProviderInterface
     public function structured(array $messages, array $schema): array
     {
         // Buget conservator in bytes pentru probe scurte. Documentele lungi vor necesita chunking explicit.
-        $budget = min(3000, (int) config('ai.ollama.context_length') - (int) config('ai.ollama.max_output_tokens') - 512);
+        $budget = min(12000, (int) config('ai.ollama.context_length') - (int) config('ai.ollama.max_output_tokens') - 512);
         if (strlen(json_encode([$messages, $schema], JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE)) > $budget) {
             throw new AiProviderException('PROMPT_TOO_LARGE');
         }
         try {
             $response = $this->checked($this->client()->post('/api/chat', [
                 'model' => config('ai.ollama.model'), 'messages' => $messages, 'format' => $schema,
-                'stream' => false, 'think' => false, 'keep_alive' => '2m',
+                'stream' => false, 'think' => false, 'keep_alive' => '10m',
                 'options' => ['temperature' => 0, 'num_ctx' => (int) config('ai.ollama.context_length'), 'num_predict' => (int) config('ai.ollama.max_output_tokens')],
             ]));
         } catch (ConnectionException) {

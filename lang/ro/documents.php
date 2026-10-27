@@ -75,7 +75,7 @@ return [
     'choose' => 'Alege fisierul',
     'no_category' => 'Fara categorie',
     'original' => 'Original pastrat privat',
-    'ocr_note' => 'Fisierul este stocat. OCR si AI vor fi disponibile intr-o etapa urmatoare.',
+    'ocr_note' => 'Textul este extras in fundal. Propunerile AI sunt optionale si necesita verificare.',
     'private' => 'Acces privat',
     'free_plan' => 'Plan Free',
     'total_pages' => 'Pagini stocate',

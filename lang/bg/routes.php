@@ -26,4 +26,8 @@ return [
     'restore' => 'vazstanovi',
     'purge' => 'iztrii-zavinagi',
     'ai.test' => 'test-ai',
+    'process' => 'obraboti',
+    'processing.status' => 'status-obrabotka',
+    'suggestions' => 'predlozheniya',
+    'suggestions.reject' => 'otkaz-predlozheniya',
 ];

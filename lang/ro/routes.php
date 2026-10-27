@@ -26,4 +26,8 @@ return [
     'restore' => 'restaureaza',
     'purge' => 'sterge-definitiv',
     'ai.test' => 'test-ai',
+    'process' => 'proceseaza',
+    'processing.status' => 'stare-procesare',
+    'suggestions' => 'sugestii',
+    'suggestions.reject' => 'respinge-sugestii',
 ];

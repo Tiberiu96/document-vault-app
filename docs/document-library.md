@@ -49,7 +49,7 @@ Categoriile/etichetele globale sunt read-only in workspace; administrarea lor va
 in panoul platformei, dupa MFA. Personalizarile locale raman private workspace-ului.
 Stergerea unei categorii sau etichete nu sterge documentele asociate.
 AI va alege implicit din catalogul global si nu va crea automat categorii sau
-etichete. Utilizatorul va confirma/corecta propunerile; aceasta procesare este etapa urmatoare.
+etichete. Utilizatorul va confirma/corecta propunerile; procesarea este descrisa in document-processing.md.
 
 ## Verificari
 
@@ -61,5 +61,5 @@ detaliile si preview-ul raster. Verificare responsive: sase pagini la sapte lati
 Numele lungi de workspace se impacheteaza fara trunchiere. Sunt simulari de viewport,
 nu certificare pe hardware/Safari. Artefactul HTML temporar de QA a fost eliminat.
 
-Nu se pretinde in aceasta etapa scanare mobila, analiza AI a documentelor sau
-protectie antivirus completa. OCR si analiza cu propuneri validate urmeaza separat.
+OCR si propunerile AI optionale sunt documentate in document-processing.md.
+Nu se pretinde scanare nativa mobila sau protectie antivirus completa.

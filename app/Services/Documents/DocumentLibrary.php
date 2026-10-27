@@ -5,6 +5,7 @@ namespace App\Services\Documents;
 use App\Jobs\Documents\GenerateDocumentPreview;
 use App\Models\Category;
 use App\Models\Document;
+use App\Models\ProcessingRun;
 use App\Models\Tag;
 use App\Models\User;
 use App\Models\Workspace;
@@ -38,7 +39,7 @@ class DocumentLibrary
                 $document->forceFill([
                     'id' => $id, 'workspace_id' => $locked->id, 'uploaded_by' => $user->id,
                     'title' => $data['title'], 'original_name' => $name ?: 'document.'.$inspection['extension'],
-                    'storage_path' => $path, 'status' => 'stored', 'preview_status' => $inspection['mime_type'] === 'application/pdf' ? 'pending' : 'ready',
+                    'ai_requested' => ! empty($data['analyze_with_ai']), 'storage_path' => $path, 'status' => 'stored', 'preview_status' => $inspection['mime_type'] === 'application/pdf' ? 'pending' : 'ready',
                     ...array_diff_key($inspection, ['extension' => true]), ...$metadata,
                 ])->save();
                 $this->syncTags($document, $locked, $data['tags'] ?? [], $data['tag_ids'] ?? []);
@@ -54,6 +55,12 @@ class DocumentLibrary
                 return $document;
             }, 3);
         } catch (\Throwable $exception) {
+            $committed = Document::withTrashed()->find($id);
+            if ($committed) {
+                $committed->forceFill(['preview_status' => 'failed'])->save();
+
+                return $committed;
+            }
             Storage::disk('local')->deleteDirectory(dirname($path));
             throw $exception;
         }
@@ -65,6 +72,18 @@ class DocumentLibrary
             $workspace = Workspace::lockForUpdate()->findOrFail($document->workspace_id);
             $fresh = Document::lockForUpdate()->findOrFail($document->id);
             Gate::forUser($user)->authorize('update', $fresh);
+            if (isset($data['ai_run_id'])) {
+                $run = ProcessingRun::where('document_id', $fresh->id)->whereKey($data['ai_run_id'])->first();
+                if (! $run || $fresh->ai_run_id !== $run->id || $fresh->ai_status !== 'ready' || $run->base_version !== $fresh->metadata_version || ($run->result['review_required'] ?? true)) {
+                    throw ValidationException::withMessages(['processing' => __('processing.stale')]);
+                }
+                $run->forceFill(['accepted_at' => now()])->save();
+                $fresh->forceFill(['ai_status' => 'accepted']);
+            }
+            if (isset($data['metadata_version']) && (int) $data['metadata_version'] !== $fresh->metadata_version) {
+                throw ValidationException::withMessages(['processing' => __('processing.stale')]);
+            }
+            $fresh->forceFill(['metadata_version' => $fresh->metadata_version + 1]);
             $fresh->forceFill(['title' => $data['title'], ...$this->metadata($workspace, $data)])->save();
             $this->syncTags($fresh, $workspace, $data['tags'] ?? [], $data['tag_ids'] ?? []);
         }, 3);

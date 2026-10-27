@@ -2,6 +2,7 @@
 @section('content')
 <a class="inline-link" href="{{ route('documents.index', $document->trashed() ? ['trash' => 1] : []) }}">← {{ __('documents.back') }}</a>
 <div class="library-heading"><div><span class="eyebrow">{{ $workspace->name }}</span><h1>{{ $document->title }}</h1>@if($document->summary)<p class="document-short-summary">{{ $document->summary }}</p>@endif<span class="stored-status"><i></i>{{ $document->trashed() ? __('documents.trash') : __('documents.stored') }}</span></div><div class="library-actions">@unless($document->trashed())<x-button :href="route('documents.download', ['document' => $document->id])" variant="outline" icon="arrow">{{ __('documents.download') }}</x-button>@can('update', $document)<x-button :href="route('documents.edit', ['document' => $document->id])">{{ __('documents.edit') }}</x-button>@endcan @endunless</div></div>
+@unless($document->trashed()) @include('documents.processing') @endunless
 <div class="document-detail-grid">
     <section class="library-panel document-preview"><div class="panel-heading"><h2>{{ __('documents.preview') }}</h2><span>{{ $document->page_count }} {{ __('documents.pages') }}</span></div>
         @if($document->trashed())<div class="library-empty"><x-icon name="document" :size="48"/><p>{{ __('documents.trash_note') }}</p></div>
@@ -20,7 +21,6 @@
         <div><dt>{{ __('documents.size') }}</dt><dd>{{ number_format($document->size_bytes / 1024, 1) }} KB</dd></div><div><dt>{{ __('documents.added') }}</dt><dd>{{ $document->created_at->timezone(config('vault.display_timezone'))->format('d.m.Y H:i') }}</dd></div>
         <div><dt>{{ __('documents.tags') }}</dt><dd>@forelse($document->tags as $tag)<span class="document-chip">{{ $tag->label() }}</span>@empty — @endforelse</dd></div>
     </dl>@if($document->description)<p class="document-description">{{ $document->description }}</p>@endif</section>
-    <p class="library-footnote">{{ __('documents.ocr_note') }}</p>
     @if($document->trashed())
         @if($document->purge_requested_at)<div class="security-notice">{{ __('documents.pending_purge') }}</div>
         @else
@@ -33,3 +33,5 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')<script src="{{ asset('js/document-processing.js') }}" defer></script>@endpush

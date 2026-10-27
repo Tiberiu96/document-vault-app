@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\ProcessingUsage;
 use App\Models\Workspace;
 use Illuminate\Validation\ValidationException;
 
@@ -18,6 +19,19 @@ class PlanLimitsService
         if ($bytes > $this->free()['max_file_bytes'] || $pages > $this->free()['max_pages'] || $pages < 1) {
             throw ValidationException::withMessages(['file' => __('documents.limit')]);
         }
+    }
+
+    public function reserveProcessing(Workspace $lockedWorkspace, string $kind, int $units, string $period): void
+    {
+        if (! in_array($kind, ['ocr', 'ai'], true)) {
+            throw new \InvalidArgumentException('Unsupported processing quota.');
+        }
+        $usage = ProcessingUsage::unguarded(fn () => ProcessingUsage::firstOrCreate(['workspace_id' => $lockedWorkspace->id, 'period' => $period]));
+        $limit = $this->free()[$kind === 'ocr' ? 'monthly_ocr_pages' : 'monthly_ai_calls'];
+        if ($limit < $usage->{$kind.'_used'} + $usage->{$kind.'_reserved'} + $units) {
+            throw ValidationException::withMessages(['processing' => __('processing.quota')]);
+        }
+        $usage->forceFill([$kind.'_reserved' => $usage->{$kind.'_reserved'} + $units])->save();
     }
 
     public function reserveStorage(Workspace $lockedWorkspace, int $bytes): void

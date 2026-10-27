@@ -75,7 +75,7 @@ return [
     'choose' => 'Choose file',
     'no_category' => 'No category',
     'original' => 'Original stored privately',
-    'ocr_note' => 'The file is stored. OCR and AI will be available in a later stage.',
+    'ocr_note' => 'Text is extracted in the background. AI suggestions are optional and require review.',
     'private' => 'Private access',
     'free_plan' => 'Free plan',
     'total_pages' => 'Pages stored',

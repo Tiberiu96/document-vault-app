@@ -4,6 +4,7 @@ namespace App\Jobs\Documents;
 
 use App\Models\Document;
 use App\Models\Workspace;
+use App\Services\Documents\DocumentProcessingService;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
@@ -43,6 +44,7 @@ class PurgeDocument implements ShouldBeUnique, ShouldQueue
             if (! $workspace || ! $document || ! $document->trashed() || ! $document->purge_requested_at) {
                 return;
             }
+            app(DocumentProcessingService::class)->cancel($document);
             $disk = Storage::disk('local');
             if (! $disk->deleteDirectory(dirname($document->storage_path))) {
                 throw new \RuntimeException('Private file cleanup failed.');

@@ -4,6 +4,7 @@ use App\Http\Controllers\AccountSecurityController;
 use App\Http\Controllers\AuthenticatedSessionController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DocumentController;
+use App\Http\Controllers\DocumentProcessingController;
 use App\Http\Controllers\LocalAiController;
 use App\Http\Controllers\PublicDiscoveryController;
 use App\Http\Controllers\PublicPageController;
@@ -51,6 +52,10 @@ Route::translate(function () {
                 Route::get(Localizer::url('documents'), [DocumentController::class, 'index'])->middleware('throttle:document.search')->name('documents.index');
                 Route::get(Localizer::url('documents.upload'), [DocumentController::class, 'create'])->name('documents.create');
                 Route::post(Localizer::url('documents'), [DocumentController::class, 'store'])->middleware('throttle:document.upload')->name('documents.store');
+                Route::post(Localizer::url('documents').'/{document}/'.Localizer::url('process').'/{kind}', [DocumentProcessingController::class, 'start'])->whereUuid('document')->where('kind', 'ocr|ai')->middleware('throttle:document.processing')->name('documents.process');
+                Route::get(Localizer::url('documents').'/{document}/'.Localizer::url('processing.status'), [DocumentProcessingController::class, 'status'])->whereUuid('document')->middleware('throttle:document.search')->name('documents.processing-status');
+                Route::get(Localizer::url('documents').'/{document}/'.Localizer::url('suggestions'), [DocumentProcessingController::class, 'suggestions'])->whereUuid('document')->name('documents.suggestions');
+                Route::post(Localizer::url('documents').'/{document}/'.Localizer::url('suggestions.reject'), [DocumentProcessingController::class, 'reject'])->whereUuid('document')->name('documents.suggestions.reject');
                 Route::get(Localizer::url('documents').'/{document}', [DocumentController::class, 'show'])->whereUuid('document')->name('documents.show');
                 Route::get(Localizer::url('documents').'/{document}/'.Localizer::url('edit'), [DocumentController::class, 'edit'])->whereUuid('document')->name('documents.edit');
                 Route::patch(Localizer::url('documents').'/{document}', [DocumentController::class, 'update'])->whereUuid('document')->name('documents.update');

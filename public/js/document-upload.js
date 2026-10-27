@@ -8,6 +8,13 @@
         const title = document.getElementById('title');
         if (title && !title.value && input.files[0]) title.value = input.files[0].name.replace(/\.[^.]+$/, '').slice(0, 160);
     };
+    input.form?.addEventListener('submit', () => {
+        const form = input.form;
+        form.setAttribute('aria-busy', 'true');
+        const progress = form.querySelector('.upload-progress');
+        if (progress) progress.hidden = false;
+        form.querySelectorAll('button[type="submit"]').forEach(button => { button.disabled = true; });
+    });
     input.addEventListener('change', show);
     ['dragenter', 'dragover'].forEach(type => zone.addEventListener(type, event => {
         event.preventDefault(); zone.classList.add('is-dragging');

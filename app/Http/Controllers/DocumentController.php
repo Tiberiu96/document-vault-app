@@ -9,11 +9,13 @@ use App\Models\Document;
 use App\Models\Tag;
 use App\Models\Workspace;
 use App\Services\Documents\DocumentLibrary;
+use App\Services\Documents\DocumentProcessingService;
 use App\Services\WebsiteContext;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\ValidationException;
 
 class DocumentController extends Controller
 {
@@ -73,7 +75,13 @@ class DocumentController extends Controller
     {
         $document = $library->upload($request->user(), $request->attributes->get('workspace'), $request->file('file'), $request->validated());
 
-        return redirect()->route('documents.show', ['document' => $document->id])->with('library_status', __('documents.uploaded'));
+        try {
+            app(DocumentProcessingService::class)->request($request->user(), $document, 'ocr');
+        } catch (ValidationException) {
+            $document->forceFill(['ocr_status' => 'failed'])->save();
+        }
+
+        return redirect()->route('documents.show', ['document' => $document->id, ...($document->ai_requested ? ['review' => 1] : [])])->with('library_status', __('documents.uploaded'));
     }
 
     public function show(Request $request, string $document)

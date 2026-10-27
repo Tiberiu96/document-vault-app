@@ -26,4 +26,8 @@ return [
     'restore' => 'restore',
     'purge' => 'purge',
     'ai.test' => 'local-ai-test',
+    'process' => 'process',
+    'processing.status' => 'processing-status',
+    'suggestions' => 'suggestions',
+    'suggestions.reject' => 'reject-suggestions',
 ];
