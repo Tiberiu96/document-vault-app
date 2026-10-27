@@ -4,6 +4,8 @@ namespace App\Providers;
 
 use App\Contracts\Ai\AiProviderInterface;
 use App\Contracts\Ocr\OcrProviderInterface;
+use App\Services\Ai\AiProviderException;
+use App\Services\Ai\GroqProvider;
 use App\Services\Ai\OllamaProvider;
 use App\Services\Ocr\LocalOcrProvider;
 use App\Services\WebsiteContext;
@@ -20,7 +22,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->app->bind(AiProviderInterface::class, OllamaProvider::class);
+        $this->app->bind(AiProviderInterface::class, fn ($app) => match (config('ai.provider')) {
+            'ollama' => $app->make(OllamaProvider::class),
+            'groq' => $app->make(GroqProvider::class),
+            default => throw new AiProviderException('UNSUPPORTED_AI_PROVIDER'),
+        });
         $this->app->bind(OcrProviderInterface::class, LocalOcrProvider::class);
     }
 

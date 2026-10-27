@@ -48,7 +48,7 @@ class DocumentProcessingTest extends TestCase
         Queue::fake();
         Storage::fake('local');
         Http::preventStrayRequests();
-        config(['ai.enabled' => true, 'ocr.enabled' => true, 'ai.ollama.context_length' => 8192]);
+        config(['ai.provider' => 'ollama', 'ai.enabled' => true, 'ocr.enabled' => true, 'ai.ollama.context_length' => 8192]);
         $this->user = User::factory()->create();
         $this->workspace = new Workspace;
         $this->workspace->forceFill(['name' => 'Processing example', 'owner_id' => $this->user->id, 'type' => 'personal'])->save();
@@ -196,10 +196,11 @@ class DocumentProcessingTest extends TestCase
     {
         $this->travelTo(Carbon::parse('2026-10-27 12:00:00', 'UTC'));
         $this->readyText('Factura pentru servicii documente. Furnizor Example SRL. Total 149.99 RON. Emisa 27.10.2026. Expira 01.12.2026.');
-        $this->fakeAi(['tag_keys' => ['to_review', 'to_review'], 'issued_on' => '2710-20-26', 'expires_on' => '01.12.2026']);
+        $this->fakeAi(['amount' => '149,99', 'tag_keys' => ['to_review', 'to_review'], 'issued_on' => '2710-20-26', 'expires_on' => '01.12.2026']);
         $result = app(DocumentAiAnalysis::class)->analyze($this->document->fresh(), 'ro');
         $this->assertFalse($result['review_required']);
         $this->assertSame(['to_review'], $result['fields']['tag_keys']);
+        $this->assertSame('149.99', $result['fields']['amount']);
         $this->assertSame('2026-10-27', $result['fields']['issued_on']);
         $this->assertSame('2026-12-01', $result['fields']['expires_on']);
     }
@@ -246,6 +247,19 @@ class DocumentProcessingTest extends TestCase
         Queue::assertPushedOn('ai', ProcessDocument::class);
         $service->complete($run->id, $this->workspace->id, ['text' => $this->text, 'engine' => 'fake']);
         $this->assertSame(1, ProcessingRun::where('kind', 'ai')->count());
+    }
+
+    public function test_queued_ai_keeps_original_provider_after_configuration_changes(): void
+    {
+        $this->readyText();
+        $this->fakeAi();
+        $run = app(DocumentProcessingService::class)->request($this->user, $this->document, 'ai');
+        $this->assertSame('ollama', $run->provider);
+        config(['ai.provider' => 'groq']);
+        $this->execute($run);
+        $this->assertSame('ready', $this->document->fresh()->ai_status);
+        $this->assertSame('groq', config('ai.provider'));
+        Http::assertSent(fn ($request) => $request->url() === 'http://127.0.0.1:11434/api/chat');
     }
 
     public function test_status_exposes_progress_but_no_private_text_and_requires_current_suggestions(): void

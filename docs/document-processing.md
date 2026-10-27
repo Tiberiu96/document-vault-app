@@ -12,6 +12,7 @@ La upload porneste OCR pe coada ocr. Optiunea AI apare imediat sub fisier,
 bifata implicit conform cerintei utilizatorului. Valoarea 0 trimisa prin formular
 opreste analiza AI; nu se presupune opt-in pentru clienti care omit campul.
 Setarea AI_ENABLED=false ascunde optiunea si blocheaza analiza pe server.
+Ollama este local; Groq optional transmite textul extras catre serviciul remote, cu informare in formular.
 Dupa OCR, numai documentele cu ai_requested pornesc analiza pe coada ai.
 Limba cererii originale este pastrata.
 

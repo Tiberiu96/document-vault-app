@@ -6,7 +6,7 @@
     @csrf
     <label class="document-dropzone" id="document-dropzone"><x-icon name="upload" :size="36"/><strong>{{ __('documents.upload_hint') }}</strong><input type="file" id="document-file" name="file" accept="application/pdf,image/jpeg,image/png" required aria-label="{{ __('documents.choose') }}"><span id="selected-file" aria-live="polite"></span></label>
     @if(config('ai.enabled'))
-    <div class="upload-ai-option"><input type="hidden" name="analyze_with_ai" value="0"><label class="remember"><input type="checkbox" name="analyze_with_ai" value="1" @checked(old('analyze_with_ai', '1') === '1')>{{ __('processing.auto_ai') }}</label><p class="field-help">{{ __('processing.auto_ai_hint') }}</p></div>
+    <div class="upload-ai-option"><input type="hidden" name="analyze_with_ai" value="0"><label class="remember"><input type="checkbox" name="analyze_with_ai" value="1" @checked(old('analyze_with_ai', '1') === '1')>{{ __('processing.auto_ai') }}</label><p class="field-help">{{ __(config('ai.provider') === 'groq' ? 'processing.remote_ai_hint' : 'processing.auto_ai_hint') }}</p></div>
     @endif
     <div class="upload-progress" role="status" hidden><span class="processing-spinner" aria-hidden="true"></span><span>{{ __('processing.uploading') }}</span></div>
     <p class="field-help">{{ __('documents.limit') }}</p>

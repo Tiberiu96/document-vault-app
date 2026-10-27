@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'remote_ai_hint' => 'A kinyert szöveget a Groq kapja meg AI-javaslatokhoz. Mentés előtt ellenőrizd őket. Csak helyi OCR-hez vedd ki a jelölést.',
     'auto_ai_hint' => 'Az AI a dokumentum alapján javasol adatokat. Mentés előtt ellenőrizd a javaslatokat. Kézi kitöltéshez vedd ki a jelölést.',
     'uploading' => 'A dokumentum feltöltése folyamatban. Ne zárd be az oldalt.',
     'checking' => 'Az eredeti mentve van. Az állapot automatikusan frissül.',

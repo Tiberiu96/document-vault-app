@@ -17,14 +17,14 @@ class CheckAi extends Command
     {
         try {
             $health = $provider->health();
-            $this->info('Ollama raspunde. Versiune: '.$health['version']);
-            $this->line('Model: '.$health['model'].'; instalat: '.($health['installed'] ? 'da' : 'nu'));
+            $this->info('Provider AI disponibil: '.$health['provider']);
+            $this->line('Model: '.$health['model'].'; disponibil: '.($health['installed'] ? 'da' : 'nu'));
             if (! $health['installed']) {
                 return self::FAILURE;
             }
             if ($this->option('infer')) {
                 $reply = $probe->run('Spune pe scurt ce este un document PDF.', 'ro');
-                $this->info('Inferenta locala reusita; JSON validat. Lungime raspuns: '.mb_strlen($reply).' caractere.');
+                $this->info('Inferenta reusita; JSON validat. Lungime raspuns: '.mb_strlen($reply).' caractere.');
             }
 
             return self::SUCCESS;

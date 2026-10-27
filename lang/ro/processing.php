@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'remote_ai_hint' => 'Textul extras este trimis catre Groq pentru propuneri AI. Verifica sugestiile inainte de salvare. Debifeaza pentru a pastra doar procesarea OCR locala.',
     'auto_ai_hint' => 'AI propune informatii pe baza documentului. Verifica sugestiile inainte de salvare. Debifeaza pentru completare manuala.',
     'uploading' => 'Se incarca documentul. Nu inchide pagina.',
     'checking' => 'Originalul este pastrat. Verificam progresul automat.',

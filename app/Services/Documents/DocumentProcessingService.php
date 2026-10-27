@@ -37,7 +37,7 @@ class DocumentProcessingService
             app(PlanLimitsService::class)->reserveProcessing($workspace, $kind, $units, $period);
             $run = new ProcessingRun;
             $run->forceFill(['workspace_id' => $workspace->id, 'document_id' => $record->id, 'requested_by' => $user->id,
-                'kind' => $kind, 'status' => 'queued', 'period' => $period, 'units' => $units,
+                'provider' => config('ai.provider'), 'kind' => $kind, 'status' => 'queued', 'period' => $period, 'units' => $units,
                 'base_version' => $record->metadata_version, 'locale' => app()->getLocale()])->save();
             $record->forceFill([$kind.'_run_id' => $run->id, $kind.'_status' => 'queued'])->save();
 

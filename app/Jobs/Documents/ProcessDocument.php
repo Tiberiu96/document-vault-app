@@ -45,6 +45,8 @@ class ProcessDocument implements ShouldBeEncrypted, ShouldBeUnique, ShouldQueue
             return;
         }
         [$run, $document] = $claimed;
+        $previousProvider = config('ai.provider');
+        config(['ai.provider' => $run->provider ?? 'ollama']);
         try {
             $result = $run->kind === 'ocr' ? $ocr->extract($document) : $ai->analyze($document, $run->locale);
             $processing->complete($this->runId, $this->workspaceId, $result);
@@ -59,6 +61,8 @@ class ProcessDocument implements ShouldBeEncrypted, ShouldBeUnique, ShouldQueue
         } catch (\Throwable) {
             // Exceptia originala poate contine cai sau text privat; nu o propaga.
             $processing->fail($this->runId, $this->workspaceId, 'PROCESSING_FAILED');
+        } finally {
+            config(['ai.provider' => $previousProvider]);
         }
     }
 

@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'remote_ai_hint' => 'Extracted text is sent to Groq for AI suggestions. Review suggestions before saving. Uncheck to use local OCR only.',
     'auto_ai_hint' => 'AI suggests information based on the document. Review suggestions before saving. Uncheck for manual entry.',
     'uploading' => 'Uploading the document. Keep this page open.',
     'checking' => 'Your original is saved. Progress updates automatically.',

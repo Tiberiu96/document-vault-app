@@ -1,8 +1,8 @@
 @extends('layouts.workspace')
 @section('content')
 <div class="library-heading"><div><span class="eyebrow">{{ __('ai.local_only') }}</span><h1>{{ __('ai.title') }}</h1><p>{{ __('ai.intro') }}</p></div></div>
-<div class="security-notice"><x-icon name="shield"/><p>{{ __('ai.notice') }}</p></div>
-<div class="library-panel library-form"><div class="panel-heading"><h2>{{ config('ai.ollama.model') }}</h2><span>{{ __('ai.queue') }}: ai</span></div>
+<div class="security-notice"><x-icon name="shield"/><p>{{ __('ai.notice') }} @if(config('ai.provider') === 'groq'){{ __('processing.remote_ai_hint') }}@endif</p></div>
+<div class="library-panel library-form"><div class="panel-heading"><h2>{{ config('ai.provider') }} / {{ config('ai.'.config('ai.provider').'.model') }}</h2><span>{{ __('ai.queue') }}: ai</span></div>
     <form method="POST" action="{{ route('ai.run') }}" class="auth-form" data-ai-form>@csrf<label for="prompt">{{ __('ai.question') }}</label><textarea id="prompt" name="prompt" rows="4" maxlength="500" required placeholder="{{ __('ai.example') }}">{{ is_string(old('prompt')) ? old('prompt') : '' }}</textarea><p class="field-help">{{ __('ai.short_only') }}</p><x-button type="submit" icon="sparkle">{{ __('ai.send') }}</x-button></form>
 </div>
 @if($run)

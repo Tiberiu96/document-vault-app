@@ -3,6 +3,10 @@
 return [
     'enabled' => (bool) env('AI_ENABLED', false),
     'provider' => env('AI_PROVIDER', 'ollama'),
+    'groq' => [
+        'api_key' => env('GROQ_API_KEY'),
+        'model' => env('GROQ_MODEL', 'openai/gpt-oss-20b'),
+    ],
     'ollama' => [
         'base_url' => env('OLLAMA_BASE_URL', 'http://127.0.0.1:11434'),
         'model' => env('OLLAMA_MODEL', 'qwen3.5:4b'),

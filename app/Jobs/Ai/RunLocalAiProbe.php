@@ -18,12 +18,15 @@ class RunLocalAiProbe implements ShouldBeEncrypted, ShouldQueue
 {
     use Queueable;
 
+    public string $provider = 'ollama';
+
     public int $tries = 2;
 
     public int $timeout = 100;
 
     public function __construct(public string $runId, public int $userId, public int $workspaceId, #[\SensitiveParameter] public string $prompt, public string $locale)
     {
+        $this->provider = config('ai.provider');
         $this->onQueue('ai')->afterCommit();
     }
 
@@ -46,6 +49,8 @@ class RunLocalAiProbe implements ShouldBeEncrypted, ShouldQueue
 
             return;
         }
+        $previousProvider = config('ai.provider');
+        config(['ai.provider' => $this->provider]);
         try {
             $this->result(['status' => 'running']);
             $reply = $probe->run($this->prompt, $this->locale);
@@ -58,6 +63,8 @@ class RunLocalAiProbe implements ShouldBeEncrypted, ShouldQueue
                 return;
             }
             $this->result(['status' => 'failed', 'reason' => $exception->reason]);
+        } finally {
+            config(['ai.provider' => $previousProvider]);
         }
     }
 

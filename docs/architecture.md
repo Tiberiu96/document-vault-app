@@ -64,3 +64,5 @@ Checkpoint web/auth si structura limbilor sunt livrate conform web-foundation.md
 Checkpoint biblioteca: document-library.md. Integrare Ollama si diagnostic local: local-ai.md.
 
 Checkpoint procesare: document-processing.md. Acces temporar de pe telefon: phone-testing.md.
+
+Provider remote optional Groq si configurare: groq.md. Joburile fixeaza providerul la solicitare.
