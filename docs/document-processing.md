@@ -6,6 +6,8 @@ stare si verificarea propunerilor. Joburile transporta identificatori, cu payloa
 
 ## Flux si interfata
 
+In primul pas se cere numai fisierul si optiunea AI, fara formular de metadate.
+Titlul provizoriu este derivat server-side din numele fisierului si poate fi corectat ulterior.
 La upload porneste OCR pe coada ocr. Optiunea AI apare imediat sub fisier,
 bifata implicit conform cerintei utilizatorului. Valoarea 0 trimisa prin formular
 opreste analiza AI; nu se presupune opt-in pentru clienti care omit campul.
@@ -17,7 +19,8 @@ Pagina documentului arata progresul deasupra preview-ului: asteptare, OCR, anali
 si timpul scurs al etapei. Polling autorizat la doua secunde, maximum zece minute;
 la pierderea conexiunii apare instructiunea de reincarcare. Nu se inventeaza procente.
 Dupa upload cu AI, parametrul review=1 deschide automat formularul cu sugestii cand
-rezultatul valid este gata. Nicio metadada nu este salvata automat. Salvarea cere
+rezultatul valid este gata. Fara AI se deschide direct formularul manual.
+La avertismente sau erori se deschide formularul manual cu explicatia problemei, fara propuneri. Nicio metadada nu este salvata automat. Salvarea cere
 confirmare explicita si verifica versiunea documentului, prevenind suprascrierea
 unei editari mai recente. Utilizatorul poate respinge propunerile.
 

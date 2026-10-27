@@ -26,6 +26,7 @@
                 finished = true;
                 clearInterval(clock);
                 if (data.ready_for_review && box.dataset.reviewUrl) location.replace(box.dataset.reviewUrl);
+                else if (box.dataset.manualUrl) location.replace(box.dataset.manualUrl);
                 else location.reload();
                 return;
             }

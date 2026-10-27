@@ -9,6 +9,8 @@ return [
     'ocr_stage' => 'Extracting document text',
     'ai_stage' => 'AI is preparing suggestions for review',
     'wait_stage' => 'Waiting for an available worker',
+    'upload_first' => 'Upload your document first. Review and complete its details in the next step.',
+    'upload_continue' => 'Upload and continue',
     'title' => 'Document processing',
     'ocr' => 'Text and OCR',
     'ai' => 'AI analysis',

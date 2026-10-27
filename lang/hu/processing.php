@@ -9,6 +9,8 @@ return [
     'ocr_stage' => 'A dokumentum szövegének kinyerése',
     'ai_stage' => 'Az AI ellenőrzésre készíti elő a javaslatokat',
     'wait_stage' => 'Várakozás egy elérhető feldolgozóra',
+    'upload_first' => 'Először töltsd fel a dokumentumot. Az adatokat a következő lépésben ellenőrizheted és egészítheted ki.',
+    'upload_continue' => 'Feltöltés és folytatás',
     'title' => 'Dokumentum feldolgozása',
     'ocr' => 'Szöveg és OCR',
     'ai' => 'AI-elemzés',

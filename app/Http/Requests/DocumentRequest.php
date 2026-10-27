@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use App\Services\PlanLimitsService;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Validation\Rule;
 
 class DocumentRequest extends FormRequest
@@ -15,6 +16,11 @@ class DocumentRequest extends FormRequest
 
     protected function prepareForValidation(): void
     {
+        if ($this->isMethod('POST') && ! $this->filled('title') && $this->file('file') instanceof UploadedFile) {
+            $name = pathinfo($this->file('file')->getClientOriginalName(), PATHINFO_FILENAME);
+            $name = trim(preg_replace('/[\x00-\x1F\x7F\\\\\/]/u', '_', $name) ?? '');
+            $this->merge(['title' => mb_substr($name ?: __('documents.upload'), 0, 160)]);
+        }
         if (is_string($this->input('tags'))) {
             $this->merge(['tags' => array_values(array_unique(array_filter(array_map('trim', explode(',', $this->input('tags'))))))]);
         }

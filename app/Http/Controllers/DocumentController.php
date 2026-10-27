@@ -68,7 +68,7 @@ class DocumentController extends Controller
     {
         Gate::authorize('create', [Document::class, $request->attributes->get('workspace')]);
 
-        return view('documents.form', [...$this->context($request, 'upload'), 'document' => null]);
+        return view('documents.upload', [...$this->context($request, 'upload'), 'document' => null]);
     }
 
     public function store(DocumentRequest $request, DocumentLibrary $library)
@@ -81,12 +81,23 @@ class DocumentController extends Controller
             $document->forceFill(['ocr_status' => 'failed'])->save();
         }
 
-        return redirect()->route('documents.show', ['document' => $document->id, ...($document->ai_requested ? ['review' => 1] : [])])->with('library_status', __('documents.uploaded'));
+        return redirect()->route($document->ai_requested ? 'documents.show' : 'documents.edit',
+            ['document' => $document->id, ...($document->ai_requested ? ['review' => 1] : [])])->with('library_status', __('documents.uploaded'));
     }
 
     public function show(Request $request, string $document)
     {
-        return view('documents.show', [...$this->context($request, 'documents'), 'document' => $this->document($request, $document, true)]);
+        $record = $this->document($request, $document, true);
+        if ($request->boolean('review') && ! $record->trashed() && Gate::allows('update', $record)) {
+            if ($record->ai_status === 'ready') {
+                return redirect()->route('documents.suggestions', ['document' => $record->id]);
+            }
+            if (in_array($record->ai_status, ['needs_review', 'failed', 'rejected'], true) || in_array($record->ocr_status, ['empty', 'failed'], true)) {
+                return redirect()->route('documents.edit', ['document' => $record->id]);
+            }
+        }
+
+        return view('documents.show', [...$this->context($request, 'documents'), 'document' => $record]);
     }
 
     public function edit(Request $request, string $document)

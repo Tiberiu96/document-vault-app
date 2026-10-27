@@ -207,9 +207,26 @@ class DocumentProcessingTest extends TestCase
     public function test_upload_option_is_checked_beside_file_and_can_be_declined(): void
     {
         $page = $this->get('/ro/documente/incarca')->assertOk();
-        $page->assertSeeInOrder(['id="document-file"', 'name="analyze_with_ai" value="1" checked', 'id="title"'], false);
+        $page->assertSeeInOrder(['id="document-file"', 'name="analyze_with_ai" value="1" checked', 'Incarca si continua'], false);
+        $this->assertFalse(str_contains($page->getContent(), 'name="title"'));
+        $this->assertFalse(str_contains($page->getContent(), 'name="supplier"'));
         $this->post('/ro/documente', ['title' => 'Only OCR', 'file' => UploadedFile::fake()->image('only-ocr.png', 30, 40), 'analyze_with_ai' => '0'])->assertSessionHasNoErrors()->assertRedirect();
         $this->assertFalse(Document::where('title', 'Only OCR')->sole()->ai_requested);
+    }
+
+    public function test_file_can_be_uploaded_before_any_metadata_and_ai_review_is_next(): void
+    {
+        $this->post('/ro/documente', ['file' => UploadedFile::fake()->image('invoice-first.png', 45, 55), 'analyze_with_ai' => '1'])
+            ->assertSessionHasNoErrors()->assertRedirect();
+        $record = Document::where('title', 'invoice-first')->sole();
+        $this->assertTrue($record->ai_requested);
+        $this->assertNull($record->supplier);
+        $this->assertNull($record->summary);
+        $this->get('/ro/documente/'.$record->id.'?review=1')->assertOk();
+        $record->forceFill(['ai_status' => 'needs_review', 'ocr_status' => 'ready'])->save();
+        $this->get('/ro/documente/'.$record->id.'?review=1')->assertRedirect(route('documents.edit', ['document' => $record->id]));
+        $this->get('/ro/documente/'.$record->id.'/editeaza')->assertOk()->assertSee('Necesita verificare manuala');
+        $this->patch('/ro/documente/'.$record->id, ['summary' => 'Missing name'])->assertSessionHasErrors('title');
     }
 
     public function test_ocr_chains_ai_only_with_opt_in_and_preserves_request_locale(): void

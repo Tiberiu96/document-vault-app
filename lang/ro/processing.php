@@ -9,6 +9,8 @@ return [
     'ocr_stage' => 'Se extrage textul documentului',
     'ai_stage' => 'AI pregateste sugestiile pentru verificare',
     'wait_stage' => 'Asteptam un procesor disponibil',
+    'upload_first' => 'Incarca mai intai documentul. Verifici si completezi informatiile in pasul urmator.',
+    'upload_continue' => 'Incarca si continua',
     'title' => 'Procesare document',
     'ocr' => 'Text si OCR',
     'ai' => 'Analiza AI',

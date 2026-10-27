@@ -5,11 +5,9 @@
 <form class="library-panel library-form auth-form" method="POST" enctype="multipart/form-data" action="{{ $document ? route('documents.update', ['document' => $document->id]) : route('documents.store') }}" data-document-upload>
     @csrf @if($document)@method('PATCH')<input type="hidden" name="metadata_version" value="{{ $document->metadata_version }}">@endif
     @isset($suggestionRunId)<input type="hidden" name="ai_run_id" value="{{ $suggestionRunId }}"><div class="security-notice"><p>{{ __('processing.review_hint') }} @if($suggestionPartial){{ __('processing.partial') }}@endif</p></div>@endisset
-    @unless($document)<label class="document-dropzone" id="document-dropzone"><x-icon name="upload" :size="36"/><strong>{{ __('documents.upload_hint') }}</strong><input type="file" id="document-file" name="file" accept="application/pdf,image/jpeg,image/png" required aria-label="{{ __('documents.choose') }}"><span id="selected-file" aria-live="polite"></span></label>@endunless
-    @unless($document)@if(config('ai.enabled'))
-    <div class="upload-ai-option"><input type="hidden" name="analyze_with_ai" value="0"><label class="remember"><input type="checkbox" name="analyze_with_ai" value="1" @checked(old('analyze_with_ai', '1') === '1')>{{ __('processing.auto_ai') }}</label><p class="field-help">{{ __('processing.auto_ai_hint') }}</p></div>
-    @endif @endunless
-    <div class="upload-progress" role="status" hidden><span class="processing-spinner" aria-hidden="true"></span><span>{{ __('processing.uploading') }}</span></div>
+    @if(!isset($suggestionRunId) && (in_array($document->ai_status, ['needs_review', 'failed']) || in_array($document->ocr_status, ['empty', 'failed'])))
+    <div class="form-alert" role="status"><strong>{{ __('processing.manual_review') }}</strong><p>{{ __('processing.no_autofill') }}</p>@foreach($document->aiRun?->result['warnings'] ?? [] as $warning)<p>{{ __('processing.warnings.'.$warning) }}</p>@endforeach</div>
+    @endif
     <div class="library-form-grid">
         <div class="full-width"><label for="title">{{ __('documents.name') }}</label><input id="title" name="title" required maxlength="160" value="{{ is_string(old('title', $document?->title)) ? old('title', $document?->title) : '' }}"></div>
         <div><label for="category">{{ __('documents.category_id') }}</label><select id="category" name="category_id"><option value="">{{ __('documents.no_category') }}</option>@foreach($categories as $category)<option value="{{ $category->id }}" @selected(old('category_id', $document?->category_id) == $category->id)>{{ $category->label() }}</option>@endforeach</select></div>
