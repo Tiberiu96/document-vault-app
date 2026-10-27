@@ -2,7 +2,7 @@
 <html lang="{{ app()->getLocale() }}" dir="ltr">
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     @php
         $brand = config('app.name');
         $title = ($page === 'security' ? __('account_mail.security_title') : __('site.seo.'.$page.'.title')).' — '.$brand;
@@ -81,5 +81,6 @@
         <div class="footer-bottom"><span>© {{ date('Y') }} {{ $brand }}</span><span>{{ $languages->pluck('locale')->map(fn ($code) => strtoupper($code))->implode(' · ') }}</span></div>
     </footer>
     @endif
+@stack('scripts')
 </body>
 </html>

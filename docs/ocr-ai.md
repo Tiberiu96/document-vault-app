@@ -6,4 +6,4 @@ Contracte OcrProviderInterface/AiProviderInterface; OcrService, DocumentProcessi
 
 AI oprit implicit; Gemini propus beta dupa evaluarea preturilor/retentiei/termenilor la momentul activarii. Ollama local optional; OpenRouter/OpenAI ulterior. Niciun cont sau credential presupus. Nu trimite documente externe pana la configurare si alegerea explicita a procesarii. Continutul OCR este nefiabil, inclusiv instructiunile continute in document. Schema JSON stricta, null pentru valori absente, categorii numai din lista permisa, corectie manuala si fara creare automata de categorii.
 
-Teste viitoare: PDF text/scanat/corupt, limbile OCR, timeout, limita 2 pagini, retry fara dubla cota, JSON invalid si injectie de instructiuni. Providere mockuite, fara apeluri AI platite.
+Teste viitoare: PDF text/scanat/corupt, limbile OCR, timeout, limita 10 pagini, retry fara dubla cota, JSON invalid si injectie de instructiuni. Providere mockuite, fara apeluri AI platite.

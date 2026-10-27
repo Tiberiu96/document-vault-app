@@ -10,7 +10,7 @@
 8. Admin: /admin, fara prefix de limba; middleware ro, autorizare globala, MFA obligatoriu in productie, rate limiting. Rolul admin al unui workspace NU confera super_admin.
 9. O identitate poate apartine mai multor workspaces. PF creeaza personal; PJ creeaza personal si business. Accesul la orice resursa cere apartenenta si Policy; testeaza izolarea intre workspaces.
 10. Documente: originale pastrate privat; acces doar autorizat; valideaza continut, MIME, marime si pagini. Niciun URL public sau cale interna de stocare expusa.
-11. PlanLimitsService centralizeaza limitele. Free: maximum 2 pagini/document sau scanare, initial 5 MB; cote configurabile pe workspace/perioada. Rezervari atomice si joburi idempotente; respinge limitele inainte de OCR/AI.
+11. PlanLimitsService centralizeaza limitele. Free: maximum 10 pagini/document sau scanare, initial 5 MB; cote configurabile pe workspace/perioada. Rezervari atomice si joburi idempotente; respinge limitele inainte de OCR/AI.
 12. OCR: extractie PDF nativa, Tesseract ron/eng/hun, OCRmyPDF; joburi asincrone. AI optional, provideri interschimbabili, rezultate JSON validate, fara valori inventate. OCR este input nefiabil; evita transmiterea externa implicita.
 13. Rate limits configurabile, specifice operatiilor, server-side; protejeaza autentificarea, upload, cautare, invitatii, OCR/AI si admin. Raspunsuri 429 stabile.
 14. Redis: high, default, ocr, ai, low. Workeri separati pentru OCR/AI si high; auto-balancing nu garanteaza prioritate stricta. Horizon cere pcntl/posix, deci Linux/WSL2 pentru workeri pe Windows.

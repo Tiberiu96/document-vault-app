@@ -11,9 +11,10 @@ au traduceri ro/en/hu/bg; limba cererii este pastrata in notificarea din coada.
 - Inregistrarea emite Registered dupa tranzactia PF/PJ. Contractul MustVerifyEmail
   declanseaza automat notificarea personalizata. Panoul ramane accesibil pentru
   administrarea initiala si arata avertizarea pentru email neconfirmat.
-- Confirmarea cere utilizator autentificat, id/email propriu si semnatura relativa
-  cu expirare la 60 minute. Accesul altei persoane si semnaturile modificate sunt
-  respinse. Confirmarea repetata este idempotenta. Documentele viitoare vor cere
+- Confirmarea valideaza id/email destinatar si semnatura relativa
+  cu expirare la 60 minute. Semnaturile modificate si emailurile schimbate dupa emitere sunt
+  respinse. Un link valid poate confirma adresa si din alt browser, fara autentificare
+  automata si fara schimbarea sesiunii curente. Confirmarea repetata este idempotenta. Documentele viitoare vor cere
   middleware verified; panoul nu este o dovada de email confirmat.
 - Resetarea foloseste brokerul Laravel: token hashuit in DB, expirare 60 minute,
   consum unic si raspuns generic indiferent de existenta contului.
@@ -41,8 +42,8 @@ Nu extindem automat valabilitatea tokenului de reset la reincercare.
 
 - Cerere reset: 3/ora/adresa normalizata si 20/ora/IP, comune intre limbi.
 - Aplicare reset: 10/minut/IP.
-- Retrimitere confirmare: 1/minut si 6/ora/utilizator.
-- Acces confirmare: 10/minut/utilizator.
+- Retrimitere confirmare: cooldown 30 secunde si 6/ora/utilizator, cu timer si raspuns 429 localizat.
+- Acces confirmare: 20/minut/IP.
 
 ## Verificare
 

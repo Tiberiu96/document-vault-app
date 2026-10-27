@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Contracts\Ai\AiProviderInterface;
+use App\Services\Ai\OllamaProvider;
 use App\Services\WebsiteContext;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
@@ -16,7 +18,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->bind(AiProviderInterface::class, OllamaProvider::class);
     }
 
     /**
@@ -32,8 +34,12 @@ class AppServiceProvider extends ServiceProvider
             return [Limit::perHour(3)->by('reset-account:'.hash('sha256', $email)), Limit::perHour(20)->by('reset-ip:'.hash('sha256', (string) $request->ip()))];
         });
         RateLimiter::for('password.reset', fn (Request $request) => Limit::perMinute(10)->by($request->ip()));
-        RateLimiter::for('verification.verify', fn (Request $request) => Limit::perMinute(10)->by($request->user()->id));
-        RateLimiter::for('verification.send', fn (Request $request) => [Limit::perMinute(1)->by('resend-minute:'.$request->user()->id), Limit::perHour(6)->by('resend-hour:'.$request->user()->id)]);
+        RateLimiter::for('verification.verify', fn (Request $request) => Limit::perMinute(20)->by($request->ip()));
+        RateLimiter::for('local.ai', fn (Request $request) => Limit::perMinute(3)->by($request->user()->id));
+        RateLimiter::for('local.ai.status', fn (Request $request) => Limit::perMinute(60)->by($request->user()->id));
+        RateLimiter::for('document.upload', fn (Request $request) => Limit::perMinute(10)->by($request->user()->id));
+        RateLimiter::for('document.search', fn (Request $request) => Limit::perMinute(60)->by($request->user()->id));
+        RateLimiter::for('taxonomy', fn (Request $request) => Limit::perMinute(30)->by($request->user()->id));
         RateLimiter::for('admin', fn (Request $request) => Limit::perMinute(30)->by($request->ip()));
         RateLimiter::for('demo', fn (Request $request) => Limit::perMinute(60)->by($request->ip()));
         RateLimiter::for('registration', fn (Request $request) => Limit::perHour(config('vault.rate_limits.registration_per_hour'))

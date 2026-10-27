@@ -69,8 +69,10 @@ class AccountSecurityTest extends TestCase
         $other = User::factory()->unverified()->create();
         app()->setLocale('ro');
         $url = (new AccountMail('verify'))->actionUrl($owner);
-        $this->actingAs($other)->get($url)->assertForbidden();
-        $this->assertFalse($owner->fresh()->hasVerifiedEmail());
+        $this->actingAs($other)->get($url)->assertOk()->assertSee('Adresa de email a fost confirmata.');
+        $this->assertTrue($owner->fresh()->hasVerifiedEmail());
+        $this->assertFalse($other->fresh()->hasVerifiedEmail());
+        $this->assertAuthenticatedAs($other);
         $this->actingAs($owner)->get($url)->assertRedirect('/ro/panou');
         $verifiedAt = $owner->fresh()->email_verified_at;
         $this->get($url)->assertRedirect('/ro/panou');
@@ -78,6 +80,44 @@ class AccountSecurityTest extends TestCase
         $this->get($url.'x')->assertForbidden();
         $this->travel(61)->minutes();
         $this->get($url)->assertForbidden();
+    }
+
+    public function test_guest_can_confirm_signed_email_without_being_logged_in(): void
+    {
+        $user = User::factory()->unverified()->create();
+        app()->setLocale('ro');
+        $url = (new AccountMail('verify'))->actionUrl($user);
+        $this->get($url)->assertOk()->assertSee('Adresa de email a fost confirmata.');
+        $this->assertTrue($user->fresh()->hasVerifiedEmail());
+        $this->assertGuest();
+    }
+
+    public function test_signed_email_cannot_confirm_an_address_changed_after_issuance(): void
+    {
+        $user = User::factory()->unverified()->create();
+        app()->setLocale('ro');
+        $url = (new AccountMail('verify'))->actionUrl($user);
+        $user->forceFill(['email' => 'changed@example.test'])->save();
+        $this->get($url)->assertForbidden()->assertSee('Linkul a expirat sau nu mai este valid.');
+        $this->assertFalse($user->fresh()->hasVerifiedEmail());
+        $this->assertGuest();
+    }
+
+    public function test_sending_many_verification_requests_shows_localized_wait_and_hourly_limit(): void
+    {
+        Notification::fake();
+        $user = User::factory()->unverified()->create();
+        $this->actingAs($user);
+        for ($i = 0; $i < 6; $i++) {
+            $this->post('/ro/retrimite-confirmarea')->assertRedirect('/ro/verifica-email');
+            $response = $this->get('/ro/verifica-email')->assertOk()->assertSee('Retrimite peste');
+            if ($i < 5) {
+                $this->assertTrue(str_contains($response->getContent(), 'data-seconds="30"'));
+            }
+            $this->travel(31)->seconds();
+        }
+        $this->post('/ro/retrimite-confirmarea')->assertStatus(429)->assertSee('Ai atins limita de 6 retrimiteri')->assertHeader('Retry-After');
+        Notification::assertSentToTimes($user, AccountMail::class, 6);
     }
 
     public function test_email_links_use_configured_host_and_locale_even_inside_a_worker(): void
@@ -102,7 +142,7 @@ class AccountSecurityTest extends TestCase
         $this->actingAs($user)->post('/ro/retrimite-confirmarea')->assertRedirect();
         $this->post('/en/resend-verification')->assertStatus(429)->assertHeader('Retry-After');
         Notification::assertSentToTimes($user, AccountMail::class, 1);
-        $this->travel(61)->seconds();
+        $this->travel(31)->seconds();
         $user->markEmailAsVerified();
         $this->post('/ro/retrimite-confirmarea')->assertRedirect();
         Notification::assertSentToTimes($user, AccountMail::class, 1);

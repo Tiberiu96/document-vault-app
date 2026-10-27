@@ -15,6 +15,6 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // Nu crea utilizatori sau administratori impliciti.
-        $this->call(LanguageSeeder::class);
+        $this->call([LanguageSeeder::class, CategorySeeder::class, TagSeeder::class]);
     }
 }

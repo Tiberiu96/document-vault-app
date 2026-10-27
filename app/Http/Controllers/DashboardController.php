@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Document;
 use App\Services\WebsiteContext;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -22,7 +23,10 @@ class DashboardController extends Controller
         return view('account.dashboard', [
             ...app(WebsiteContext::class)->forPage($request, 'dashboard'),
             'workspaces' => $workspaces,
-            'activeWorkspace' => $activeWorkspace,
+            'activeWorkspace' => $activeWorkspace, 'workspace' => $activeWorkspace, 'section' => 'dashboard',
+            'recentDocuments' => $activeWorkspace ? Document::where('workspace_id', $activeWorkspace->id)->with('category')->latest()->limit(8)->get() : collect(),
+            'documentCount' => $activeWorkspace ? Document::where('workspace_id', $activeWorkspace->id)->count() : 0,
+            'pageCount' => $activeWorkspace ? Document::where('workspace_id', $activeWorkspace->id)->sum('page_count') : 0,
         ]);
     }
 }

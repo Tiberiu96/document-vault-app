@@ -49,6 +49,10 @@ class AuthenticatedSessionController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
+        if ($request->boolean('switch_account')) {
+            return redirect()->route('login');
+        }
+
         return redirect()->route('home');
     }
 }

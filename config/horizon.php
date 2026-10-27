@@ -19,7 +19,7 @@ return [
         ],
         'default' => [
             'connection' => 'redis', 'queue' => ['default'], 'balance' => false,
-            'maxProcesses' => 1, 'memory' => 128, 'tries' => 3, 'timeout' => 60,
+            'maxProcesses' => 1, 'memory' => 256, 'tries' => 3, 'timeout' => 200,
         ],
         'ocr' => [
             'connection' => 'redis', 'queue' => ['ocr'], 'balance' => false,

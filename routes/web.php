@@ -3,11 +3,16 @@
 use App\Http\Controllers\AccountSecurityController;
 use App\Http\Controllers\AuthenticatedSessionController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DocumentController;
+use App\Http\Controllers\LocalAiController;
 use App\Http\Controllers\PublicDiscoveryController;
 use App\Http\Controllers\PublicPageController;
 use App\Http\Controllers\RegisteredUserController;
 use App\Http\Controllers\SwitchWorkspaceController;
+use App\Http\Controllers\TaxonomyController;
+use App\Http\Middleware\EnsureActiveWorkspace;
 use App\Http\Middleware\EnsureAvailableLanguage;
+use App\Http\Middleware\EnsureLocalEnvironment;
 use App\Services\LanguageCatalog;
 use Illuminate\Support\Facades\Route;
 use NielsNumbers\LaravelLocalizer\Facades\Localizer;
@@ -22,7 +27,13 @@ Route::translate(function () {
         foreach (config('vault.public_pages') as $page) {
             Route::get(Localizer::url($page), [PublicPageController::class, 'index'])->name($page)->defaults('indexable', true);
         }
+        Route::middleware([EnsureLocalEnvironment::class, 'auth', 'auth.session', 'verified', EnsureActiveWorkspace::class])->group(function () {
+            Route::get(Localizer::url('ai.test'), [LocalAiController::class, 'index'])->name('ai.playground');
+            Route::post(Localizer::url('ai.test'), [LocalAiController::class, 'store'])->middleware('throttle:local.ai')->name('ai.run');
+            Route::get(Localizer::url('ai.test').'/{run}', [LocalAiController::class, 'status'])->whereUuid('run')->middleware('throttle:local.ai.status')->name('ai.status');
+        });
         Route::get(Localizer::url('demo'), [PublicPageController::class, 'demo'])->middleware('throttle:demo')->name('demo');
+        Route::get(Localizer::url('verification.verify').'/{id}/{hash}', [AccountSecurityController::class, 'verify'])->whereNumber('id')->where('hash', '[a-f0-9]{40}')->middleware(['signed:relative', 'throttle:verification.verify'])->name('verification.verify');
         Route::middleware('guest')->group(function () {
             Route::get(Localizer::url('password.request'), [AccountSecurityController::class, 'forgot'])->name('password.request');
             Route::post(Localizer::url('password.request'), [AccountSecurityController::class, 'sendReset'])->middleware('throttle:password.email')->name('password.email');
@@ -35,8 +46,26 @@ Route::translate(function () {
         });
         Route::middleware(['auth', 'auth.session'])->group(function () {
             Route::get(Localizer::url('verification.notice'), [AccountSecurityController::class, 'notice'])->name('verification.notice');
-            Route::get(Localizer::url('verification.verify').'/{id}/{hash}', [AccountSecurityController::class, 'verify'])->middleware(['signed:relative', 'throttle:verification.verify'])->name('verification.verify');
-            Route::post(Localizer::url('verification.send'), [AccountSecurityController::class, 'resend'])->middleware('throttle:verification.send')->name('verification.send');
+            Route::post(Localizer::url('verification.send'), [AccountSecurityController::class, 'resend'])->name('verification.send');
+            Route::middleware(['verified', EnsureActiveWorkspace::class])->group(function () {
+                Route::get(Localizer::url('documents'), [DocumentController::class, 'index'])->middleware('throttle:document.search')->name('documents.index');
+                Route::get(Localizer::url('documents.upload'), [DocumentController::class, 'create'])->name('documents.create');
+                Route::post(Localizer::url('documents'), [DocumentController::class, 'store'])->middleware('throttle:document.upload')->name('documents.store');
+                Route::get(Localizer::url('documents').'/{document}', [DocumentController::class, 'show'])->whereUuid('document')->name('documents.show');
+                Route::get(Localizer::url('documents').'/{document}/'.Localizer::url('edit'), [DocumentController::class, 'edit'])->whereUuid('document')->name('documents.edit');
+                Route::patch(Localizer::url('documents').'/{document}', [DocumentController::class, 'update'])->whereUuid('document')->name('documents.update');
+                Route::delete(Localizer::url('documents').'/{document}', [DocumentController::class, 'destroy'])->whereUuid('document')->name('documents.destroy');
+                Route::get(Localizer::url('documents').'/{document}/'.Localizer::url('preview'), [DocumentController::class, 'file'])->whereUuid('document')->name('documents.preview');
+                Route::get(Localizer::url('documents').'/{document}/'.Localizer::url('download'), [DocumentController::class, 'file'])->whereUuid('document')->defaults('download', true)->name('documents.download');
+                Route::post(Localizer::url('documents').'/{document}/'.Localizer::url('restore'), [DocumentController::class, 'restore'])->whereUuid('document')->name('documents.restore');
+                Route::delete(Localizer::url('documents').'/{document}/'.Localizer::url('purge'), [DocumentController::class, 'purge'])->whereUuid('document')->name('documents.purge');
+                Route::get(Localizer::url('categories'), [TaxonomyController::class, 'index'])->name('categories.index');
+                foreach (['category' => 'categories', 'tag' => 'tags'] as $kind => $slug) {
+                    Route::post(Localizer::url($slug), [TaxonomyController::class, 'save'])->defaults('taxonomy', $kind)->middleware('throttle:taxonomy')->name($slug.'.store');
+                    Route::patch(Localizer::url($slug).'/{item}', [TaxonomyController::class, 'save'])->whereNumber('item')->defaults('taxonomy', $kind)->middleware('throttle:taxonomy')->name($slug.'.update');
+                    Route::delete(Localizer::url($slug).'/{item}', [TaxonomyController::class, 'destroy'])->whereNumber('item')->defaults('taxonomy', $kind)->middleware('throttle:taxonomy')->name($slug.'.destroy');
+                }
+            });
             Route::get(Localizer::url('dashboard'), DashboardController::class)->name('dashboard');
             Route::post(Localizer::url('logout'), [AuthenticatedSessionController::class, 'destroy'])->name('logout');
             Route::post(Localizer::url('workspace.switch'), SwitchWorkspaceController::class)->name('workspace.switch');
