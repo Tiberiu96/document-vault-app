@@ -33,7 +33,7 @@ return [
     'invalid_category' => 'Categoria nu este disponibila in acest spatiu.',
     'storage_full' => 'Spatiul de stocare este plin. Documentele din cos ocupa in continuare spatiu.',
     'storage_error' => 'Fisierul nu a putut fi salvat. Incearca din nou.',
-    'duplicate' => 'Acest fisier exista deja in spatiu, inclusiv posibil in cos.',
+    'duplicate' => 'Acest fisier exista deja in spatiu.',
     'uploaded' => 'Documentul a fost incarcat in siguranta.',
     'saved' => 'Modificarile au fost salvate.',
     'trashed' => 'Documentul a fost mutat in cos.',

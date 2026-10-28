@@ -33,7 +33,7 @@ return [
     'invalid_category' => 'This category is not available in this workspace.',
     'storage_full' => 'Storage is full. Documents in the trash still use storage.',
     'storage_error' => 'The file could not be saved. Please try again.',
-    'duplicate' => 'This file already exists in the workspace, possibly in the trash.',
+    'duplicate' => 'This file already exists in the workspace.',
     'uploaded' => 'Your document was uploaded securely.',
     'saved' => 'Changes saved.',
     'trashed' => 'Document moved to trash.',

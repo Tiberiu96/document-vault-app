@@ -33,7 +33,7 @@ return [
     'invalid_category' => 'Ez a kategória nem érhető el ebben a munkatérben.',
     'storage_full' => 'A tárhely megtelt. A kukában lévő dokumentumok is foglalnak helyet.',
     'storage_error' => 'A fájl mentése nem sikerült. Próbáld újra.',
-    'duplicate' => 'Ez a fájl már létezik a munkatérben, esetleg a kukában.',
+    'duplicate' => 'Ez a fájl már létezik a munkatérben.',
     'uploaded' => 'A dokumentum biztonságosan feltöltve.',
     'saved' => 'Módosítások mentve.',
     'trashed' => 'A dokumentum a kukába került.',
