@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 #[Guarded(['*'])]
@@ -49,6 +50,11 @@ class Document extends Model
     public function ocrRun(): BelongsTo
     {
         return $this->belongsTo(ProcessingRun::class, 'ocr_run_id');
+    }
+
+    public function reminder(): HasOne
+    {
+        return $this->hasOne(Reminder::class);
     }
 
     public function decimalAmount(): ?string

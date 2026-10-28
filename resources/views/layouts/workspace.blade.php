@@ -2,7 +2,7 @@
 <html lang="{{ app()->getLocale() }}">
 <head>
     <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-    <title>{{ $section === 'ai' ? __('ai.title') : __('documents.'.($section === 'dashboard' ? 'dashboard' : ($section === 'categories' ? 'categories' : 'title'))) }} — {{ config('app.name') }}</title>
+    <title>{{ $section === 'reminders' ? __('reminders.title') : ($section === 'ai' ? __('ai.title') : __('documents.'.($section === 'dashboard' ? 'dashboard' : ($section === 'categories' ? 'categories' : 'title')))) }} — {{ config('app.name') }}</title>
     <meta name="robots" content="noindex, nofollow"><meta name="referrer" content="no-referrer">
     <x-favicons/>
     <link rel="stylesheet" href="{{ asset('css/app.css') }}?v={{ filemtime(public_path('css/app.css')) }}">
@@ -19,6 +19,7 @@
             @foreach(['dashboard' => ['home', 'dashboard'], 'documents.index' => ['document', 'title'], 'categories.index' => ['folder', 'categories']] as $name => [$icon, $label])
             <a href="{{ route($name) }}" @if(($name === 'dashboard' && $section === 'dashboard') || ($name === 'documents.index' && in_array($section, ['documents', 'upload'])) || ($name === 'categories.index' && $section === 'categories')) aria-current="page" @endif><x-icon :name="$icon"/>{{ __('documents.'.$label) }}</a>
             @endforeach
+            <a href="{{ route('reminders.index') }}" @if($section === 'reminders')aria-current="page"@endif><x-icon name="bell"/>{{ __('reminders.title') }}</a>
         @if(app()->environment('local') && config('ai.enabled') && $workspace && Gate::allows('manage', [App\Models\Document::class, $workspace]))<a href="{{ route('ai.playground') }}" @if($section === 'ai') aria-current="page" @endif><x-icon name="sparkle"/>{{ __('ai.title') }}</a>@endif
         </nav>
         <div class="library-botanical"><x-branch/><p>{{ __('site.life.quote') }}</p><span>{{ __('documents.private') }}</span></div>
@@ -29,7 +30,7 @@
             @if($workspace)<x-workspace-picker :workspace="$workspace" :workspaces="$workspaces" class="library-mobile-workspace"/>@endif
             <x-brand class="library-mobile-brand" :href="route('dashboard')"/>
             <form action="{{ route('documents.index') }}" class="library-search" role="search"><x-icon name="search"/><input type="search" name="q" maxlength="100" placeholder="{{ __('documents.search') }}" aria-label="{{ __('documents.search') }}" value="{{ is_string(request('q')) ? request('q') : '' }}"><button type="submit" aria-label="{{ __('documents.search') }}"><x-icon name="arrow"/></button></form>
-            <details class="library-account"><summary><span class="library-avatar">{{ mb_substr(auth()->user()->name, 0, 1) }}</span><span>{{ auth()->user()->name }}</span><x-icon name="chevron" :size="16"/></summary><div class="library-account-menu"><x-language-switcher :languages="$languages"/><a href="{{ route('verification.notice') }}">{{ __('account_mail.status') }}</a><form action="{{ route('logout') }}" method="POST">@csrf<button type="submit">{{ __('site.nav.logout') }}</button></form></div></details>
+            <details class="library-account"><summary><span class="library-avatar">{{ mb_substr(auth()->user()->name, 0, 1) }}</span><span>{{ auth()->user()->name }}</span><x-icon name="chevron" :size="16"/></summary><div class="library-account-menu"><a href="{{ route('reminders.index') }}">{{ __('reminders.title') }}</a><x-language-switcher :languages="$languages"/><a href="{{ route('verification.notice') }}">{{ __('account_mail.status') }}</a><form action="{{ route('logout') }}" method="POST">@csrf<button type="submit">{{ __('site.nav.logout') }}</button></form></div></details>
         </header>
         <main id="main" class="library-content" tabindex="-1">
             @if(session('library_status'))<div class="security-notice" role="status">{{ session('library_status') }}</div>@endif

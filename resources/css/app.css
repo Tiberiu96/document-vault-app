@@ -892,3 +892,26 @@
 .site-footer .brand img { width:156px; height:52px; }
 @media(max-width:800px){.library-mobile-brand img{width:150px;height:50px}}
 @media(max-width:600px){.site-header .brand img{width:156px;height:52px}}
+
+.reminder-panel { margin-top:22px; }
+.reminder-panel-body { padding:24px; }
+.reminder-panel-body h3 { font-size:18px; font-weight:500; margin:22px 0 12px; }
+.reminder-status-row { display:flex; align-items:center; flex-wrap:wrap; gap:12px; font-size:16px; }
+.reminder-timeline { list-style:none; padding:0; margin:12px 0; }
+.reminder-timeline li { display:flex; flex-wrap:wrap; justify-content:space-between; gap:8px 18px; padding:12px 0; border-bottom:1px solid #e6e2da; font-size:16px; }
+.reminder-timeline li span { color:#77766f; }
+.reminder-actions { margin:20px 0; gap:12px; }
+.reminder-date-action,.reminder-history { margin:18px 0 0; font-size:16px; }
+.reminder-date-action summary,.reminder-history summary { cursor:pointer; color:#715a3e; padding:8px 0; }
+.reminder-date-action form,.reminder-create { display:flex; flex-wrap:wrap; align-items:flex-end; gap:12px; margin-top:12px; }
+.reminder-date-action label,.reminder-create label { display:grid; gap:8px; font-size:16px; }
+.reminder-date-action input,.reminder-create input { font:inherit; padding:12px; border:1px solid #e6e2da; border-radius:5px; min-width:0; background:#fff; }
+.reminder-list { display:grid; gap:20px; }
+.reminder-list-card h2 { overflow-wrap:anywhere; }
+.dashboard-reminders { margin-bottom:28px; }
+.dashboard-reminder-row { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; padding:12px 0; border-bottom:1px solid #e6e2da; font-size:16px; }
+.dashboard-reminder-row span { overflow-wrap:anywhere; }
+.dashboard-reminder-row time { color:#77766f; }
+@media(max-width:600px){.reminder-panel-body{padding:20px 16px}.reminder-actions{align-items:stretch}.reminder-actions form{flex:1 1 100%}.reminder-actions button{width:100%}.reminder-date-action form,.reminder-create{display:grid;grid-template-columns:minmax(0,1fr)}}
+
+.reminder-tabs{flex-wrap:nowrap;gap:4px;overflow-x:auto}.reminder-tabs a{flex:1;padding:12px 10px;text-align:center;white-space:nowrap}

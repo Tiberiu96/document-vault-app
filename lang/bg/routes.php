@@ -34,4 +34,5 @@ return [
     'suggestions' => 'predlozheniya',
     'suggestions.reject' => 'otkaz-predlozheniya',
     'delete.confirm' => 'iztrivane',
+    'reminders' => 'napomnyaniya',
 ];

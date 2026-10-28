@@ -5,6 +5,7 @@ namespace App\Jobs\Documents;
 use App\Models\Document;
 use App\Models\Workspace;
 use App\Services\Documents\DocumentProcessingService;
+use App\Services\ReminderService;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
@@ -50,6 +51,7 @@ class PurgeDocument implements ShouldBeUnique, ShouldQueue
                 throw new \RuntimeException('Private file cleanup failed.');
             }
             $workspace->forceFill(['storage_used_bytes' => max(0, $workspace->storage_used_bytes - ($document->source_released_at ? 0 : $document->size_bytes + $document->preview_bytes))])->save();
+            app(ReminderService::class)->deleteNotifications($document);
             $document->forceDelete();
         }, 3);
     }

@@ -16,3 +16,8 @@ Notificarile de cont AccountMail sunt in high, afterCommit si ShouldBeEncrypted;
 3 incercari, timeout 30s, backoff 10/60/180s. Workerii locali Horizon ruleaza prin
 serviciul utilizatorului vaulty-horizon, separat de Mailpit. Configurarea si testele
 sunt descrise in account-email.md si integrations.md.
+
+DeliverReminder ruleaza pe high cu payload encrypted, afterCommit si timeout45s.
+SMTP timeout15s. Schedulerul local ruleaza ca serviciu user vaulty-scheduler,
+dispatch in fiecare minut cu withoutOverlapping. Detalii despre claim, deduplicare
+si evitarea retrimiterilor SMTP incerte in reminders.md.

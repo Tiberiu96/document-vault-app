@@ -49,6 +49,7 @@ class AppServiceProvider extends ServiceProvider
         RateLimiter::for('document.processing', fn (Request $request) => Limit::perMinute(3)->by($request->user()->id));
         RateLimiter::for('document.upload', fn (Request $request) => Limit::perMinute(10)->by($request->user()->id));
         RateLimiter::for('document.search', fn (Request $request) => Limit::perMinute(60)->by($request->user()->id));
+        RateLimiter::for('reminders', fn (Request $request) => Limit::perMinute(config('reminders.changes_per_minute'))->by($request->user()->id));
         RateLimiter::for('taxonomy', fn (Request $request) => Limit::perMinute(30)->by($request->user()->id));
         RateLimiter::for('admin', fn (Request $request) => Limit::perMinute(30)->by($request->ip()));
         RateLimiter::for('demo', fn (Request $request) => Limit::perMinute(60)->by($request->ip()));

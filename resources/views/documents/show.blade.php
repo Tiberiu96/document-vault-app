@@ -3,9 +3,8 @@
 <a class="inline-link" href="{{ route('documents.index') }}">← {{ __('documents.back') }}</a>
 <div class="library-heading"><div><span class="eyebrow">{{ $workspace->name }}</span><h1>{{ $document->title }}</h1>@if($document->summary)<p class="document-short-summary">{{ $document->summary }}</p>@endif<span class="stored-status"><i></i>{{ $document->isDraft() ? __('processing.draft') : __('documents.stored') }}</span></div><div class="library-actions">@unless($document->trashed())@unless($document->source_released_at)<x-button :href="route('documents.download', ['document' => $document->id])" variant="outline" icon="arrow">{{ __('documents.download') }}</x-button>@endunless @can('update', $document)<x-button :href="route('documents.edit', ['document' => $document->id])">{{ __('documents.edit') }}</x-button>@endcan @endunless</div></div>
 @if($document->isDraft())<div class="security-notice"><p>{{ __('processing.draft_notice') }}</p><form method="POST" action="{{ route('documents.discard', ['document' => $document->id]) }}">@csrf @method('DELETE')<button type="submit" class="inline-link">{{ __('documents.cancel') }}</button></form></div>@endif
-@unless($document->trashed()) @include('documents.processing') @endunless
 <div class="document-detail-grid">
-    <section class="library-panel document-preview"><div class="panel-heading"><h2>{{ __('documents.preview') }}</h2><span>{{ $document->page_count }} {{ __('documents.pages') }}</span></div>
+    <section class="library-panel document-preview"><div class="panel-heading"><h2>{{ __('documents.preview') }}</h2><span>{{ $document->page_count }} {{ trans_choice('documents.page_count', $document->page_count) }}</span></div>
         @if($document->source_released_at)<div class="library-empty"><x-icon name="shield" :size="40"/><p>{{ __('processing.source_erased') }}</p></div>
         @elseif($document->mime_type === 'application/pdf')
             @if($document->preview_status === 'ready')
@@ -23,10 +22,12 @@
         <div><dt>{{ __('documents.tags') }}</dt><dd>@forelse($document->tags as $tag)<span class="document-chip">{{ $tag->label() }}</span>@empty — @endforelse</dd></div>
     </dl>@if($document->description)<p class="document-description">{{ $document->description }}</p>@endif</section>
     @unless($document->isDraft())
+        @include('reminders.document', ['reminder' => $document->reminder])
         @can('delete', $document)<div class="library-danger"><a class="danger-button" href="{{ route('documents.delete-confirmation', ['document' => $document->id]) }}">{{ __('documents.delete') }}</a></div>@endcan
     @endunless
     </div>
 </div>
+@unless($document->trashed()) @include('documents.processing') @endunless
 @endsection
 
 @push('scripts')<script src="{{ asset('js/document-processing.js') }}" defer></script>@endpush

@@ -10,6 +10,7 @@ use App\Http\Controllers\LocalAiController;
 use App\Http\Controllers\PublicDiscoveryController;
 use App\Http\Controllers\PublicPageController;
 use App\Http\Controllers\RegisteredUserController;
+use App\Http\Controllers\ReminderController;
 use App\Http\Controllers\SwitchWorkspaceController;
 use App\Http\Controllers\TaxonomyController;
 use App\Http\Middleware\EnsureActiveWorkspace;
@@ -50,6 +51,9 @@ Route::translate(function () {
             Route::get(Localizer::url('verification.notice'), [AccountSecurityController::class, 'notice'])->name('verification.notice');
             Route::post(Localizer::url('verification.send'), [AccountSecurityController::class, 'resend'])->name('verification.send');
             Route::middleware(['verified', EnsureActiveWorkspace::class])->group(function () {
+                Route::get(Localizer::url('reminders'), [ReminderController::class, 'index'])->name('reminders.index');
+                Route::post(Localizer::url('documents').'/{document}/'.Localizer::url('reminders'), [ReminderController::class, 'store'])->whereUuid('document')->middleware('throttle:reminders')->name('reminders.store');
+                Route::patch(Localizer::url('reminders').'/{reminder}', [ReminderController::class, 'update'])->whereUuid('reminder')->middleware('throttle:reminders')->name('reminders.update');
                 Route::get(Localizer::url('documents'), [DocumentController::class, 'index'])->middleware('throttle:document.search')->name('documents.index');
                 Route::get(Localizer::url('documents.scan'), [DocumentScannerController::class, 'index'])->name('documents.scan');
                 Route::post(Localizer::url('documents.scan'), [DocumentScannerController::class, 'store'])->middleware('throttle:document.upload')->name('documents.scan-store');

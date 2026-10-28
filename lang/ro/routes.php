@@ -34,4 +34,5 @@ return [
     'suggestions' => 'sugestii',
     'suggestions.reject' => 'respinge-sugestii',
     'delete.confirm' => 'sterge',
+    'reminders' => 'remindere',
 ];

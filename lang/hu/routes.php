@@ -34,4 +34,5 @@ return [
     'suggestions' => 'javaslatok',
     'suggestions.reject' => 'javaslatok-elutasitasa',
     'delete.confirm' => 'torles',
+    'reminders' => 'emlekeztetok',
 ];

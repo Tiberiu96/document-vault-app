@@ -1,0 +1,17 @@
+[Unit]
+Description=Vaulty local Laravel Scheduler
+After=network.target vaulty-horizon.service
+
+[Service]
+WorkingDirectory=/var/www/document-vault-app
+ExecStart=/usr/bin/php /var/www/document-vault-app/artisan schedule:work --no-interaction
+Restart=always
+RestartSec=5
+TimeoutStopSec=30
+UMask=0077
+NoNewPrivileges=true
+StandardOutput=null
+StandardError=journal
+
+[Install]
+WantedBy=default.target

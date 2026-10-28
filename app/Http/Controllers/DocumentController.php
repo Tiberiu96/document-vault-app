@@ -35,7 +35,7 @@ class DocumentController extends Controller
 
     private function document(Request $request, string $id): Document
     {
-        $query = Document::where('workspace_id', $request->attributes->get('workspace')->id)->with(['category', 'tags']);
+        $query = Document::where('workspace_id', $request->attributes->get('workspace')->id)->with(['category', 'tags', 'reminder.user', 'reminder.deliveries' => fn ($q) => $q->orderBy('scheduled_for')]);
         $document = $query->findOrFail($id);
         Gate::authorize('view', $document);
 
