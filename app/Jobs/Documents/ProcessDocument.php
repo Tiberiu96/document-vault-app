@@ -24,7 +24,7 @@ class ProcessDocument implements ShouldBeEncrypted, ShouldBeUnique, ShouldQueue
 
     public function __construct(public string $runId, public int $workspaceId, public string $kind)
     {
-        $this->timeout = $kind === 'ocr' ? 240 : 100;
+        $this->timeout = $kind === 'ocr' ? 240 : 400;
         $this->onQueue($kind === 'ocr' ? 'ocr' : 'ai')->afterCommit();
     }
 

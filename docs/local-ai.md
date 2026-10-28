@@ -18,14 +18,14 @@ Documentatie: https://docs.ollama.com/faq si https://docs.ollama.com/linux
 
 .env local: AI_ENABLED=true, AI_PROVIDER=ollama,
 OLLAMA_BASE_URL=http://127.0.0.1:11434, OLLAMA_MODEL=qwen3.5:4b,
-OLLAMA_TIMEOUT=90, OLLAMA_NUM_CTX=8192. .env.example ramane AI_ENABLED=false.
+OLLAMA_TIMEOUT=90, OLLAMA_NUM_CTX=16384. .env.example ramane AI_ENABLED=false.
 Dupa schimbare: php artisan config:clear si systemctl --user restart vaulty-horizon.
 
 AiProviderInterface separa transportul. OllamaProvider accepta numai IP loopback,
 fara redirecturi HTTP sau modele cloud. Raspunsurile JSON trebuie validate de
 apelant conform regulilor de domeniu. LocalAiProbe valideaza schema reply si nu
 foloseste documente sau metadate private implicit. Probele scurte au un buget
-conservator de input; documentele lungi necesita segmentare explicita in etapa AI.
+conservator de input; documentele lungi sunt segmentate explicit in etapa AI.
 Erorile de provider sunt sanitizate; prompturile/corpurile HTTP nu apar in exceptii.
 
 ## Testare
@@ -49,3 +49,13 @@ Modelele se descarca de pe internet, dar inferenta locala nu necesita trimiterea
 prompturilor catre un provider extern. Analiza documentelor este locala si optionala, cu propuneri validate si confirmate explicit.
 Optiunea de upload este bifata implicit la cererea utilizatorului si poate fi debifata.
 Clientul pastreaza modelul incarcat 10 minute dupa analiza, pentru a reduce reincarcarile.
+
+## Context si documente lungi
+
+Context implicit 16384, raspuns maximum 1024 tokenuri, 1024 rezervate pentru template. Bugetarea inputului foloseste conservator maximum un token per byte JSON; nu pretinde tokenizare exacta. Din acest buget se rezerva 6000 bytes pentru instructiuni/schema/catalog. Documentul intra integral daca incape; altfel se imparte in maximum 4 sectiuni UTF-8 cu suprapunere de pana la 256 caractere. Intregul plan se valideaza inainte de inferenta: daca nu incape in patru sectiuni, esec explicit PROMPT_TOO_LARGE, fara trimitere partiala sau omisiuni. Numarul de pagini nu garanteaza incadrarea oricarui text.
+
+Sectiunile se proceseaza secvential. Categoria poate lipsi intr-o sectiune, dar trebuie identificata in rezultatul final. Campurile factuale se verifica fata de sectiunea lor; valori diferite intre sectiuni, calitate slaba sau sectiuni nevalidate blocheaza toate sugestiile. Sumarul este primul sumar valid disponibil, nu un rezumat garantat al tuturor clauzelor. Originalul/OCR nu sunt modificate. Rezultatul indica sections si partial=false numai cand toate sectiunile au fost procesate.
+
+Horizon ai: un worker; Ollama OLLAMA_NUM_PARALLEL=1, maximum un model incarcat. Maximum 90s/apel si 4 apeluri/analiza, job 400s, Horizon 420s, Redis retry_after 480s, systemd TimeoutStopSec 450s. Acestea sunt plafoane, nu timpi estimati. La schimbarea timeouturilor actualizeaza si mediul/conexiunea Redis si reporneste workerii. Joburile high au worker separat.
+
+Proba locala 2026-10-28 la 16K: aproximativ 30 KB text compactat, patru sectiuni, 135.6s dupa restartul serviciului. Runtime-ul a raportat context_length=16384 si aproximativ 3.5 GB memorie model, cu incarcare partiala pe GPU. Toate sectiunile au fost evaluate; modelul a returnat indicii neconvingatoare/contradictorii, deci precompletarea a ramas blocata. Acest test confirma executia completa, nu acuratetea modelului sau o latenta garantata.

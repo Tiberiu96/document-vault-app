@@ -61,8 +61,8 @@ class OllamaProvider implements AiProviderInterface
 
     public function structured(array $messages, array $schema): array
     {
-        // Buget conservator in bytes pentru probe scurte. Documentele lungi vor necesita chunking explicit.
-        $budget = min(12000, (int) config('ai.ollama.context_length') - (int) config('ai.ollama.max_output_tokens') - 512);
+        // Limita conservatoare: inputul, raspunsul si template-ul incap in context.
+        $budget = app(OllamaContext::class)->inputBudget();
         if (strlen(json_encode([$messages, $schema], JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE)) > $budget) {
             throw new AiProviderException('PROMPT_TOO_LARGE');
         }
@@ -76,6 +76,9 @@ class OllamaProvider implements AiProviderInterface
             throw new AiProviderException('OLLAMA_UNAVAILABLE', true);
         }
         $content = $response->json('message.content');
+        if ($response->json('done_reason') === 'length') {
+            throw new AiProviderException('AI_OUTPUT_TRUNCATED');
+        }
         if (! is_string($content) || strlen($content) > 32000 || $response->json('done') !== true || $response->json('done_reason') === 'length') {
             throw new AiProviderException('INVALID_AI_RESPONSE');
         }

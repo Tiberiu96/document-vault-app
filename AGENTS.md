@@ -38,6 +38,8 @@ Emailuri de cont (confirmare/resetare/alerta parola): notificari asincrone pe hi
 
 Documentele expirate pot fi precompletate si salvate, cu avertisment neblocant. Datele de expirare deja trecute nu programeaza notificari viitoare. Calitatea slaba si informatiile fara dovezi raman blocante pentru sugestii.
 
+Ollama: context local implicit 16K, un singur worker AI si OLLAMA_NUM_PARALLEL=1. Fara taierea tacita a textului; text integral sau maximum 4 sectiuni UTF-8 suprapuse, cu plan validat inainte de inferenta si combinare determinista. Conflictele intre sectiuni blocheaza precompletarea. Pastreaza timeout job < Horizon < Redis retry_after si timpul de oprire systemd peste durata jobului. Vezi docs/local-ai.md.
+
 Fluxul de upload este in doua faze: copia serverului pentru analiza si preview-urile se sterg la finalul procesarii; browserul tine originalul numai in memoria paginii. La confirmare se reincarca acelasi fisier si se verifica SHA-256/MIME/pagini sub lock. Reloadul cere reselectarea originalului. Joburile vechi nu pot recrea surse temporare sau sterge originale confirmate; source_revision si source_released_at protejeaza tranzitiile.
 
 Documentele confirmate se sterg definitiv numai dupa confirmare explicita Da/Nu. Fara cos sau restaurare publica; marcajele interne sunt doar pentru retry de curatare. Accesul se opreste imediat, iar cota se elibereaza numai dupa eliminarea fisierelor. Nu sterge retroactiv fisiere din vechiul cos fara instructiune explicita.

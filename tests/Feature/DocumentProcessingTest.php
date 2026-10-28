@@ -53,7 +53,7 @@ class DocumentProcessingTest extends TestCase
         Queue::fake();
         Storage::fake('local');
         Http::preventStrayRequests();
-        config(['ai.provider' => 'ollama', 'ai.enabled' => true, 'ocr.enabled' => true, 'ai.ollama.context_length' => 8192]);
+        config(['ai.provider' => 'ollama', 'ai.enabled' => true, 'ocr.enabled' => true, 'ai.ollama.context_length' => 16384]);
         $this->user = User::factory()->create();
         $this->workspace = new Workspace;
         $this->workspace->forceFill(['name' => 'Processing example', 'owner_id' => $this->user->id, 'type' => 'personal'])->save();
@@ -271,6 +271,51 @@ class DocumentProcessingTest extends TestCase
             return $input['partial'] === false && $input['ocr'] === trim($text)
                 && str_contains($input['ocr'], 'MIDDLE_PAGE_EVIDENCE');
         });
+    }
+
+    public function test_ollama_sections_cover_long_document_and_merge_only_supported_fields(): void
+    {
+        config(['ai.ollama.context_length' => 16384, 'ai.ollama.max_output_tokens' => 1024]);
+        $text = $this->text."\n".str_repeat("Conditii contractuale pentru servicii.\n", 400).'FINAL_PAGE_EVIDENCE';
+        $this->readyText($text);
+        $inputs = [];
+        Http::fake(['127.0.0.1:11434/api/chat' => function ($request) use (&$inputs) {
+            $input = json_decode($request['messages'][1]['content'], true);
+            $inputs[] = $input;
+            $main = str_contains($input['ocr'], 'Furnizor Example SRL');
+            $data = $this->response(['tag_keys' => [], 'category_key' => $main ? 'invoices' : null,
+                'supplier' => $main ? 'Example SRL' : null, 'amount' => $main ? '149.99' : null,
+                'currency' => $main ? 'RON' : null, 'issued_on' => $main ? '01.01.2020' : null,
+                'summary' => $main ? 'Factura pentru servicii.' : null]);
+
+            return Http::response(['message' => ['content' => json_encode($data)], 'done' => true, 'done_reason' => 'stop']);
+        }]);
+        $result = app(DocumentAiAnalysis::class)->analyze($this->document->fresh(), 'ro');
+        $this->assertFalse($result['review_required']);
+        $this->assertFalse($result['partial']);
+        $this->assertGreaterThan(1, $result['sections']);
+        $this->assertSame(count($inputs), $result['sections']);
+        $this->assertSame('149.99', $result['fields']['amount']);
+        $this->assertSame('2020-01-01', $result['fields']['issued_on']);
+        $this->assertStringContainsString('FINAL_PAGE_EVIDENCE', $inputs[array_key_last($inputs)]['ocr']);
+        foreach ($inputs as $index => $input) {
+            $this->assertSame($index + 1, $input['section_index']);
+            $this->assertSame(count($inputs), $input['section_count']);
+        }
+        Http::assertSent(fn ($request) => $request['options']['num_ctx'] === 16384 && $request['options']['num_predict'] === 1024);
+    }
+
+    public function test_unprocessable_long_document_makes_no_partial_ai_calls(): void
+    {
+        config(['ai.ollama.context_length' => 16384, 'ai.ollama.max_output_tokens' => 1024]);
+        $this->readyText(str_repeat('Document cu text lizibil. ', 5000));
+        try {
+            app(DocumentAiAnalysis::class)->analyze($this->document->fresh(), 'ro');
+            $this->fail('Expected explicit size rejection');
+        } catch (AiProviderException $error) {
+            $this->assertSame('PROMPT_TOO_LARGE', $error->reason);
+        }
+        Http::assertNothingSent();
     }
 
     public function test_only_short_summary_is_editable_and_legacy_description_is_preserved(): void

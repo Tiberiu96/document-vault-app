@@ -27,7 +27,7 @@ return [
         ],
         'ai' => [
             'connection' => 'redis', 'queue' => ['ai'], 'balance' => false,
-            'maxProcesses' => 1, 'memory' => 256, 'tries' => 3, 'timeout' => 120,
+            'maxProcesses' => 1, 'memory' => 256, 'tries' => 3, 'timeout' => 420,
         ],
         'low' => [
             'connection' => 'redis', 'queue' => ['low'], 'balance' => false,
