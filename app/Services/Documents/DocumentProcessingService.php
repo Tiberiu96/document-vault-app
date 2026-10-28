@@ -32,6 +32,9 @@ class DocumentProcessingService
             if ($existing && (in_array($existing->status, ['queued', 'running'], true) || ($existing->status === 'succeeded' && ! $nowReadable) || ($kind === 'ocr' && $record->ocr_status === 'ready'))) {
                 return [$existing, false];
             }
+            if ($kind === 'ocr' && $record->source_released_at) {
+                throw ValidationException::withMessages(['file' => __('processing.source_reselect')]);
+            }
             if ($kind === 'ai' && ($record->ocr_status !== 'ready' || ! trim($record->ocr_text ?? ''))) {
                 throw ValidationException::withMessages(['processing' => __('processing.need_ocr')]);
             }
@@ -70,6 +73,7 @@ class DocumentProcessingService
             $user = User::find($run->requested_by);
             if (! $document || ! $user || ! $user->hasVerifiedEmail() || ! Gate::forUser($user)->allows('update', $document)) {
                 $this->settle($run, false, 'ACCESS_REVOKED');
+                app(DraftSource::class)->releaseOrQueue($run->document_id, $workspaceId);
 
                 return null;
             }
@@ -132,11 +136,15 @@ class DocumentProcessingService
                 if ($user) {
                     $this->request($user, $document, 'ai');
                 }
-            } catch (ValidationException $exception) {
+            } catch (\Throwable $exception) {
                 $document->forceFill(['ai_status' => $exception instanceof ProcessingQuotaExceeded ? 'quota_exceeded' : 'failed'])->save();
             } finally {
                 app()->setLocale($oldLocale);
             }
+        }
+        $finished = ProcessingRun::find($id);
+        if ($finished) {
+            app(DraftSource::class)->releaseOrQueue($finished->document_id, $workspaceId);
         }
     }
 
@@ -151,6 +159,10 @@ class DocumentProcessingService
                 $this->settle($run, false, $code);
             }
         }, 3);
+        $run = ProcessingRun::find($id);
+        if ($run) {
+            app(DraftSource::class)->releaseOrQueue($run->document_id, $workspaceId);
+        }
     }
 
     public function cancel(Document $document): void

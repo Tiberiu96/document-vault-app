@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'source.received' => 'eredeti-atveve',
     'documents.scan' => 'dokumentumok/szkenneles',
     'draft.discard' => 'feltoltes-elvetese',
     'home' => '',

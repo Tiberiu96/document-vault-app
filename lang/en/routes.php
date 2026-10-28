@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'source.received' => 'source-received',
     'documents.scan' => 'documents/scan',
     'draft.discard' => 'discard-upload',
     'home' => '',

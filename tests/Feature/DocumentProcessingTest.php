@@ -4,8 +4,10 @@ namespace Tests\Feature;
 
 use App\Contracts\Ocr\OcrProviderInterface;
 use App\Jobs\Documents\ExpireDocumentDraft;
+use App\Jobs\Documents\GenerateDocumentPreview;
 use App\Jobs\Documents\ProcessDocument;
 use App\Jobs\Documents\PurgeDocument;
+use App\Jobs\Documents\ReleaseDraftSource;
 use App\Models\Category;
 use App\Models\Document;
 use App\Models\ProcessingRun;
@@ -16,6 +18,7 @@ use App\Services\Ai\AiProviderException;
 use App\Services\Ai\DocumentAiAnalysis;
 use App\Services\Documents\DocumentLibrary;
 use App\Services\Documents\DocumentProcessingService;
+use App\Services\Documents\DraftSource;
 use App\Services\Ocr\OcrException;
 use App\Services\Ocr\TextQuality;
 use Carbon\Carbon;
@@ -215,7 +218,7 @@ class DocumentProcessingTest extends TestCase
     public function test_upload_option_is_checked_beside_file_and_can_be_declined(): void
     {
         $page = $this->get('/ro/documente/incarca')->assertOk();
-        $page->assertSee('Scaneaza documentul')->assertSee(route('documents.scan'), false);
+        $page->assertSee('Selecteaza fisierul')->assertSee('Ajutor incarcare');
         $page->assertSeeInOrder(['id="document-file"', 'name="analyze_with_ai" value="1" checked', 'Incarca si continua'], false);
         $this->assertFalse(str_contains($page->getContent(), 'name="title"'));
         $this->assertFalse(str_contains($page->getContent(), 'name="supplier"'));
@@ -296,7 +299,7 @@ class DocumentProcessingTest extends TestCase
         $admin = User::factory()->create();
         $this->workspace->members()->attach($admin->id, ['role' => 'admin']);
         $this->actingAs($admin)->get('/ro/documente/'.$draft->id)->assertForbidden();
-        $this->actingAs($this->user)->patch('/ro/documente/'.$draft->id, ['title' => 'Confirmed document', 'metadata_version' => 0])->assertSessionHasNoErrors();
+        $this->actingAs($this->user)->patch('/ro/documente/'.$draft->id, ['title' => 'Confirmed document', 'metadata_version' => 0, 'file' => UploadedFile::fake()->image('private-draft.png', 55, 66)])->assertSessionHasNoErrors();
         $this->assertSame('stored', $draft->fresh()->status);
         $this->get('/ro/documente')->assertSee('Confirmed document');
         $this->delete('/ro/documente/'.$draft->id.'/renunta-incarcare')->assertStatus(409);
@@ -413,6 +416,149 @@ class DocumentProcessingTest extends TestCase
         $this->assertFalse($result['review_required']);
         $this->assertSame($spaced, $this->document->fresh()->ocr_text);
         $this->assertFalse(app(TextQuality::class)->good('%%% #@@ ! ! ! '.str_repeat('?', 100)));
+    }
+
+    public function test_analysis_copy_is_deleted_and_confirmation_requires_identical_reupload(): void
+    {
+        $before = $this->workspace->fresh()->storage_used_bytes;
+        $file = UploadedFile::fake()->image('two-phase.jpg', 72, 96);
+        $draft = app(DocumentLibrary::class)->upload($this->user, $this->workspace, $file, ['title' => 'Two phase', 'analyze_with_ai' => true], draft: true);
+        $service = app(DocumentProcessingService::class);
+        $ocrRun = $service->request($this->user, $draft, 'ocr');
+        $ocr = Mockery::mock(OcrProviderInterface::class);
+        $ocr->shouldReceive('extract')->once()->andReturn(['text' => $this->text, 'engine' => 'fake']);
+        $this->execute($ocrRun, $ocr);
+        $draft->refresh();
+        $this->assertTrue(Storage::disk('local')->exists($draft->storage_path)); // AI inca foloseste rezultatul OCR.
+        $this->fakeAi();
+        $this->execute($draft->aiRun);
+        $draft->refresh();
+        $this->assertNotNull($draft->source_released_at);
+        $this->assertFalse(Storage::disk('local')->exists($draft->storage_path));
+        $this->assertSame($before, $this->workspace->fresh()->storage_used_bytes);
+        $this->assertSame('draft', $draft->status);
+        $this->get('/ro/documente/'.$draft->id.'/descarca')->assertNotFound();
+        $this->get('/ro/documente/'.$draft->id.'/sugestii')->assertOk()->assertSee('id="confirm-source"', false)->assertSee('Reselecteaza acelasi fisier original');
+        $this->patch('/ro/documente/'.$draft->id, ['title' => 'Confirmed'])->assertSessionHasErrors('file');
+        $this->patch('/ro/documente/'.$draft->id, ['title' => 'Confirmed', 'file' => UploadedFile::fake()->image('wrong.jpg', 73, 96)])->assertSessionHasErrors('file');
+        $this->assertSame('draft', $draft->fresh()->status);
+        $this->assertSame($before, $this->workspace->fresh()->storage_used_bytes);
+        $this->patch('/ro/documente/'.$draft->id, ['title' => 'Confirmed', 'metadata_version' => 0, 'ai_run_id' => $draft->ai_run_id, 'file' => $file])->assertSessionHasNoErrors();
+        $draft->refresh();
+        $this->assertSame('stored', $draft->status);
+        $this->assertNull($draft->source_released_at);
+        $this->assertTrue(Storage::disk('local')->exists($draft->storage_path));
+        $this->assertSame($draft->sha256, hash('sha256', Storage::disk('local')->get($draft->storage_path)));
+        app(DraftSource::class)->release($draft->id, $draft->workspace_id);
+        $this->assertTrue(Storage::disk('local')->exists($draft->storage_path)); // Curatarea tardiva nu atinge originalul confirmat.
+        $this->patch('/ro/documente/'.$draft->id, ['title' => 'Late overwrite', 'metadata_version' => 0, 'file' => $file])->assertSessionHasErrors('processing');
+        $this->assertSame('Confirmed', $draft->fresh()->title);
+    }
+
+    public function test_released_draft_cancellation_does_not_release_other_document_storage_twice(): void
+    {
+        $before = $this->workspace->fresh()->storage_used_bytes;
+        $draft = app(DocumentLibrary::class)->upload($this->user, $this->workspace, UploadedFile::fake()->image('release.png', 83, 97), ['title' => 'Release'], draft: true);
+        $draft->forceFill(['ocr_status' => 'ready'])->save();
+        app(DraftSource::class)->release($draft->id, $draft->workspace_id);
+        app(DraftSource::class)->release($draft->id, $draft->workspace_id);
+        $this->assertSame($before, $this->workspace->fresh()->storage_used_bytes);
+        app(DocumentLibrary::class)->discardDraft($draft);
+        $this->assertSame($before, $this->workspace->fresh()->storage_used_bytes);
+        $this->assertTrue(Storage::disk('local')->exists($this->document->storage_path));
+    }
+
+    public function test_scanner_returns_exact_pdf_to_browser_and_late_preview_cannot_recreate_temporary_files(): void
+    {
+        $response = $this->postJson('/ro/documente/scaneaza', ['pages' => [UploadedFile::fake()->image('page.jpg', 160, 220)], 'analyze_with_ai' => '0', 'retain_file' => true])
+            ->assertCreated()->assertHeader('Content-Type', 'application/pdf');
+        $meta = json_decode(base64_decode($response->headers->get('X-Vault-Upload')), true);
+        $draft = Document::findOrFail($meta['id']);
+        $file = UploadedFile::fake()->createWithContent('scan.pdf', $response->getContent());
+        $this->assertSame($draft->sha256, hash('sha256', $response->getContent()));
+        $oldPreview = new GenerateDocumentPreview($draft->id, $draft->workspace_id, 0);
+        $ocr = Mockery::mock(OcrProviderInterface::class);
+        $ocr->shouldReceive('extract')->once()->andReturn(['text' => $this->text, 'engine' => 'fake']);
+        $this->execute($draft->ocrRun, $ocr);
+        $this->assertFalse(Storage::disk('local')->exists($draft->storage_path));
+        $oldPreview->handle();
+        $this->assertFalse(Storage::disk('local')->exists($draft->storage_path));
+        $this->patch('/ro/documente/'.$draft->id, ['title' => 'Confirmed scan', 'file' => $file])->assertSessionHasNoErrors();
+        $oldPreview->failed(null);
+        $this->assertSame('pending', $draft->fresh()->preview_status);
+        $this->assertTrue(Storage::disk('local')->exists($draft->storage_path));
+        $this->assertGreaterThan(0, $draft->fresh()->source_revision);
+    }
+
+    public function test_duplicate_draft_upload_resumes_only_its_creator_without_new_processing_reservations(): void
+    {
+        $file = UploadedFile::fake()->image('resumable.png', 76, 91);
+        $first = $this->postJson('/ro/documente', ['file' => $file, 'analyze_with_ai' => false])->assertCreated();
+        $second = $this->postJson('/ro/documente', ['file' => $file, 'analyze_with_ai' => false])->assertCreated();
+        $this->assertSame($first->json('id'), $second->json('id'));
+        $this->assertSame(1, ProcessingRun::where('document_id', $first->json('id'))->count());
+        $this->workspace->forceFill(['type' => 'business'])->save();
+        $other = User::factory()->create();
+        $this->workspace->members()->attach($other->id, ['role' => 'admin']);
+        $this->actingAs($other)->postJson('/ro/documente', ['file' => $file])->assertUnprocessable();
+        $this->assertSame(1, ProcessingRun::where('document_id', $first->json('id'))->count());
+    }
+
+    public function test_confirmation_quota_failure_keeps_metadata_and_other_files_unchanged(): void
+    {
+        $before = $this->workspace->fresh()->storage_used_bytes;
+        $file = UploadedFile::fake()->image('quota-confirm.png', 98, 103);
+        $draft = app(DocumentLibrary::class)->upload($this->user, $this->workspace, $file, ['title' => 'Before confirmation'], draft: true);
+        $draft->forceFill(['ocr_status' => 'ready'])->save();
+        app(DraftSource::class)->release($draft->id, $draft->workspace_id);
+        config(['vault.plans.free.storage_bytes' => $before]);
+        $this->patch('/ro/documente/'.$draft->id, ['title' => 'Should not commit', 'file' => $file])->assertSessionHasErrors('file');
+        $this->assertSame('draft', $draft->fresh()->status);
+        $this->assertSame('Before confirmation', $draft->fresh()->title);
+        $this->assertSame($before, $this->workspace->fresh()->storage_used_bytes);
+        $this->assertFalse(Storage::disk('local')->exists($draft->storage_path));
+        $this->assertTrue(Storage::disk('local')->exists($this->document->storage_path));
+    }
+
+    public function test_draft_source_cleanup_failure_queues_safe_retry(): void
+    {
+        $service = Mockery::mock(DraftSource::class)->makePartial();
+        $service->shouldReceive('release')->once()->andThrow(new \RuntimeException('Simulated unavailable storage'));
+        $service->releaseOrQueue($this->document->id, $this->workspace->id);
+        Queue::assertPushedOn('low', ReleaseDraftSource::class);
+        (new ReleaseDraftSource($this->document->id, $this->workspace->id))->handle(app(DraftSource::class));
+        $this->assertTrue(Storage::disk('local')->exists($this->document->storage_path));
+    }
+
+    public function test_receipt_of_legacy_source_releases_it_only_for_authorized_draft_and_correct_size(): void
+    {
+        $before = $this->workspace->fresh()->storage_used_bytes;
+        $file = UploadedFile::fake()->image('legacy.png', 94, 99);
+        $draft = app(DocumentLibrary::class)->upload($this->user, $this->workspace, $file, ['title' => 'Legacy draft'], draft: true);
+        $draft->forceFill(['ocr_status' => 'ready'])->save();
+        $this->get('/ro/documente/'.$draft->id.'/editeaza')->assertOk()->assertSee('data-source-available="1"', false);
+        $this->post('/ro/documente/'.$draft->id.'/original-primit', ['bytes' => $draft->size_bytes + 1])->assertStatus(422);
+        $this->assertTrue(Storage::disk('local')->exists($draft->storage_path));
+        $this->post('/ro/documente/'.$draft->id.'/original-primit', ['bytes' => (string) $draft->size_bytes])->assertOk();
+        $this->assertFalse(Storage::disk('local')->exists($draft->storage_path));
+        $this->assertSame($before, $this->workspace->fresh()->storage_used_bytes);
+        $this->post('/ro/documente/'.$this->document->id.'/original-primit', ['bytes' => $this->document->size_bytes])->assertStatus(409);
+        $this->assertTrue(Storage::disk('local')->exists($this->document->storage_path));
+    }
+
+    public function test_upload_resumes_ai_that_was_never_started_but_never_repeats_finished_analysis(): void
+    {
+        $file = UploadedFile::fake()->image('quota-resume.png', 99, 109);
+        $draft = app(DocumentLibrary::class)->upload($this->user, $this->workspace, $file, ['title' => 'Quota resume', 'analyze_with_ai' => true], draft: true);
+        $draft->forceFill(['ocr_status' => 'ready', 'ocr_text' => $this->text, 'ai_status' => 'failed'])->save();
+        $this->postJson('/ro/documente', ['file' => $file, 'analyze_with_ai' => true])->assertCreated();
+        $this->assertSame('queued', $draft->fresh()->ai_status);
+        $run = $draft->fresh()->aiRun;
+        $this->fakeAi();
+        $this->execute($run);
+        $this->postJson('/ro/documente', ['file' => $file, 'analyze_with_ai' => true])->assertCreated();
+        $this->assertSame(1, ProcessingRun::where('document_id', $draft->id)->count());
+        Http::assertSentCount(1);
     }
 
     public function test_stale_suggestions_and_invalid_category_are_rejected(): void

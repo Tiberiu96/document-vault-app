@@ -1,10 +1,21 @@
 <?php
 
 return [
+    'upload_failed' => 'A fájl feltöltése nem sikerült. Ellenőrizd a korlátot és a kapcsolatot, majd próbáld újra.',
+    'upload_help' => 'Feltöltési súgó',
+    'choose_file' => 'Fájl kiválasztása',
+    'ai_upload_label' => 'AI-kitöltés',
+
+    'source_label' => 'Eredeti fájl a megerősítéshez',
+    'source_reselect' => 'Válaszd ki újra ugyanazt az eredeti fájlt. Az oldal újratöltődött, vagy a fájl már nincs a böngésző memóriájában. Beolvasás esetén válaszd a korábban letöltött PDF-et, vagy olvasd be újra.',
+    'source_retained' => 'A kiválasztott fájl készen áll az újbóli feltöltésre megerősítéskor:',
+    'source_mismatch' => 'Ez a fájl eltér az elemzettől. Válaszd az eredetileg feltöltött fájlt.',
+    'source_erased' => 'Az elemzési másolatot és az előnézeteket eltávolítottuk a szerverről. Megerősítéskor az eredeti újra feltöltődik.',
+
     'camera' => 'Dokumentum fényképezése',
     'camera_hint' => 'Készíts egy olvasható képet egy oldalról a telefonoddal, majd válaszd a Feltöltés és folytatás gombot. Több oldalhoz tölts fel PDF-et. Automatikus körbevágás nincs.',
     'draft' => 'Nem megerősített feltöltés',
-    'draft_notice' => 'A dokumentumot ideiglenesen tároljuk a feldolgozáshoz. Csak megerősítés és mentés után jelenik meg a könyvtárban. A Mégse eltávolítja a feltöltést; az elhagyott feltöltések 24 óra után lejárnak.',
+    'draft_notice' => 'Nem megerősített feltöltés. Az elemzési másolatot feldolgozás után eltávolítjuk. Az eredeti csak megerősítés és mentés után kerül a könyvtárba.',
     'discarded' => 'Feltöltés megszakítva. A dokumentum nem került a könyvtárba.',
     'already_analyzed' => 'Az elemzés már elkészült. Használd a meglévő eredményt.',
 

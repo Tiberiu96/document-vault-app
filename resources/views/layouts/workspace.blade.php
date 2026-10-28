@@ -7,7 +7,7 @@
     <link rel="icon" type="image/svg+xml" href="{{ asset('images/favicon.svg') }}">
     <link rel="stylesheet" href="{{ asset('css/app.css') }}?v={{ filemtime(public_path('css/app.css')) }}">
 </head>
-<body @class(['library-body', 'scanner-body' => ($section ?? '') === 'scan'])>
+<body @class(['library-body', 'scanner-body' => ($section ?? '') === 'scan', 'upload-body' => ($section ?? '') === 'upload'])>
 <a href="#main" class="skip-link">{{ __('site.a11y.skip') }}</a>
 <div class="library-shell">
     <aside class="library-sidebar">
@@ -45,5 +45,6 @@
     @if($workspace && Gate::allows('create', [App\Models\Document::class, $workspace]))<a class="mobile-upload mobile-scan" href="{{ route('documents.scan') }}"><x-icon name="scan"/><span>{{ __('scanner.short_title') }}</span></a>@endif
     <a href="{{ route('documents.index') }}"><x-icon name="document"/><span>{{ __('documents.title') }}</span></a>
 </nav>
+<script src="{{ asset('js/document-upload-flow.js') }}?v={{ filemtime(public_path('js/document-upload-flow.js')) }}" defer></script>
 @stack('scripts')
 </body></html>

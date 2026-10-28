@@ -49,7 +49,7 @@ class PurgeDocument implements ShouldBeUnique, ShouldQueue
             if (! $disk->deleteDirectory(dirname($document->storage_path))) {
                 throw new \RuntimeException('Private file cleanup failed.');
             }
-            $workspace->forceFill(['storage_used_bytes' => max(0, $workspace->storage_used_bytes - $document->size_bytes - $document->preview_bytes)])->save();
+            $workspace->forceFill(['storage_used_bytes' => max(0, $workspace->storage_used_bytes - ($document->source_released_at ? 0 : $document->size_bytes + $document->preview_bytes))])->save();
             $document->forceDelete();
         }, 3);
     }

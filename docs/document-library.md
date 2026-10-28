@@ -29,7 +29,7 @@ contor corect. Datele acelui test au fost eliminate.
 
 ## Previzualizare si stergere
 
-GenerateDocumentPreview pe default rasterizeaza PDF-ul in JPEG private cu
+Dupa confirmare, GenerateDocumentPreview pe default rasterizeaza PDF-ul in JPEG private cu
 pdftoppm, maximum 1400 px, pana la 20 MiB total. Originalul nu se modifica.
 Jobul este idempotent, cu maximum doua incercari si timeout 180s. Supervisorul
 default are timeout 200s, sub retry_after Redis 360s. Cota insuficienta este
@@ -65,3 +65,8 @@ OCR si propunerile AI optionale sunt documentate in document-processing.md.
 Nu se pretinde scanare nativa mobila sau protectie antivirus completa.
 
 Uploadul web este temporar pana la confirmare; drafturile nu apar in biblioteca. Renunta le elimina, iar cele abandonate expira dupa 24h prin coada low. Detalii in document-processing.md.
+
+Copia de analiza a draftului este eliminata dupa procesare, iar browserul pastreaza
+originalul in memorie pentru retrimiterea la confirmare. Drafturile nu genereaza
+preview pe server. Originalele confirmate raman private; reselectarea trebuie sa
+aiba acelasi SHA-256, MIME si numar de pagini.

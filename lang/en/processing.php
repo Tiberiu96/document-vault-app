@@ -1,10 +1,21 @@
 <?php
 
 return [
+    'upload_failed' => 'We could not upload the file. Check the limit and connection, then try again.',
+    'upload_help' => 'Upload help',
+    'choose_file' => 'Choose a file',
+    'ai_upload_label' => 'Fill details with AI',
+
+    'source_label' => 'Original file for confirmation',
+    'source_reselect' => 'Select the same original file again. The page was reloaded or the file is no longer in browser memory. For a scan, select the previously downloaded PDF or scan again.',
+    'source_retained' => 'The selected file is ready to upload again on confirmation:',
+    'source_mismatch' => 'This file differs from the analysed file. Select the original used for upload.',
+    'source_erased' => 'The analysis copy and previews were removed from the server. The original will be uploaded again on confirmation.',
+
     'camera' => 'Photograph document',
     'camera_hint' => 'Take a clear photo of one page on your phone, then select Upload and continue. For multiple pages, upload a PDF. No automatic cropping.',
     'draft' => 'Unconfirmed upload',
-    'draft_notice' => 'The document is held temporarily for processing. It appears in your library only after Confirm and save. Cancel removes the upload; abandoned uploads expire after 24 hours.',
+    'draft_notice' => 'Unconfirmed upload. The analysis copy is removed after processing. The original is kept in your library only after Confirm and save.',
     'discarded' => 'Upload cancelled. The document was not added to the library.',
     'already_analyzed' => 'Analysis is already complete. Use the existing result.',
 

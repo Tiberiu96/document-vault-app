@@ -1,10 +1,21 @@
 <?php
 
 return [
+    'upload_failed' => 'Nu am putut incarca fisierul. Verifica limita si conexiunea, apoi incearca din nou.',
+    'upload_help' => 'Ajutor incarcare',
+    'choose_file' => 'Selecteaza fisierul',
+    'ai_upload_label' => 'Completeaza cu AI',
+
+    'source_label' => 'Originalul pentru confirmare',
+    'source_reselect' => 'Reselecteaza acelasi fisier original. Pagina a fost reincarcata sau fisierul nu mai este in memoria browserului. Pentru o scanare, selecteaza PDF-ul descarcat anterior sau scaneaza din nou.',
+    'source_retained' => 'Fisierul selectat este pregatit pentru reincarcare la confirmare:',
+    'source_mismatch' => 'Fisierul nu este identic cu cel analizat. Selecteaza originalul folosit la incarcare.',
+    'source_erased' => 'Copia de analiza si preview-urile au fost eliminate de pe server. Originalul va fi incarcat din nou la confirmare.',
+
     'camera' => 'Fotografiaza documentul',
     'camera_hint' => 'Fotografiaza o pagina clara cu telefonul, apoi apasa Incarca si continua. Pentru mai multe pagini, incarca un PDF. Fara decupare automata.',
     'draft' => 'Incarcare neconfirmata',
-    'draft_notice' => 'Documentul este pastrat temporar pentru procesare. Apare in biblioteca numai dupa Confirma si salveaza. Renunta elimina incarcarea; incarcarile abandonate expira dupa 24 de ore.',
+    'draft_notice' => 'Incarcare neconfirmata. Copia folosita pentru analiza se elimina dupa procesare. Originalul se pastreaza in biblioteca numai dupa Confirma si salveaza.',
     'discarded' => 'Incarcarea a fost anulata. Documentul nu a fost adaugat in biblioteca.',
     'already_analyzed' => 'Analiza a fost deja finalizata. Foloseste rezultatul existent.',
 

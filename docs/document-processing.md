@@ -134,3 +134,54 @@ este folosita numai in .env local la cererea utilizatorului; valoarea implicita 
 cod/example ramane 10. Rate limits, limitele documentelor si rezervarile atomice raman.
 ProcessingQuotaExceeded produce status quota_exceeded si explicatie clara, inclusiv
 cand cota este atinsa intre OCR si AI, fara a pretinde ca documentul nu a fost inteles.
+
+## Analiza temporara si reincarcare la confirmare
+
+Uploadul/scannerul retin File in memoria paginii, fara IndexedDB, localStorage sau
+sessionStorage pentru continut. POST creeaza draftul si trimite catre browser numai
+identificatorul, URL-urile autorizate si textele necesare. Pentru scanner, serverul
+returneaza exact PDF-ul generat ca raspuns binar no-store, inainte de stergerea folderului
+local temporar din ScanPdf::finally. Browserul pastreaza acesti bytes pentru confirmare.
+
+Dupa OCR (fara AI) sau dupa terminarea AI, DraftSource elimina copia de analiza si orice
+preview, seteaza source_released_at si elibereaza spatiul rezervat. Rezultatele/textul OCR
+raman criptate pentru verificare, pana la confirmare/anulare sau expirarea draftului.
+La esec definitiv/cota atinsa curatarea se aplica la fel. Erorile de stergere au retry
+pe low; originalele confirmate sunt excluse de la curatare sub lock.
+
+Drafturile noi nu genereaza preview-uri pe server: preview-ul este un blob URL privat
+in browser. Metadatele si rezultatele sunt afisate fara navigare completa, pastrand File.
+La Confirma si salveaza browserul trimite din nou acel File; serverul verifica tipul,
+limitele, paginile si SHA-256 comparativ cu analiza initiala. Numai dupa validare si
+verificarea versiunii metadatelor, originalul este pastrat privat si draftul devine stored.
+Preview-urile finale se genereaza dupa confirmare. source_revision invalideaza joburile
+vechi, inclusiv callbackurile failed/cleanup, impiedicand stergerea/recrearea fisierelor.
+
+Daca pagina este reincarcata/inchisa, File se pierde intentionat. Formularul solicita
+reselectarea originalului; un fisier diferit este refuzat fara schimbarea metadatelor.
+Incarcarile repetate ale aceluiasi draft de catre creator reiau fluxul, fara noi rezervari
+sau consum dublu. Alt membru nu poate prelua draftul. Conflictele intre taburi sunt respinse
+prin versiune; o confirmare veche nu suprascrie documentul deja confirmat.
+
+Cereri cu JSON si raspunsuri PDF folosesc no-store/private. Erorile SQL/IO nu sunt logate
+cu bindinguri sau continut; logul pastreaza numai clasa exceptiei si codul operatiunii.
+Quota de stocare este refacuta la reincarcare; anularea dupa eliberarea sursei nu o scade
+inca o data. Reziduurile unei operatii intrerupte sunt curatate prin retry sau expirarea
+la 24h. Testele acopera lipsa/modificarea sursei, cota insuficienta, reluarea uploadului,
+confirmarea repetata, joburile tardive si pastrarea originalului confirmat.
+
+Pagina Incarca fisier afiseaza doar selectorul, optiunea AI, informarea remote scurta
+si continuarea. Limitele/explicatiile secundare sunt in ajutor contextual accesibil
+prin click/tastatura. Antetul de mobil este compact, fara cautare sau selector mare.
+
+Pentru drafturile vechi cu sursa disponibila, formularul descarca originalul autorizat
+in memoria browserului, apoi confirma primirea prin source-received; curatarea asteapta
+terminarea procesarii. Nu se elimina in masa surse vechi de scanare fara aceasta preluare.
+Browserul avertizeaza la inchidere si permite descarcarea PDF-ului generat. Dupa pierderea
+paginii, o scanare necesita acel PDF descarcat sau o scanare noua; fotografiile initiale
+nu pot inlocui direct PDF-ul analizat. Continutul nu este persistat in stocarea browserului.
+
+Promptul AI accepta fotografii/capturi lizibile de documente si ignora interfata
+vizualizatorului. Campurile optionale absente raman null. Scadenta unei facturi nu
+este tratata drept expirarea documentului. Captura Altex furnizata a fost verificata
+manual prin OCR si providerul configurat, fara recrearea draftului anulat.

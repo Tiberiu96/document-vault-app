@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'source.received' => 'poluchen-original',
     'documents.scan' => 'dokumenti/skanirane',
     'draft.discard' => 'otkaz-kachvane',
     'home' => '',

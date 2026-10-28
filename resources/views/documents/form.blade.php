@@ -2,8 +2,12 @@
 @section('content')
 <a class="inline-link" href="{{ $document ? route('documents.show', ['document' => $document->id]) : route('documents.index') }}">← {{ __('documents.back') }}</a>
 <div class="library-heading"><div><span class="eyebrow">{{ $workspace->name }}</span><h1>{{ isset($suggestionRunId) ? __('processing.review') : ($document ? __('documents.edit') : __('documents.upload')) }}</h1><p>{{ __('documents.limit') }}</p></div></div>
-<form class="library-panel library-form auth-form" method="POST" enctype="multipart/form-data" action="{{ $document ? route('documents.update', ['document' => $document->id]) : route('documents.store') }}" data-document-upload>
+<form class="library-panel library-form auth-form" method="POST" enctype="multipart/form-data" action="{{ $document ? route('documents.update', ['document' => $document->id]) : route('documents.store') }}" data-document-confirm data-document-id="{{ $document->id }}" @if($document->isDraft())data-source-available="{{ $document->source_released_at ? '0' : '1' }}" data-upload-state="{{ base64_encode(json_encode((new \App\Http\Resources\DraftUploadResource($document))->resolve(request()), JSON_THROW_ON_ERROR)) }}"@endif>
     @if($document->isDraft())<div class="security-notice"><p>{{ __('processing.draft_notice') }}</p></div>@endif
+    @if($document->isDraft())
+    <div data-source-upload><label for="confirm-source">{{ __('processing.source_label') }}</label><input type="file" id="confirm-source" name="file" accept="application/pdf,image/jpeg,image/png" required><p class="field-help">{{ __('processing.source_reselect') }}</p></div>
+    <p data-retained-source class="field-help" hidden>{{ __('processing.source_retained') }} <span></span> <a data-local-preview target="_blank" rel="noopener" class="inline-link">{{ __('documents.preview') }}</a> <a data-local-download class="inline-link" download>{{ __('documents.download') }}</a></p>
+    @endif
     @csrf @if($document)@method('PATCH')<input type="hidden" name="metadata_version" value="{{ $document->metadata_version }}">@endif
     @isset($suggestionRunId)<input type="hidden" name="ai_run_id" value="{{ $suggestionRunId }}"><div class="security-notice"><p>{{ __('processing.review_hint') }} @if($suggestionPartial){{ __('processing.partial') }}@endif</p></div>@endisset
     @foreach($suggestionWarnings ?? [] as $warning)<div class="security-notice" role="status"><p>{{ __('processing.warnings.'.$warning) }}</p></div>@endforeach

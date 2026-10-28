@@ -40,6 +40,8 @@ class DocumentProcessingController extends Controller
             && $record->metadata_version === $record->aiRun->base_version && Gate::allows('update', $record);
 
         return response()->json([
+            'pending' => in_array($record->ocr_status, ['queued', 'running'], true) || in_array($record->ai_status, ['queued', 'running'], true) || ($record->ai_requested && $record->ocr_status === 'ready' && $record->ai_status === 'idle'),
+            'source_released' => (bool) $record->source_released_at,
             'ocr_status' => $record->ocr_status, 'ai_status' => $record->ai_status,
             'ocr_label' => __('processing.states.'.$record->ocr_status), 'ai_label' => __('processing.states.'.$record->ai_status),
             'elapsed_seconds' => $pendingRun ? max(0, (int) abs(now()->diffInSeconds($pendingRun->created_at))) : 0,

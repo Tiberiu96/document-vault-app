@@ -62,6 +62,7 @@ Route::translate(function () {
                 Route::get(Localizer::url('documents').'/{document}', [DocumentController::class, 'show'])->whereUuid('document')->name('documents.show');
                 Route::get(Localizer::url('documents').'/{document}/'.Localizer::url('edit'), [DocumentController::class, 'edit'])->whereUuid('document')->name('documents.edit');
                 Route::patch(Localizer::url('documents').'/{document}', [DocumentController::class, 'update'])->whereUuid('document')->name('documents.update');
+                Route::post(Localizer::url('documents').'/{document}/'.Localizer::url('source.received'), [DocumentController::class, 'sourceReceived'])->whereUuid('document')->middleware('throttle:document.upload')->name('documents.source-received');
                 Route::delete(Localizer::url('documents').'/{document}/'.Localizer::url('draft.discard'), [DocumentController::class, 'discard'])->whereUuid('document')->name('documents.discard');
                 Route::delete(Localizer::url('documents').'/{document}', [DocumentController::class, 'destroy'])->whereUuid('document')->name('documents.destroy');
                 Route::get(Localizer::url('documents').'/{document}/'.Localizer::url('preview'), [DocumentController::class, 'file'])->whereUuid('document')->name('documents.preview');

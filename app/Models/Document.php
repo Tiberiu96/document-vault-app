@@ -18,7 +18,7 @@ class Document extends Model
 
     protected function casts(): array
     {
-        return ['metadata_version' => 'integer', 'ai_requested' => 'boolean', 'ocr_text' => 'encrypted', 'issued_on' => 'date', 'expires_on' => 'date', 'purge_requested_at' => 'datetime', 'size_bytes' => 'integer', 'amount_minor' => 'integer'];
+        return ['source_released_at' => 'datetime', 'source_revision' => 'integer', 'metadata_version' => 'integer', 'ai_requested' => 'boolean', 'ocr_text' => 'encrypted', 'issued_on' => 'date', 'expires_on' => 'date', 'purge_requested_at' => 'datetime', 'size_bytes' => 'integer', 'amount_minor' => 'integer'];
     }
 
     public function isDraft(): bool

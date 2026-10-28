@@ -155,11 +155,18 @@
             for(let i=0;i<pages.length;i++){await select(i);await crop();}
             stopCamera();
             const data=new FormData(form);
+            data.set('retain_file','1');
             data.set('analyze_with_ai', form.elements.analyze_with_ai?.checked?'1':'0');
             if (!form.elements.analyze_with_ai) data.delete('analyze_with_ai');
             pages.forEach((p,i)=>data.append('pages[]',p.blob,`page-${i+1}.jpg`));
             const response=await fetch(form.action,{method:'POST',body:data,credentials:'same-origin',headers:{Accept:'application/json'}});
             if (response.status===413) throw new Error(root.dataset.limit);
+            if(response.ok && response.headers.has('X-Vault-Upload')){
+                const meta=JSON.parse(atob(response.headers.get('X-Vault-Upload')));
+                const file=new File([await response.blob()],'scan.pdf',{type:'application/pdf'});
+                pages.forEach(page=>URL.revokeObjectURL(page.url));pages.length=0;bitmap?.close?.();bitmap=null;
+                await window.VaultUploadFlow.start(file,meta,form.elements._token.value);return;
+            }
             const result=await response.json();
             if(!response.ok) throw new Error(Object.values(result.errors||{}).flat()[0] || root.dataset.failed);
             const target=new URL(result.redirect,location.href);

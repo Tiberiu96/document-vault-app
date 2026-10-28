@@ -62,10 +62,11 @@ class DocumentLibraryTest extends TestCase
 
     private function upload(array $changes = []): Document
     {
-        $this->post('/ro/documente', $this->payload($changes))->assertRedirect();
+        $payload = $this->payload($changes);
+        $this->post('/ro/documente', $payload)->assertRedirect();
 
         $record = Document::latest('created_at')->firstOrFail();
-        $this->patch('/ro/documente/'.$record->id, array_diff_key($this->payload($changes), ['file' => true]))->assertSessionHasNoErrors();
+        $this->patch('/ro/documente/'.$record->id, $payload)->assertSessionHasNoErrors();
 
         return $record->fresh();
     }
@@ -198,7 +199,7 @@ class DocumentLibraryTest extends TestCase
         $response = $this->get('/ro/documente/'.$document->id.'/descarca')->assertOk()->assertHeader('X-Content-Type-Options', 'nosniff');
         $this->assertStringContainsString('attachment', $response->headers->get('Content-Disposition'));
         $this->assertSame(PdfFixture::make(2), $response->streamedContent());
-        (new GenerateDocumentPreview($document->id, $document->workspace_id))->handle();
+        (new GenerateDocumentPreview($document->id, $document->workspace_id, $document->source_revision))->handle();
         $response = $this->get('/ro/documente/'.$document->id.'/previzualizare')->assertOk()->assertHeader('Content-Type', 'image/jpeg');
         $this->assertStringContainsString('inline', $response->headers->get('Content-Disposition'));
         $this->assertStringContainsString('no-store', $response->headers->get('Cache-Control'));
@@ -290,7 +291,7 @@ class DocumentLibraryTest extends TestCase
         $document = $this->upload(['file' => UploadedFile::fake()->createWithContent('ten.pdf', PdfFixture::make(10))]);
         $this->assertSame(10, $document->page_count);
         Queue::assertPushedOn('default', GenerateDocumentPreview::class);
-        $job = new GenerateDocumentPreview($document->id, $document->workspace_id);
+        $job = new GenerateDocumentPreview($document->id, $document->workspace_id, $document->source_revision);
         $job->handle();
         $document->refresh();
         $this->assertSame('ready', $document->preview_status);
@@ -313,7 +314,7 @@ class DocumentLibraryTest extends TestCase
         Queue::fake();
         $document = $this->upload();
         config(['vault.plans.free.storage_bytes' => $document->size_bytes]);
-        (new GenerateDocumentPreview($document->id, $document->workspace_id))->handle();
+        (new GenerateDocumentPreview($document->id, $document->workspace_id, $document->source_revision))->handle();
         $this->assertSame('failed', $document->fresh()->preview_status);
         $this->assertSame($document->size_bytes, (int) $this->workspace->fresh()->storage_used_bytes);
         Storage::disk('local')->assertExists($document->storage_path);

@@ -23,14 +23,17 @@ class GenerateDocumentPreview implements ShouldBeUnique, ShouldQueue
 
     public int $uniqueFor = 600;
 
-    public function __construct(public string $documentId, public int $workspaceId)
+    public int $sourceRevision = 0;
+
+    public function __construct(public string $documentId, public int $workspaceId, int $sourceRevision = 0)
     {
+        $this->sourceRevision = $sourceRevision;
         $this->onQueue('default')->afterCommit();
     }
 
     public function uniqueId(): string
     {
-        return $this->documentId;
+        return $this->documentId.':'.$this->sourceRevision;
     }
 
     public function backoff(): array
@@ -41,7 +44,7 @@ class GenerateDocumentPreview implements ShouldBeUnique, ShouldQueue
     public function handle(): void
     {
         $document = Document::where('workspace_id', $this->workspaceId)->find($this->documentId);
-        if (! $document || $document->preview_status === 'ready' || $document->mime_type !== 'application/pdf') {
+        if (! $document || $document->source_released_at || $document->source_revision !== $this->sourceRevision || $document->preview_status === 'ready' || $document->mime_type !== 'application/pdf') {
             return;
         }
         $disk = Storage::disk('local');
@@ -71,7 +74,7 @@ class GenerateDocumentPreview implements ShouldBeUnique, ShouldQueue
             DB::transaction(function () use ($files, $bytes, $disk) {
                 $workspace = Workspace::lockForUpdate()->find($this->workspaceId);
                 $record = Document::where('workspace_id', $this->workspaceId)->lockForUpdate()->find($this->documentId);
-                if (! $workspace || ! $record || $record->preview_status === 'ready') {
+                if (! $workspace || ! $record || $record->source_released_at || $record->source_revision !== $this->sourceRevision || $record->preview_status === 'ready') {
                     return;
                 }
                 app(PlanLimitsService::class)->reserveStorage($workspace, $bytes);
@@ -101,7 +104,7 @@ class GenerateDocumentPreview implements ShouldBeUnique, ShouldQueue
         DB::transaction(function () {
             Workspace::lockForUpdate()->find($this->workspaceId);
             $record = Document::withTrashed()->where('workspace_id', $this->workspaceId)->whereKey($this->documentId)->lockForUpdate()->first();
-            if ($record && $record->preview_status !== 'ready') {
+            if ($record && $record->source_revision === $this->sourceRevision && ! $record->source_released_at && $record->preview_status !== 'ready') {
                 for ($page = 1; $page <= $record->page_count; $page++) {
                     Storage::disk('local')->delete(dirname($record->storage_path).'/preview-'.$page.'.jpg');
                 }
@@ -112,6 +115,6 @@ class GenerateDocumentPreview implements ShouldBeUnique, ShouldQueue
     public function failed(?\Throwable $exception): void
     {
         $this->cleanPartialPreviews();
-        Document::withTrashed()->where('workspace_id', $this->workspaceId)->whereKey($this->documentId)->where('preview_status', 'pending')->update(['preview_status' => 'failed']);
+        Document::withTrashed()->where('workspace_id', $this->workspaceId)->whereKey($this->documentId)->where('source_revision', $this->sourceRevision)->whereNull('source_released_at')->where('preview_status', 'pending')->update(['preview_status' => 'failed']);
     }
 }

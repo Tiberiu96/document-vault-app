@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'source.received' => 'original-primit',
     'documents.scan' => 'documente/scaneaza',
     'draft.discard' => 'renunta-incarcare',
     'home' => '',

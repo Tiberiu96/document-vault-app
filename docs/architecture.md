@@ -68,3 +68,8 @@ Checkpoint procesare: document-processing.md. Acces temporar de pe telefon: phon
 Provider remote optional Groq si configurare: groq.md. Joburile fixeaza providerul la solicitare.
 
 Scanner web multipagina: captura/galerie, rotire, crop manual si PDF privat prin FPDF1.9; flux draft cu confirmare. Nu inlocuieste scannerul nativ Expo sau corectia automata de perspectiva.
+
+Checkpoint sursa draft: migrarea 000012 adauga source_released_at/source_revision.
+Analiza elimina copia temporara; confirmarea retrimite originalul identic.
+Lockurile si reviziile protejeaza fisierul final de joburi tardive; detalii si
+limitarile retinerii in memoria browserului in document-processing.md.

@@ -20,6 +20,7 @@ class DocumentScanRequest extends FormRequest
         $limits = app(PlanLimitsService::class)->free();
 
         return [
+            'retain_file' => ['nullable', 'boolean'],
             'pages' => ['required', 'array', 'min:1', 'max:'.$limits['max_pages']],
             'pages.*' => ['required', 'file', 'mimes:jpg,jpeg,png', 'dimensions:max_width=2500,max_height=2500', 'max:'.intdiv($limits['max_file_bytes'], 1024)],
             'analyze_with_ai' => ['nullable', 'boolean', Rule::prohibitedIf(! config('ai.enabled'))],

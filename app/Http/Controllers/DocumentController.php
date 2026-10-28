@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\DocumentRequest;
+use App\Http\Resources\DraftUploadResource;
 use App\Jobs\Documents\PurgeDocument;
 use App\Models\Category;
 use App\Models\Document;
@@ -10,6 +11,7 @@ use App\Models\Tag;
 use App\Models\Workspace;
 use App\Services\Documents\DocumentLibrary;
 use App\Services\Documents\DocumentProcessingService;
+use App\Services\Documents\DraftSource;
 use App\Services\Documents\ProcessingQuotaExceeded;
 use App\Services\WebsiteContext;
 use Illuminate\Http\Request;
@@ -76,10 +78,21 @@ class DocumentController extends Controller
     {
         $document = $library->upload($request->user(), $request->attributes->get('workspace'), $request->file('file'), $request->validated(), draft: true);
 
+        $document->refresh();
         try {
-            app(DocumentProcessingService::class)->request($request->user(), $document, 'ocr');
+            if ($document->ocr_status === 'idle') {
+                app(DocumentProcessingService::class)->request($request->user(), $document, 'ocr');
+            } elseif ($request->boolean('analyze_with_ai') && $document->ai_requested && $document->ocr_status === 'ready' && ! $document->ai_run_id && in_array($document->ai_status, ['failed', 'quota_exceeded'], true)) {
+                app(DocumentProcessingService::class)->request($request->user(), $document, 'ai');
+            }
         } catch (ValidationException $exception) {
-            $document->forceFill(['ocr_status' => $exception instanceof ProcessingQuotaExceeded ? 'quota_exceeded' : 'failed'])->save();
+            $stage = $document->ocr_status === 'ready' ? 'ai_status' : 'ocr_status';
+            $document->forceFill([$stage => $exception instanceof ProcessingQuotaExceeded ? 'quota_exceeded' : 'failed'])->save();
+        }
+
+        app(DraftSource::class)->releaseOrQueue($document->id, $document->workspace_id);
+        if ($request->expectsJson()) {
+            return response()->json((new DraftUploadResource($document))->resolve($request), 201)->header('Cache-Control', 'no-store, private');
         }
 
         return redirect()->route($document->ai_requested ? 'documents.show' : 'documents.edit',
@@ -112,7 +125,10 @@ class DocumentController extends Controller
     public function update(DocumentRequest $request, string $document, DocumentLibrary $library)
     {
         $record = $this->document($request, $document);
-        $library->update($request->user(), $record, $request->validated());
+        $library->update($request->user(), $record, $request->validated(), $request->file('file'));
+        if ($request->expectsJson()) {
+            return response()->json(['redirect' => route('documents.show', ['document' => $record->id])])->header('Cache-Control', 'no-store, private');
+        }
 
         return redirect()->route('documents.show', ['document' => $record->id])->with('library_status', __('documents.saved'));
     }
@@ -120,6 +136,7 @@ class DocumentController extends Controller
     public function file(Request $request, string $document)
     {
         $record = $this->document($request, $document);
+        abort_if($record->source_released_at, 404);
         $disk = Storage::disk('local');
         if (! ($request->route()->defaults['download'] ?? false) && $record->mime_type === 'application/pdf') {
             $page = $request->validate(['page' => ['nullable', 'integer', 'min:1', 'max:'.$record->page_count]])['page'] ?? 1;
@@ -134,11 +151,27 @@ class DocumentController extends Controller
         return $disk->response($record->storage_path, $record->original_name, $headers, ($request->route()->defaults['download'] ?? false) ? 'attachment' : 'inline');
     }
 
+    public function sourceReceived(Request $request, string $document, DraftSource $source)
+    {
+        $record = $this->document($request, $document);
+        Gate::authorize('update', $record);
+        abort_unless($record->isDraft(), 409);
+        $data = $request->validate(['bytes' => ['required', 'integer', 'min:1']]);
+        abort_unless((int) $data['bytes'] === $record->size_bytes, 422);
+        $source->releaseOrQueue($record->id, $record->workspace_id);
+
+        return response()->json(['received' => true])->header('Cache-Control', 'no-store, private');
+    }
+
     public function discard(Request $request, string $document, DocumentLibrary $library)
     {
         $record = $this->document($request, $document);
         Gate::authorize('update', $record);
         abort_unless($library->discardDraft($record), 409);
+
+        if ($request->expectsJson()) {
+            return response()->json(['redirect' => route('documents.index')])->header('Cache-Control', 'no-store, private');
+        }
 
         return redirect()->route('documents.index')->with('library_status', __('processing.discarded'));
     }
@@ -149,6 +182,10 @@ class DocumentController extends Controller
         if ($candidate->isDraft()) {
             Gate::authorize('update', $candidate);
             abort_unless($library->discardDraft($candidate), 409);
+
+            if ($request->expectsJson()) {
+                return response()->json(['redirect' => route('documents.index')])->header('Cache-Control', 'no-store, private');
+            }
 
             return redirect()->route('documents.index')->with('library_status', __('processing.discarded'));
         }

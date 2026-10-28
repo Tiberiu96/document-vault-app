@@ -12,9 +12,11 @@ use App\Models\Tag;
 use App\Models\User;
 use App\Models\Workspace;
 use App\Services\PlanLimitsService;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -31,7 +33,11 @@ class DocumentLibrary
             return DB::transaction(function () use ($user, $workspace, $file, $data, $inspection, $id, $path, $draft) {
                 $locked = Workspace::lockForUpdate()->findOrFail($workspace->id);
                 Gate::forUser($user)->authorize('create', [Document::class, $locked]);
-                if (Document::withTrashed()->where('workspace_id', $locked->id)->where('sha256', $inspection['sha256'])->exists()) {
+                $duplicate = Document::withTrashed()->where('workspace_id', $locked->id)->where('sha256', $inspection['sha256'])->first();
+                if ($duplicate && $duplicate->isDraft() && ! $duplicate->trashed() && $duplicate->uploaded_by === $user->id) {
+                    return $duplicate;
+                }
+                if ($duplicate) {
                     throw ValidationException::withMessages(['file' => __('documents.duplicate')]);
                 }
                 app(PlanLimitsService::class)->reserveStorage($locked, $inspection['size_bytes']);
@@ -41,7 +47,7 @@ class DocumentLibrary
                 $document->forceFill([
                     'id' => $id, 'workspace_id' => $locked->id, 'uploaded_by' => $user->id,
                     'title' => $data['title'], 'original_name' => $name ?: 'document.'.$inspection['extension'],
-                    'ai_requested' => ! empty($data['analyze_with_ai']), 'storage_path' => $path, 'status' => $draft ? 'draft' : 'stored', 'preview_status' => $inspection['mime_type'] === 'application/pdf' ? 'pending' : 'ready',
+                    'ai_requested' => ! empty($data['analyze_with_ai']), 'storage_path' => $path, 'status' => $draft ? 'draft' : 'stored', 'preview_status' => $inspection['mime_type'] === 'application/pdf' ? ($draft ? 'awaiting_source' : 'pending') : 'ready',
                     ...array_diff_key($inspection, ['extension' => true]), ...$metadata,
                 ])->save();
                 $this->syncTags($document, $locked, $data['tags'] ?? [], $data['tag_ids'] ?? []);
@@ -53,7 +59,7 @@ class DocumentLibrary
                 if ($draft) {
                     ExpireDocumentDraft::dispatch($document->id, $document->workspace_id)->delay(now()->addDay());
                 }
-                if ($document->mime_type === 'application/pdf') {
+                if (! $draft && $document->mime_type === 'application/pdf') {
                     GenerateDocumentPreview::dispatch($document->id, $document->workspace_id);
                 }
 
@@ -67,31 +73,86 @@ class DocumentLibrary
                 return $committed;
             }
             Storage::disk('local')->deleteDirectory(dirname($path));
-            throw $exception;
+            if ($exception instanceof ValidationException || $exception instanceof AuthorizationException) {
+                throw $exception;
+            }
+            Log::warning('DOCUMENT_STORAGE_OPERATION_FAILED', ['exception_class' => get_class($exception)]);
+            throw ValidationException::withMessages(['file' => __('documents.storage_error')]);
         }
     }
 
-    public function update(User $user, Document $document, array $data): void
+    public function update(User $user, Document $document, array $data, ?UploadedFile $source = null): void
     {
-        DB::transaction(function () use ($user, $document, $data) {
-            $workspace = Workspace::lockForUpdate()->findOrFail($document->workspace_id);
-            $fresh = Document::lockForUpdate()->findOrFail($document->id);
-            Gate::forUser($user)->authorize('update', $fresh);
-            if (isset($data['ai_run_id'])) {
-                $run = ProcessingRun::where('document_id', $fresh->id)->whereKey($data['ai_run_id'])->first();
-                if (! $run || $fresh->ai_run_id !== $run->id || $fresh->ai_status !== 'ready' || $run->base_version !== $fresh->metadata_version || ($run->result['review_required'] ?? true)) {
+        Gate::forUser($user)->authorize('update', $document);
+        $inspection = $source ? app(FileInspector::class)->inspect($source) : null;
+        $previewRevision = null;
+        try {
+            DB::transaction(function () use ($user, $document, $data, $source, $inspection, &$previewRevision) {
+                $workspace = Workspace::lockForUpdate()->findOrFail($document->workspace_id);
+                $fresh = Document::lockForUpdate()->findOrFail($document->id);
+                Gate::forUser($user)->authorize('update', $fresh);
+                if (isset($data['ai_run_id'])) {
+                    $run = ProcessingRun::where('document_id', $fresh->id)->whereKey($data['ai_run_id'])->first();
+                    if (! $run || $fresh->ai_run_id !== $run->id || $fresh->ai_status !== 'ready' || $run->base_version !== $fresh->metadata_version || ($run->result['review_required'] ?? true)) {
+                        throw ValidationException::withMessages(['processing' => __('processing.stale')]);
+                    }
+                    $run->forceFill(['accepted_at' => now()])->save();
+                    $fresh->forceFill(['ai_status' => 'accepted']);
+                }
+                if (isset($data['metadata_version']) && (int) $data['metadata_version'] !== $fresh->metadata_version) {
                     throw ValidationException::withMessages(['processing' => __('processing.stale')]);
                 }
-                $run->forceFill(['accepted_at' => now()])->save();
-                $fresh->forceFill(['ai_status' => 'accepted']);
+                $metadata = $this->metadata($workspace, $data);
+                // Validarea etichetelor precede scrierea fisierului; rollback la orice eroare.
+                $this->syncTags($fresh, $workspace, $data['tags'] ?? [], $data['tag_ids'] ?? []);
+                if ($fresh->isDraft()) {
+                    if (! $source || ! $inspection) {
+                        throw ValidationException::withMessages(['file' => __('processing.source_reselect')]);
+                    }
+                    if (! hash_equals($fresh->sha256, $inspection['sha256']) || $fresh->mime_type !== $inspection['mime_type'] || $fresh->page_count !== $inspection['page_count']) {
+                        throw ValidationException::withMessages(['file' => __('processing.source_mismatch')]);
+                    }
+                    if ($fresh->source_released_at) {
+                        app(PlanLimitsService::class)->reserveStorage($workspace, $inspection['size_bytes']);
+                    }
+                    if (! Storage::disk('local')->putFileAs(dirname($fresh->storage_path), $source, basename($fresh->storage_path), ['visibility' => 'private'])) {
+                        throw ValidationException::withMessages(['file' => __('documents.storage_error')]);
+                    }
+                    $storedHash = @hash_file('sha256', Storage::disk('local')->path($fresh->storage_path));
+                    if (! is_string($storedHash) || ! hash_equals($fresh->sha256, $storedHash)) {
+                        throw ValidationException::withMessages(['file' => __('documents.storage_error')]);
+                    }
+                    $fresh->forceFill(['source_released_at' => null, 'source_revision' => $fresh->source_revision + 1]);
+                    if ($fresh->mime_type === 'application/pdf' && $fresh->preview_status !== 'ready') {
+                        $fresh->preview_status = 'pending';
+                        $previewRevision = $fresh->source_revision;
+                    }
+                    if (! isset($data['ai_run_id']) && $fresh->ai_status === 'ready') {
+                        $fresh->ai_status = 'rejected';
+                    }
+                } elseif ($source) {
+                    throw ValidationException::withMessages(['file' => __('processing.source_mismatch')]);
+                }
+                $fresh->forceFill(['metadata_version' => $fresh->metadata_version + 1]);
+                $fresh->forceFill(['status' => 'stored', 'title' => $data['title'], ...$metadata])->save();
+            }, 3);
+        } catch (\Throwable $exception) {
+            if ($source) {
+                app(DraftSource::class)->releaseOrQueue($document->id, $document->workspace_id);
             }
-            if (isset($data['metadata_version']) && (int) $data['metadata_version'] !== $fresh->metadata_version) {
-                throw ValidationException::withMessages(['processing' => __('processing.stale')]);
+            if ($exception instanceof ValidationException || $exception instanceof AuthorizationException) {
+                throw $exception;
             }
-            $fresh->forceFill(['metadata_version' => $fresh->metadata_version + 1]);
-            $fresh->forceFill(['status' => 'stored', 'title' => $data['title'], ...$this->metadata($workspace, $data)])->save();
-            $this->syncTags($fresh, $workspace, $data['tags'] ?? [], $data['tag_ids'] ?? []);
-        }, 3);
+            Log::warning('DOCUMENT_STORAGE_OPERATION_FAILED', ['exception_class' => get_class($exception)]);
+            throw ValidationException::withMessages(['file' => __('documents.storage_error')]);
+        }
+        if ($previewRevision !== null) {
+            try {
+                GenerateDocumentPreview::dispatch($document->id, $document->workspace_id, $previewRevision);
+            } catch (\Throwable) {
+                Document::whereKey($document->id)->where('source_revision', $previewRevision)->update(['preview_status' => 'failed']);
+            }
+        }
     }
 
     public function discardDraft(Document $document, bool $expiredOnly = false): bool
