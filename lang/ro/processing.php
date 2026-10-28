@@ -73,4 +73,6 @@ return [
         'future_date' => 'A fost detectata o data de emitere in viitor. Verifica documentul manual.',
         'inconsistent' => 'Unele informatii propuse nu au dovezi suficiente in textul extras.',
     ],
+    'suggested_fields' => 'Propuneri AI',
+    'expired_short' => 'Data este in trecut. Nu se programeaza notificari.',
 ];

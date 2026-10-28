@@ -242,6 +242,24 @@ class DocumentProcessingTest extends TestCase
         $this->assertSame('Existing private note', $this->document->fresh()->description);
     }
 
+    public function test_review_uses_compact_preview_and_red_cancel_instead_of_routine_alerts(): void
+    {
+        $this->readyText($this->text.' Expira 01.01.2021.');
+        $this->fakeAi(['expires_on' => '2021-01-01']);
+        $run = app(DocumentProcessingService::class)->request($this->user, $this->document->fresh(), 'ai');
+        $this->execute($run);
+        $page = $this->get('/ro/documente/'.$this->document->id.'/sugestii')->assertOk();
+        $page->assertSee('review-source')->assertSee('button button-danger', false)
+            ->assertDontSee('class="security-notice"', false)->assertDontSee(__('processing.draft_notice'))
+            ->assertSee('id="expiry-warning"', false)->assertSee(__('processing.expired_short'));
+        $this->assertLessThan(strpos($page->getContent(), 'id="expiry-warning"'), strpos($page->getContent(), 'id="expires_on"'));
+        $this->document->forceFill(['status' => 'draft'])->save();
+        $this->get('/ro/documente/'.$this->document->id.'/editeaza')->assertOk()
+            ->assertSee('data-retained-source', false)->assertSee('data-local-pdf', false)
+            ->assertSee('form="discard-upload" formnovalidate class="button button-danger"', false)
+            ->assertDontSee(__('processing.source_retained'));
+    }
+
     public function test_upload_option_is_checked_beside_file_and_can_be_declined(): void
     {
         $page = $this->get('/ro/documente/incarca')->assertOk();

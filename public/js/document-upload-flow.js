@@ -5,11 +5,41 @@
         if (target.origin !== location.origin) throw new Error('origin');
         return target.href;
     };
-    const clear = () => { stopped = true; clearTimeout(pollTimer); if(current?.previewUrl)URL.revokeObjectURL(current.previewUrl); current = null; };
+    const clear = () => { stopped = true; clearTimeout(pollTimer); if(current?.previewUrl)URL.revokeObjectURL(current.previewUrl); if(current?.pdfTask)current.pdfTask.destroy().catch(()=>{}); current = null; };
     const message = (form, text) => {
         let box = form.querySelector('[data-flow-error]');
         if (!box) { box = document.createElement('div'); box.className = 'form-alert'; box.dataset.flowError = ''; box.setAttribute('role','alert'); form.prepend(box); }
         box.textContent = text;
+    };
+    // Miniatura este desenata exclusiv din File-ul local; niciun upload suplimentar.
+    const thumbnail = async (info, state) => {
+        if (state.thumbnailElement === info) return;
+        state.thumbnailElement = info;
+        const fallback = info.querySelector('.review-source-thumb svg');
+        const image = info.querySelector('[data-local-image]');
+        if (state.file.type.startsWith('image/')) {
+            image.onload = () => { if (current === state && info.isConnected) { image.hidden=false; fallback.setAttribute('hidden',''); } };
+            image.src = state.previewUrl;
+            return;
+        }
+        if (state.file.type !== 'application/pdf') return;
+        let loadingTask;
+        try {
+            const pdfjs = await import('/vendor/pdfjs/legacy/build/pdf.js');
+            if (current !== state || !info.isConnected) return;
+            pdfjs.GlobalWorkerOptions.workerSrc = '/vendor/pdfjs/legacy/build/pdf.worker.js';
+            loadingTask = pdfjs.getDocument({data:new Uint8Array(await state.file.arrayBuffer()), standardFontDataUrl:'/vendor/pdfjs/standard_fonts/', useWasm:false, isEvalSupported:false, enableXfa:false, stopAtErrors:true});
+            state.pdfTask=loadingTask;
+            const pdf = await loadingTask.promise;
+            if (current !== state || !info.isConnected) return;
+            const page = await pdf.getPage(1), base = page.getViewport({scale:1});
+            const viewport = page.getViewport({scale:Math.min(240/base.width,320/base.height)});
+            const canvas=info.querySelector('[data-local-pdf]');
+            canvas.width=Math.ceil(viewport.width);canvas.height=Math.ceil(viewport.height);
+            await page.render({canvasContext:canvas.getContext('2d'),viewport}).promise;
+            if (current === state && info.isConnected) { canvas.hidden=false; fallback.setAttribute('hidden',''); }
+        } catch (_) { /* Originalul ramane accesibil daca miniatura nu poate fi desenata. */ }
+        finally { if (loadingTask) await loadingTask.destroy().catch(()=>{}); if(state.pdfTask===loadingTask)state.pdfTask=null; }
     };
     const decorate = () => {
         const form = document.querySelector('[data-document-confirm]');
@@ -18,11 +48,12 @@
         if (source) {
             source.hidden = true;
             const input = source.querySelector('input'); input.required = false; input.disabled = true;
-            const info = form.querySelector('[data-retained-source]'); info.hidden = false; info.querySelector('span').textContent = current.file.name;
+            const info = form.querySelector('[data-retained-source]'); info.hidden = false; info.querySelector('[data-local-name]').textContent = current.file.name;
             current.previewUrl ||= URL.createObjectURL(current.file);
-            info.querySelector('[data-local-preview]').href=current.previewUrl;
+            info.querySelectorAll('[data-local-preview]').forEach(link=>link.href=current.previewUrl);
             info.querySelector('[data-local-download]').href=current.previewUrl;
             info.querySelector('[data-local-download]').download=current.file.name;
+            thumbnail(info,current);
         }
     };
     const render = async url => {
@@ -52,7 +83,7 @@
         const status=document.createElement('p'); status.setAttribute('aria-live','polite');
         const elapsed=document.createElement('p'); elapsed.className='field-help';
         const retry=document.createElement('button'); retry.type='button'; retry.className='button button-outline'; retry.textContent=meta.messages.retry; retry.hidden=true;
-        const discard=document.createElement('button'); discard.type='button'; discard.className='inline-link'; discard.textContent=meta.messages.cancel;
+        const discard=document.createElement('button'); discard.type='button'; discard.className='button button-danger'; discard.textContent=meta.messages.cancel;
         discard.addEventListener('click',()=>{discard.disabled=true;cancel().catch(()=>{notice.textContent=meta.messages.failed;discard.disabled=false;});});
         panel.append(title,spinner,notice,status,elapsed,retry,discard); main.replaceChildren(panel); history.replaceState(null,'',sameOrigin(meta.show_url));
         let count=0;
@@ -87,6 +118,7 @@
             const body=new FormData(form); body.set('file',current.file,current.file.name);
             const response=await fetch(sameOrigin(form.action),{method:'POST',body,credentials:'same-origin',headers:{Accept:'application/json'}});
             const result=await response.json();
+            if(!response.ok && result.errors?.file){const source=form.querySelector('[data-source-upload]');if(source){source.hidden=false;const input=source.querySelector('input');input.disabled=false;input.required=true;}}
             if(!response.ok)throw Object.assign(new Error(Object.values(result.errors||{}).flat()[0]||current.meta.messages.failed),{userMessage:true});
             const target=sameOrigin(result.redirect);clear();location.assign(target);
         } catch(e) {message(form,e.userMessage?e.message:current?.meta.messages.failed);form.dataset.sending='0';form.removeAttribute('aria-busy');buttons.forEach(b=>b.disabled=false);}
@@ -106,6 +138,15 @@
             if([401,403,404,409,410].includes(receipt.status)){clear();location.reload();}
         } catch(_) { /* Reselectarea manuala ramane disponibila, fara afisarea continutului privat. */ }
     };
+    document.addEventListener('change',event=>{
+        const input=event.target;
+        if (!(input instanceof HTMLInputElement) || input.id!=='confirm-source' || !input.files[0]) return;
+        const form=input.closest('[data-document-confirm]');
+        if (!form?.dataset.uploadState) return;
+        clear();stopped=false;
+        current={file:input.files[0],meta:JSON.parse(atob(form.dataset.uploadState)),csrf:form.elements._token.value};
+        decorate();
+    });
     adopt();
     window.addEventListener('beforeunload',event=>{if(current){event.preventDefault();event.returnValue='';}});
     window.VaultUploadFlow = {start};

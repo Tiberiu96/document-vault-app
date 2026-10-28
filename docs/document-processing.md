@@ -190,3 +190,21 @@ AI primeste definitiile etichetelor globale, nu doar cheile lor. Lista poate ram
 goala: metoda de plata nu dovedeste achitarea, iar o factura nu este automat urgenta,
 semnata sau recurenta. Expirarea se extrage numai daca este mentionata; scadenta
 facturii ramane un concept separat.
+
+Formularul de verificare foloseste un card compact cu miniatura primei pagini,
+numele fisierului si actiuni de previzualizare/descarcare. Mesajele informative
+despre draft si propunerile AI nu mai apar ca alerte mari; contextul AI ramane
+in tooltip, iar expirarea trecuta este o nota langa data. Erorile reale raman vizibile.
+Renunta este un buton rosu, inclusiv in timpul procesarii.
+
+PDF.js 6.4.299 este servit local din public/vendor/pdfjs, cu licenta Apache-2.0
+si manifest de versiune/integritate SHA-512 verificata fata de registry.npmjs.org.
+Folosim distributia legacy ES modules si workerul propriu, fara Node/Vite la runtime
+sau CDN. Dependenta este necesara pentru miniaturi PDF in browser pe mobil;
+https://mozilla.github.io/pdf.js/examples/ descrie API-ul de randare. Sunt incluse
+fonturile standard; extensia modulelor este .js pentru MIME JavaScript corect
+pe Nginx, fara modificarea continutului distributiei. Manifestul pastreaza hashurile
+fisierelor. WASM/XFA sunt dezactivate pentru miniatura. Prima pagina
+se deseneaza in canvas numai din File-ul local si nu se salveaza pe server.
+Daca randarea nu este suportata, pictograma si deschiderea originalului raman
+disponibile. Workerul este distrus dupa randare sau la anularea fluxului.

@@ -73,4 +73,6 @@ return [
         'future_date' => 'An issue date in the future was detected. Review the document manually.',
         'inconsistent' => 'Some suggested facts lack sufficient evidence in the extracted text.',
     ],
+    'suggested_fields' => 'AI suggestions',
+    'expired_short' => 'This date is in the past. No notifications will be scheduled.',
 ];

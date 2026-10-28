@@ -73,4 +73,6 @@ return [
         'future_date' => 'Jövőbeli kiállítási dátumot észleltünk. Ellenőrizd kézzel a dokumentumot.',
         'inconsistent' => 'Egyes javasolt adatokhoz nincs elegendő bizonyíték a kinyert szövegben.',
     ],
+    'suggested_fields' => 'AI-javaslatok',
+    'expired_short' => 'A dátum a múltban van. Nem lesznek értesítések ütemezve.',
 ];
