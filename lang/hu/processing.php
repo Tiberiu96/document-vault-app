@@ -43,6 +43,7 @@ return [
     'ready' => 'A javaslatok elkészültek. Egyetlen mező sem változott automatikusan.',
     'reject' => 'Javaslatok elutasítása',
     'states' => [
+        'quota_exceeded' => 'A feldolgozási keret elfogyott',
         'idle' => 'Nem indult el',
         'queued' => 'Sorban áll',
         'running' => 'Feldolgozás alatt',

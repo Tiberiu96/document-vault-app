@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\ProcessingUsage;
 use App\Models\Workspace;
+use App\Services\Documents\ProcessingQuotaExceeded;
 use Illuminate\Validation\ValidationException;
 
 class PlanLimitsService
@@ -28,8 +29,8 @@ class PlanLimitsService
         }
         $usage = ProcessingUsage::unguarded(fn () => ProcessingUsage::firstOrCreate(['workspace_id' => $lockedWorkspace->id, 'period' => $period]));
         $limit = $this->free()[$kind === 'ocr' ? 'monthly_ocr_pages' : 'monthly_ai_calls'];
-        if ($limit < $usage->{$kind.'_used'} + $usage->{$kind.'_reserved'} + $units) {
-            throw ValidationException::withMessages(['processing' => __('processing.quota')]);
+        if ($limit >= 0 && $limit < $usage->{$kind.'_used'} + $usage->{$kind.'_reserved'} + $units) {
+            throw ProcessingQuotaExceeded::withMessages(['processing' => __('processing.quota')]);
         }
         $usage->forceFill([$kind.'_reserved' => $usage->{$kind.'_reserved'} + $units])->save();
     }

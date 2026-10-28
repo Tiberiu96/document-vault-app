@@ -6,6 +6,7 @@ use App\Http\Requests\DocumentScanRequest;
 use App\Models\Document;
 use App\Services\Documents\DocumentLibrary;
 use App\Services\Documents\DocumentProcessingService;
+use App\Services\Documents\ProcessingQuotaExceeded;
 use App\Services\Documents\ScanPdf;
 use App\Services\PlanLimitsService;
 use App\Services\WebsiteContext;
@@ -35,8 +36,8 @@ class DocumentScannerController extends Controller
             $document = $library->upload($request->user(), $workspace, $file, ['title' => __('scanner.default_title').' '.now(config('vault.display_timezone'))->format('d.m.Y H:i'), 'analyze_with_ai' => $request->boolean('analyze_with_ai')], draft: true);
             try {
                 $processing->request($request->user(), $document, 'ocr');
-            } catch (ValidationException) {
-                $document->forceFill(['ocr_status' => 'failed'])->save();
+            } catch (ValidationException $exception) {
+                $document->forceFill(['ocr_status' => $exception instanceof ProcessingQuotaExceeded ? 'quota_exceeded' : 'failed'])->save();
             }
 
             return $document;

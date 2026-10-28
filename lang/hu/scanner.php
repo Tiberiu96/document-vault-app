@@ -1,6 +1,19 @@
 <?php
 
 return [
+    'camera_short' => 'Kamera',
+    'gallery_short' => 'Galéria',
+    'compact_intro' => 'Fényképezd le vagy töltsd fel a dokumentumot.',
+    'tap_capture' => 'Koppints a fényképezéshez',
+    'drag_hint' => 'Húzd a sarkokat a körbevágáshoz. A módosítások folytatáskor is érvényesülnek.',
+    'remote_notice' => 'A kinyert szöveget a Groq kapja meg elemzésre.',
+    'details' => 'Szkennelés részletei',
+    'continue' => 'Folytatás',
+    'corner_tl' => 'Bal felső sarok',
+    'corner_tr' => 'Jobb felső sarok',
+    'corner_bl' => 'Bal alsó sarok',
+    'corner_br' => 'Jobb alsó sarok',
+
     'title' => 'Dokumentum szkennelése',
     'short_title' => 'Szkennelés',
     'intro' => 'Fényképezd le, igazítsd és erősítsd meg az oldalakat feltöltés előtt.',

@@ -8,6 +8,7 @@ use App\Models\ProcessingRun;
 use App\Models\ProcessingUsage;
 use App\Models\User;
 use App\Models\Workspace;
+use App\Services\Ocr\TextQuality;
 use App\Services\PlanLimitsService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
@@ -26,7 +27,9 @@ class DocumentProcessingService
             $record = Document::lockForUpdate()->findOrFail($document->id);
             Gate::forUser($user)->authorize('update', $record);
             $existing = ProcessingRun::find($record->{$kind.'_run_id'});
-            if ($existing && (in_array($existing->status, ['queued', 'running', 'succeeded'], true) || ($kind === 'ocr' && $record->ocr_status === 'ready'))) {
+            $nowReadable = $kind === 'ai' && $existing && ($existing->result['skipped_ai'] ?? false)
+                && app(TextQuality::class)->good($record->ocr_text ?? '');
+            if ($existing && (in_array($existing->status, ['queued', 'running'], true) || ($existing->status === 'succeeded' && ! $nowReadable) || ($kind === 'ocr' && $record->ocr_status === 'ready'))) {
                 return [$existing, false];
             }
             if ($kind === 'ai' && ($record->ocr_status !== 'ready' || ! trim($record->ocr_text ?? ''))) {
@@ -129,8 +132,8 @@ class DocumentProcessingService
                 if ($user) {
                     $this->request($user, $document, 'ai');
                 }
-            } catch (ValidationException) {
-                $document->forceFill(['ai_status' => 'failed'])->save();
+            } catch (ValidationException $exception) {
+                $document->forceFill(['ai_status' => $exception instanceof ProcessingQuotaExceeded ? 'quota_exceeded' : 'failed'])->save();
             } finally {
                 app()->setLocale($oldLocale);
             }

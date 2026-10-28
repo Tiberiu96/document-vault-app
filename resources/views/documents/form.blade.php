@@ -7,6 +7,7 @@
     @csrf @if($document)@method('PATCH')<input type="hidden" name="metadata_version" value="{{ $document->metadata_version }}">@endif
     @isset($suggestionRunId)<input type="hidden" name="ai_run_id" value="{{ $suggestionRunId }}"><div class="security-notice"><p>{{ __('processing.review_hint') }} @if($suggestionPartial){{ __('processing.partial') }}@endif</p></div>@endisset
     @foreach($suggestionWarnings ?? [] as $warning)<div class="security-notice" role="status"><p>{{ __('processing.warnings.'.$warning) }}</p></div>@endforeach
+    @if($document->ai_status === 'quota_exceeded' || $document->ocr_status === 'quota_exceeded')<div class="form-alert" role="status">{{ __('processing.quota') }}</div>@endif
     @if(!isset($suggestionRunId) && (in_array($document->ai_status, ['needs_review', 'failed']) || in_array($document->ocr_status, ['empty', 'failed'])))
     <div class="form-alert" role="status"><strong>{{ __('processing.manual_review') }}</strong><p>{{ __('processing.no_autofill') }}</p>@foreach($document->aiRun?->result['warnings'] ?? [] as $warning)<p>{{ __('processing.warnings.'.$warning) }}</p>@endforeach</div>
     @endif

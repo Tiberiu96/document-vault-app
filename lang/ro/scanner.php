@@ -1,6 +1,19 @@
 <?php
 
 return [
+    'camera_short' => 'Camera',
+    'gallery_short' => 'Galerie',
+    'compact_intro' => 'Fotografiaza sau incarca documentul.',
+    'tap_capture' => 'Atinge pentru a fotografia',
+    'drag_hint' => 'Trage colturile pentru a decupa. Ajustarile se aplica si la Continua.',
+    'remote_notice' => 'Textul extras este trimis la Groq pentru analiza.',
+    'details' => 'Detalii scanare',
+    'continue' => 'Continua',
+    'corner_tl' => 'Coltul din stanga sus',
+    'corner_tr' => 'Coltul din dreapta sus',
+    'corner_bl' => 'Coltul din stanga jos',
+    'corner_br' => 'Coltul din dreapta jos',
+
     'title' => 'Scaneaza documentul',
     'short_title' => 'Scaneaza',
     'intro' => 'Fotografiaza, ajusteaza si confirma paginile inainte de incarcare.',

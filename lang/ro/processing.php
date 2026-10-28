@@ -43,6 +43,7 @@ return [
     'ready' => 'Sugestiile sunt pregatite. Niciun camp nu a fost schimbat automat.',
     'reject' => 'Respinge sugestiile',
     'states' => [
+        'quota_exceeded' => 'Cota de procesare atinsa',
         'idle' => 'Nepornit',
         'queued' => 'In coada',
         'running' => 'Se proceseaza',

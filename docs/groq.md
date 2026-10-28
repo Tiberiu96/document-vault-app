@@ -46,3 +46,5 @@ si limitele in consola inainte de productie. Groq declara lipsa retentiei implic
 continutului de inferenta, cu exceptii pentru functii ce necesita stocare si investigatii
 de fiabilitate/abuz; metadatele de utilizare sunt retinute. Revizuieste Data Controls,
 termenii si acordurile de procesare inainte de documente confidentiale in productie.
+
+Testarea locala foloseste VAULT_FREE_AI_CALLS=-1 la cererea utilizatorului (fara cota lunara AI); rate limits si limitele de fisiere raman aplicabile.

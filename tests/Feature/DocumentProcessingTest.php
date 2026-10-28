@@ -17,6 +17,7 @@ use App\Services\Ai\DocumentAiAnalysis;
 use App\Services\Documents\DocumentLibrary;
 use App\Services\Documents\DocumentProcessingService;
 use App\Services\Ocr\OcrException;
+use App\Services\Ocr\TextQuality;
 use Carbon\Carbon;
 use Database\Seeders\DatabaseSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -367,7 +368,7 @@ class DocumentProcessingTest extends TestCase
 
     public function test_scanner_creates_private_multipage_draft_and_rejects_excess_pages(): void
     {
-        $this->get('/ro/documente/scaneaza')->assertOk()->assertSee('Confirma scanarea');
+        $this->get('/ro/documente/scaneaza')->assertOk()->assertSee('Continua')->assertSee('data-crop-corner="tl"', false)->assertDontSee('type="range"', false);
         $response = $this->postJson('/ro/documente/scaneaza', ['pages' => [UploadedFile::fake()->image('one.jpg', 150, 210), UploadedFile::fake()->image('two.png', 210, 150)], 'analyze_with_ai' => '0', 'workspace_id' => 999, 'status' => 'stored'])
             ->assertCreated()->assertJsonStructure(['redirect']);
         $record = Document::where('mime_type', 'application/pdf')->sole();
@@ -384,6 +385,34 @@ class DocumentProcessingTest extends TestCase
         $accountant = User::factory()->create();
         $this->workspace->members()->attach($accountant->id, ['role' => 'accountant']);
         $this->actingAs($accountant)->get('/ro/documente/scaneaza')->assertForbidden();
+    }
+
+    public function test_ai_quota_reports_its_actual_cause_and_negative_limit_disables_monthly_cap(): void
+    {
+        config(['vault.plans.free.monthly_ai_calls' => 0]);
+        $this->document->forceFill(['ai_requested' => true])->save();
+        $service = app(DocumentProcessingService::class);
+        $ocrRun = $service->request($this->user, $this->document, 'ocr');
+        $ocr = Mockery::mock(OcrProviderInterface::class);
+        $ocr->shouldReceive('extract')->once()->andReturn(['text' => $this->text, 'engine' => 'fake']);
+        $this->execute($ocrRun, $ocr);
+        $this->assertSame('quota_exceeded', $this->document->fresh()->ai_status);
+        $this->get('/ro/documente/'.$this->document->id)->assertOk()->assertSee('Cota lunara de procesare');
+        $this->assertNull($this->document->fresh()->ai_run_id);
+        config(['vault.plans.free.monthly_ai_calls' => -1]);
+        $run = $service->request($this->user, $this->document, 'ai');
+        $this->assertSame('queued', $run->status);
+    }
+
+    public function test_pdf_column_spacing_does_not_make_readable_text_fail_quality_checks(): void
+    {
+        $spaced = str_replace(' ', str_repeat(' ', 25), $this->text);
+        $this->readyText($spaced);
+        $this->fakeAi();
+        $result = app(DocumentAiAnalysis::class)->analyze($this->document->fresh(), 'ro');
+        $this->assertFalse($result['review_required']);
+        $this->assertSame($spaced, $this->document->fresh()->ocr_text);
+        $this->assertFalse(app(TextQuality::class)->good('%%% #@@ ! ! ! '.str_repeat('?', 100)));
     }
 
     public function test_stale_suggestions_and_invalid_category_are_rejected(): void

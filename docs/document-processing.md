@@ -50,7 +50,7 @@ Expirarea in trecut este un avertisment neblocant: propunerile pot fi confirmate
 Nu se programeaza notificari de expirare pentru date deja trecute; modulul de remindere urmeaza.
 O data de emitere in trecut este normala. AI nu certifica autenticitatea juridica.
 
-Pentru texte de peste 3000 bytes, analiza foloseste un extras de la inceput si final;
+Pentru texte peste bugetul providerului (3000 bytes Ollama / 9000 bytes Groq dupa compactarea spatiilor), analiza foloseste un extras de la inceput si final;
 interfata declara aceasta limita. Nu este analiza integrala a unui document lung.
 OCR bulgar dedicat nu este instalat; interfata bulgara si textul PDF nativ sunt acceptate,
 dar pachetul OCR actual este ron/eng/hun. Calitatea extragerii nu este garantata.
@@ -113,3 +113,24 @@ in director temporar0700, eliminat in finally. PDF-ul trece prin inspectia si li
 obisnuite, este un draft privat si urmeaza OCR/AI. Nu exista detectie automata a marginilor,
 corectie de perspectiva sau scanare nativa Expo in acest checkpoint. Verificarea pe un
 telefon fizic ramane necesara; browserul desktop poate verifica selectia si editarea imaginilor.
+
+## Scanner compact si calitatea textului tabelar
+
+Scannerul foloseste un singur card, actiuni centrate, miniaturi si patru colturi
+care se pot trage direct pe fotografie (pointer events cu pointer capture), plus
+ajustare din tastele sageti. Selectia este rectangulara; nu se corecteaza perspectiva.
+Cropul este pastrat separat pe fiecare pagina si se aplica explicit sau la Continua.
+Bara Continua este fixa deasupra navigatiei mobile; inaltimea navigatiei este masurata,
+nu presupusa. Camera se deschide numai printr-o actiune a utilizatorului.
+
+TextQuality exclude spatiile din calculul proportiei alfanumerice, pentru ca alinierea
+coloanelor din pdftotext -layout nu inseamna text ilizibil. Pentru prompt se compacteaza
+spatiile orizontale, fara modificarea OCR-ului original criptat. Raspunsurile AI efective
+finalizate nu se refac; un rezultat omis local (skipped_ai) poate fi reprocesat numai
+daca textul trece acum evaluarea de calitate.
+
+Cota lunara AI poate fi dezactivata prin VAULT_FREE_AI_CALLS=-1. Aceasta configurare
+este folosita numai in .env local la cererea utilizatorului; valoarea implicita din
+cod/example ramane 10. Rate limits, limitele documentelor si rezervarile atomice raman.
+ProcessingQuotaExceeded produce status quota_exceeded si explicatie clara, inclusiv
+cand cota este atinsa intre OCR si AI, fara a pretinde ca documentul nu a fost inteles.

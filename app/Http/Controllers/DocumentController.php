@@ -10,6 +10,7 @@ use App\Models\Tag;
 use App\Models\Workspace;
 use App\Services\Documents\DocumentLibrary;
 use App\Services\Documents\DocumentProcessingService;
+use App\Services\Documents\ProcessingQuotaExceeded;
 use App\Services\WebsiteContext;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -77,8 +78,8 @@ class DocumentController extends Controller
 
         try {
             app(DocumentProcessingService::class)->request($request->user(), $document, 'ocr');
-        } catch (ValidationException) {
-            $document->forceFill(['ocr_status' => 'failed'])->save();
+        } catch (ValidationException $exception) {
+            $document->forceFill(['ocr_status' => $exception instanceof ProcessingQuotaExceeded ? 'quota_exceeded' : 'failed'])->save();
         }
 
         return redirect()->route($document->ai_requested ? 'documents.show' : 'documents.edit',
@@ -92,7 +93,7 @@ class DocumentController extends Controller
             if ($record->ai_status === 'ready') {
                 return redirect()->route('documents.suggestions', ['document' => $record->id]);
             }
-            if (in_array($record->ai_status, ['needs_review', 'failed', 'rejected'], true) || in_array($record->ocr_status, ['empty', 'failed'], true)) {
+            if (in_array($record->ai_status, ['needs_review', 'failed', 'rejected', 'quota_exceeded'], true) || in_array($record->ocr_status, ['empty', 'failed', 'quota_exceeded'], true)) {
                 return redirect()->route('documents.edit', ['document' => $record->id]);
             }
         }

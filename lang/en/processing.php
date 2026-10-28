@@ -43,6 +43,7 @@ return [
     'ready' => 'Suggestions are ready. No field was changed automatically.',
     'reject' => 'Reject suggestions',
     'states' => [
+        'quota_exceeded' => 'Processing quota reached',
         'idle' => 'Not started',
         'queued' => 'Queued',
         'running' => 'Processing',

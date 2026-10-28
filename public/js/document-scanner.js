@@ -3,7 +3,9 @@
     if (!root) return;
     const find = name => root.querySelector(`[data-scan-${name}]`);
     const canvas = find('canvas'), video = find('video'), form = find('submit');
-    const pages = [], sliders = [...root.querySelectorAll('[data-crop]')];
+    const pages = [], handles = [...root.querySelectorAll('[data-crop-corner]')];
+    const fullCrop = () => ({left:0, top:0, right:1, bottom:1});
+    let cropArea = fullCrop();
     let active = -1, bitmap = null, stream = null, busy = false, generation = 0;
     const error = text => { find('error').textContent = text; find('error').hidden = !text; };
     const stopCamera = () => { stream?.getTracks().forEach(track => track.stop()); stream = null; video.srcObject = null; video.hidden = true; find('shoot').hidden = true; };
@@ -13,9 +15,15 @@
         const url = URL.createObjectURL(blob), image = new Image();
         try { image.src = url; await image.decode(); return image; } finally { URL.revokeObjectURL(url); }
     };
-    const bounds = () => {
-        const v = Object.fromEntries(sliders.map(s => [s.dataset.crop, Number(s.value) / 100]));
-        return {x:canvas.width * v.left, y:canvas.height * v.top, w:canvas.width * (1 - v.left - v.right), h:canvas.height * (1 - v.top - v.bottom)};
+    const bounds = () => ({x:canvas.width*cropArea.left, y:canvas.height*cropArea.top, w:canvas.width*(cropArea.right-cropArea.left), h:canvas.height*(cropArea.bottom-cropArea.top)});
+    const positionHandles = () => {
+        const r=canvas.getBoundingClientRect(), stage=canvas.parentElement.getBoundingClientRect();
+        handles.forEach(handle=>{
+            const corner=handle.dataset.cropCorner;
+            handle.hidden=!bitmap || video.hidden===false;
+            handle.style.left=`${r.left-stage.left+r.width*(corner.includes('l')?cropArea.left:cropArea.right)}px`;
+            handle.style.top=`${r.top-stage.top+r.height*(corner.includes('t')?cropArea.top:cropArea.bottom)}px`;
+        });
     };
     const draw = () => {
         if (!bitmap) return;
@@ -25,10 +33,13 @@
         ctx.fillRect(0,0,canvas.width,b.y); ctx.fillRect(0,b.y+b.h,canvas.width,canvas.height-b.y-b.h);
         ctx.fillRect(0,b.y,b.x,b.h); ctx.fillRect(b.x+b.w,b.y,canvas.width-b.x-b.w,b.h);
         ctx.strokeStyle='#bca47c'; ctx.lineWidth=Math.max(3, canvas.width/400); ctx.strokeRect(b.x,b.y,b.w,b.h);
+        positionHandles();
     };
     const refresh = () => {
         find('count').textContent = `${pages.length} / ${root.dataset.maxPages}`;
         form.querySelector('button[type="submit"]').disabled = busy || !pages.length;
+        find('tools').hidden = active < 0;
+        find('page-section').hidden = !pages.length;
         ['crop','rotate','remove'].forEach(name => { find(name).disabled = busy || active < 0; });
         const list = find('pages'); list.replaceChildren();
         pages.forEach((page, i) => {
@@ -40,10 +51,11 @@
         });
     };
     const select = async index => {
-        stopCamera(); active=index; sliders.forEach(s=>s.value='0');
+        stopCamera(); active=index; cropArea=pages[index]?.crop || fullCrop();
         const current=++generation;
         bitmap?.close?.(); bitmap=null;
         canvas.hidden = index < 0; find('empty').hidden = index >= 0;
+        handles.forEach(h=>h.hidden=true);
         refresh();
         if (index < 0) return;
         const image=await load(pages[index].blob);
@@ -56,7 +68,7 @@
         await select(index);
     };
     const crop = async () => {
-        if (!bitmap || !sliders.some(s=>Number(s.value)>0)) return;
+        if (!bitmap || (cropArea.left===0 && cropArea.top===0 && cropArea.right===1 && cropArea.bottom===1)) return;
         const b=bounds(), out=document.createElement('canvas'); out.width=Math.round(b.w); out.height=Math.round(b.h);
         out.getContext('2d').drawImage(bitmap,b.x,b.y,b.w,b.h,0,0,out.width,out.height);
         await replace(await blobFrom(out));
@@ -89,7 +101,7 @@
         if (!window.isSecureContext || !navigator.mediaDevices?.getUserMedia) { error(root.dataset.fallback); find('camera-file').click(); return; }
         try {
             stopCamera(); stream=await navigator.mediaDevices.getUserMedia({audio:false,video:{facingMode:{ideal:'environment'},width:{ideal:1920},height:{ideal:1080}}});
-            video.srcObject=stream; video.hidden=false; canvas.hidden=true; find('empty').hidden=true; find('shoot').hidden=false; await video.play();
+            handles.forEach(h=>h.hidden=true); video.srcObject=stream; video.hidden=false; canvas.hidden=true; find('empty').hidden=true; find('shoot').hidden=false; await video.play();
         } catch(_) { stopCamera(); error(root.dataset.fallback); }
     });
     find('shoot').addEventListener('click',()=>guarded(async()=>{
@@ -100,6 +112,7 @@
     find('crop').addEventListener('click',()=>guarded(crop));
     find('rotate').addEventListener('click',()=>guarded(async()=>{
         if (!bitmap) return;
+        await crop();
         const out=document.createElement('canvas'); out.width=bitmap.height; out.height=bitmap.width;
         const ctx=out.getContext('2d'); ctx.translate(out.width,0); ctx.rotate(Math.PI/2); ctx.drawImage(bitmap,0,0);
         await replace(await blobFrom(out));
@@ -108,12 +121,39 @@
         if (active<0) return;
         URL.revokeObjectURL(pages[active].url); pages.splice(active,1); await select(Math.min(active,pages.length-1));
     }));
-    sliders.forEach(s=>s.addEventListener('input',draw));
+    const moveCorner = (corner,x,y) => {
+        if (busy || !bitmap) return;
+        if(corner.includes('l')) cropArea.left=Math.max(0,Math.min(cropArea.right-.1,x));
+        else cropArea.right=Math.min(1,Math.max(cropArea.left+.1,x));
+        if(corner.includes('t')) cropArea.top=Math.max(0,Math.min(cropArea.bottom-.1,y));
+        else cropArea.bottom=Math.min(1,Math.max(cropArea.top+.1,y));
+        pages[active].crop={...cropArea}; draw();
+    };
+    handles.forEach(handle=>{
+        handle.addEventListener('pointerdown',event=>{ if(busy || !bitmap)return; event.preventDefault(); handle.setPointerCapture(event.pointerId); });
+        handle.addEventListener('pointermove',event=>{
+            if(!handle.hasPointerCapture(event.pointerId))return;
+            const r=canvas.getBoundingClientRect();
+            moveCorner(handle.dataset.cropCorner,(event.clientX-r.left)/r.width,(event.clientY-r.top)/r.height);
+        });
+        handle.addEventListener('pointerup',event=>{ if(handle.hasPointerCapture(event.pointerId))handle.releasePointerCapture(event.pointerId); });
+        handle.addEventListener('keydown',event=>{
+            const shifts={ArrowLeft:[-.01,0],ArrowRight:[.01,0],ArrowUp:[0,-.01],ArrowDown:[0,.01]};
+            if(!shifts[event.key])return;
+            event.preventDefault(); const c=handle.dataset.cropCorner;
+            moveCorner(c,(c.includes('l')?cropArea.left:cropArea.right)+shifts[event.key][0],(c.includes('t')?cropArea.top:cropArea.bottom)+shifts[event.key][1]);
+        });
+    });
+    new ResizeObserver(()=>{if(bitmap)positionHandles();}).observe(canvas);
+    const nav=document.querySelector('.library-mobile-nav');
+    if(nav) new ResizeObserver(()=>document.documentElement.style.setProperty('--scan-nav-height', `${nav.getBoundingClientRect().height}px`)).observe(nav);
+    find('empty').addEventListener('click',()=>find('camera').click());
     form.addEventListener('submit',async event=>{
         event.preventDefault(); if(busy || !pages.length)return;
         busy=true; refresh(); error(''); find('loading').hidden=false; form.setAttribute('aria-busy','true');
         try {
-            await crop(); stopCamera();
+            for(let i=0;i<pages.length;i++){await select(i);await crop();}
+            stopCamera();
             const data=new FormData(form);
             data.set('analyze_with_ai', form.elements.analyze_with_ai?.checked?'1':'0');
             if (!form.elements.analyze_with_ai) data.delete('analyze_with_ai');

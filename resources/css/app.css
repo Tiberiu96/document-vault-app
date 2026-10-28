@@ -755,3 +755,56 @@
 .scan-viewer { display:flex; flex-direction:column; }
 .scan-viewer>.library-actions { order:-1; margin:0 0 20px; }
 @media(max-width:800px){.scan-stage{min-height:240px}.scan-empty{padding:28px;gap:20px}}
+
+/* Scanner compact: un singur card, ajustare directa si actiune accesibila. */
+.scan-compact { max-width:860px; margin-inline:auto; }
+.scan-compact .scan-viewer { padding:20px; gap:0; }
+.scan-compact .scan-stage { min-height:240px; overflow:visible; background:#eee9df; border:1px solid #e6e2da; }
+.scan-compact .scan-stage canvas,.scan-compact .scan-stage video { max-height:48dvh; border-radius:7px; }
+.scan-compact .scan-empty { border:1px dashed #d7cebf; border-radius:7px; color:#77766f; background:#faf8f3; width:100%; max-width:none; min-height:240px; gap:14px; padding:28px; cursor:pointer; font:inherit; font-size:16px; }
+.scan-compact .scan-empty strong { color:#242724; font-size:16px; font-weight:500; }
+.scan-compact .scan-empty svg { color:#8b7355; }
+.scan-compact .scan-empty span { max-width:320px; }
+.scan-compact .scan-viewer>.library-actions { order:0; justify-content:center; margin:16px 0 0; }
+.scan-compact .scan-capture-actions .button { justify-content:center; flex:1 1 200px; max-width:310px; }
+.scan-edit-actions { display:flex; flex-wrap:wrap; justify-content:center; gap:10px; padding-top:16px; }
+.scan-edit-actions .button,.scan-edit-actions .danger-button { font-size:16px; padding:12px 16px; }
+.scan-corner { position:absolute; width:44px; height:44px; padding:0; border:0; background:transparent; transform:translate(-50%,-50%); touch-action:none; z-index:3; cursor:move; }
+.scan-corner::after { content:''; display:block; width:16px; height:16px; margin:14px; border:2px solid #8b7355; border-radius:50%; background:#fff; }
+.scan-corner:focus-visible { outline:2px solid #8b7355; outline-offset:2px; border-radius:50%; }
+.scan-page-section { margin-top:20px; font-size:16px; }
+.scan-page-section>p { color:#77766f; margin-bottom:8px; }
+.scan-compact .scan-thumbnails { padding-bottom:0; }
+.scan-confirm-form { padding:18px 0; }
+.scan-confirm-form .remember { display:flex; align-items:flex-start; gap:12px; font-size:16px; line-height:1.5; }
+.scan-confirm-form .remember input { width:20px; height:20px; flex:none; accent-color:#8b7355; margin-top:2px; }
+.scan-confirm-form .field-help { margin:8px 0 0 32px; }
+.scan-details { margin:18px 0; color:#77766f; font-size:16px; line-height:1.6; }
+.scan-details summary { cursor:pointer; }
+.scan-details p { margin-top:10px; }
+.scan-continue>.button { width:100%; justify-content:center; }
+@media(max-width:800px){
+ .scanner-body .library-content { padding-bottom:calc(210px + env(safe-area-inset-bottom)); }
+ .scanner-body .library-heading { margin-bottom:20px; }
+ .scan-compact .scan-viewer { padding:16px; }
+ .scan-compact .scan-empty { min-height:210px; padding:24px; }
+ .scan-compact .scan-stage { min-height:210px; }
+ .scan-compact .scan-capture-actions { gap:10px; }
+ .scan-compact .scan-capture-actions .button { flex-basis:100%; max-width:none; }
+ .scan-continue { position:fixed; bottom:var(--scan-nav-height, calc(90px + env(safe-area-inset-bottom))); left:0; right:0; z-index:21; padding:10px 20px; background:#f7f5f0; border-top:1px solid #e6e2da; }
+ .scan-continue .upload-progress { margin:0 0 8px; padding:10px; }
+ .scan-edit-actions>* { flex:1 1 auto; text-align:center; justify-content:center; }
+}
+
+.scan-action-short { display:none; }
+.scan-edit-actions .danger-button { display:inline-flex; align-items:center; justify-content:center; gap:8px; }
+@media(max-width:800px){
+ .scan-action-long,.scan-tool-label { display:none; }
+ .scan-action-short { display:inline; }
+ .scan-compact .scan-capture-actions .button { flex:1 1 100px; }
+ .scan-compact .scan-stage canvas,.scan-compact .scan-stage video { max-height:34dvh; }
+ .scan-edit-actions { flex-wrap:nowrap; }
+ .scan-edit-actions>* { flex:1 1 0; min-width:44px; }
+ .scan-compact .scan-thumbnails img { width:42px; height:56px; }
+ .scan-compact .scan-thumbnails button { min-width:56px; }
+}

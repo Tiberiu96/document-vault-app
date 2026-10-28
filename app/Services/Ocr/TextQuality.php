@@ -6,7 +6,7 @@ class TextQuality
 {
     public function good(string $text): bool
     {
-        $length = mb_strlen(trim($text));
+        $length = mb_strlen(preg_replace('/\s/u', '', $text));
         preg_match_all('/[\p{L}\p{N}]/u', $text, $characters);
         preg_match_all('/\p{L}{2,}/u', $text, $words);
 

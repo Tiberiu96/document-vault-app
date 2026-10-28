@@ -1,6 +1,19 @@
 <?php
 
 return [
+    'camera_short' => 'Camera',
+    'gallery_short' => 'Gallery',
+    'compact_intro' => 'Photograph or upload your document.',
+    'tap_capture' => 'Tap to take a photo',
+    'drag_hint' => 'Drag the corners to crop. Changes also apply when you continue.',
+    'remote_notice' => 'Extracted text is sent to Groq for analysis.',
+    'details' => 'Scan details',
+    'continue' => 'Continue',
+    'corner_tl' => 'Top left corner',
+    'corner_tr' => 'Top right corner',
+    'corner_bl' => 'Bottom left corner',
+    'corner_br' => 'Bottom right corner',
+
     'title' => 'Scan document',
     'short_title' => 'Scan',
     'intro' => 'Capture, adjust and confirm pages before upload.',
