@@ -1,6 +1,8 @@
 <?php
 
 return [
+    'ai_failed_title' => 'Analiza AI nu a reusit',
+    'ai_failed_hint' => 'Nu am putut obtine sugestii de la serviciul AI. Poti completa campurile manual. Aceasta eroare nu indica o problema cu documentul.',
     'upload_failed' => 'Nu am putut incarca fisierul. Verifica limita si conexiunea, apoi incearca din nou.',
     'upload_help' => 'Ajutor incarcare',
     'choose_file' => 'Selecteaza fisierul',

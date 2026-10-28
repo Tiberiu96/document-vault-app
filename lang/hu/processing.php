@@ -1,6 +1,8 @@
 <?php
 
 return [
+    'ai_failed_title' => 'Az AI-elemzés sikertelen',
+    'ai_failed_hint' => 'Nem sikerült javaslatokat kérni az AI-szolgáltatástól. Az adatokat kézzel is megadhatod. Ez a hiba nem jelenti azt, hogy a dokumentummal probléma van.',
     'upload_failed' => 'A fájl feltöltése nem sikerült. Ellenőrizd a korlátot és a kapcsolatot, majd próbáld újra.',
     'upload_help' => 'Feltöltési súgó',
     'choose_file' => 'Fájl kiválasztása',

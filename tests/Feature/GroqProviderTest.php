@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Contracts\Ai\AiProviderInterface;
+use App\Services\Admin\OperationalSummary;
 use App\Services\Ai\AiProviderException;
 use App\Services\Ai\LocalAiProbe;
 use Illuminate\Http\Client\Factory;
@@ -69,6 +70,25 @@ class GroqProviderTest extends TestCase
                 $this->assertSame(3, $e->retryAfter);
                 $this->assertStringNotContainsString('private-provider-body', $e->getMessage());
                 $this->assertStringNotContainsString('fake-test-key', $e->getMessage());
+            }
+        }
+    }
+
+    public function test_http_failures_keep_safe_status_diagnostics_without_response_body(): void
+    {
+        foreach ([400 => 'GROQ_BAD_REQUEST', 413 => 'GROQ_REQUEST_TOO_LARGE', 422 => 'GROQ_UNPROCESSABLE_REQUEST', 504 => 'GROQ_REQUEST_TIMEOUT', 503 => 'GROQ_SERVICE_ERROR'] as $status => $code) {
+            Http::swap(new Factory);
+            Http::preventStrayRequests();
+            Http::fake(['*' => Http::response(['error' => ['message' => 'private-body']], $status)]);
+            try {
+                app(AiProviderInterface::class)->health();
+                $this->fail('Expected HTTP rejection');
+            } catch (AiProviderException $error) {
+                $this->assertSame($code, $error->reason);
+                $this->assertSame($status >= 500, $error->retryable);
+                $this->assertStringNotContainsString('private-body', $error->getMessage());
+                $this->assertSame($code, OperationalSummary::safeCode($code));
+                $this->assertSame($error->retryable, OperationalSummary::retryable($code));
             }
         }
     }

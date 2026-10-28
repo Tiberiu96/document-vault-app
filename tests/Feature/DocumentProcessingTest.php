@@ -389,6 +389,15 @@ class DocumentProcessingTest extends TestCase
         }
     }
 
+    public function test_failed_ai_form_does_not_present_failure_as_document_quality_rejection(): void
+    {
+        $this->document->forceFill(['ocr_status' => 'ready', 'ai_status' => 'failed'])->save();
+        $this->get('/ro/documente/'.$this->document->id.'/editeaza')->assertOk()
+            ->assertSee('Analiza AI nu a reusit')
+            ->assertSee('Aceasta eroare nu indica o problema cu documentul.')
+            ->assertDontSee('<strong>Necesita verificare manuala</strong>', false);
+    }
+
     public function test_upload_remains_private_draft_until_explicit_confirmation(): void
     {
         $this->post('/ro/documente', ['file' => UploadedFile::fake()->image('private-draft.png', 55, 66), 'analyze_with_ai' => '0'])->assertSessionHasNoErrors();

@@ -1,6 +1,8 @@
 <?php
 
 return [
+    'ai_failed_title' => 'AI analysis failed',
+    'ai_failed_hint' => 'We could not obtain suggestions from the AI service. You can enter the details manually. This error does not indicate a problem with the document.',
     'upload_failed' => 'We could not upload the file. Check the limit and connection, then try again.',
     'upload_help' => 'Upload help',
     'choose_file' => 'Choose a file',

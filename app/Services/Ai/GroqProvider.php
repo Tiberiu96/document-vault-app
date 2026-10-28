@@ -34,6 +34,11 @@ class GroqProvider implements AiProviderInterface
             $code = match ($status) {
                 401, 403 => 'INVALID_GROQ_CREDENTIALS',
                 429 => 'GROQ_RATE_LIMITED',
+                400 => 'GROQ_BAD_REQUEST',
+                413 => 'GROQ_REQUEST_TOO_LARGE',
+                422 => 'GROQ_UNPROCESSABLE_REQUEST',
+                408, 504 => 'GROQ_REQUEST_TIMEOUT',
+                500, 502, 503 => 'GROQ_SERVICE_ERROR',
                 default => 'GROQ_HTTP_ERROR',
             };
             $retry = $response->header('Retry-After');

@@ -19,7 +19,7 @@
     @isset($suggestionRunId)<input type="hidden" name="ai_run_id" value="{{ $suggestionRunId }}">@endisset
     @if($document->ai_status === 'quota_exceeded' || $document->ocr_status === 'quota_exceeded')<div class="form-alert" role="status">{{ __('processing.quota') }}</div>@endif
     @if(!isset($suggestionRunId) && (in_array($document->ai_status, ['needs_review', 'failed']) || in_array($document->ocr_status, ['empty', 'failed'])))
-    <div class="form-alert" role="status"><strong>{{ __('processing.manual_review') }}</strong><p>{{ __('processing.no_autofill') }}</p>@foreach($document->aiRun?->result['warnings'] ?? [] as $warning)<p>{{ __('processing.warnings.'.$warning) }}</p>@endforeach</div>
+    <div class="form-alert" role="status"><strong>{{ __($document->ai_status === 'failed' ? 'processing.ai_failed_title' : 'processing.manual_review') }}</strong><p>{{ __($document->ai_status === 'failed' ? 'processing.ai_failed_hint' : 'processing.no_autofill') }}</p>@foreach($document->aiRun?->result['warnings'] ?? [] as $warning)<p>{{ __('processing.warnings.'.$warning) }}</p>@endforeach</div>
     @endif
     <div class="library-form-grid">
         <div class="full-width"><label for="title">{{ __('documents.name') }}</label><input id="title" name="title" required maxlength="160" value="{{ is_string(old('title', $document?->title)) ? old('title', $document?->title) : '' }}"></div>

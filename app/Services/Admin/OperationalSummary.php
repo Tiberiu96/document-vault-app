@@ -10,6 +10,8 @@ class OperationalSummary
 {
     private const AI_RESPONSE_CODES = [
         'AI_OUTPUT_TRUNCATED', 'AI_RESPONSE_REFUSED',
+        'GROQ_BAD_REQUEST', 'GROQ_REQUEST_TOO_LARGE', 'GROQ_UNPROCESSABLE_REQUEST',
+        'GROQ_REQUEST_TIMEOUT', 'GROQ_SERVICE_ERROR',
         'AI_INVALID_DOCUMENT_LIKE', 'AI_INVALID_READABLE', 'AI_INVALID_CONFIDENT',
         'AI_INVALID_CATEGORY_KEY', 'AI_INVALID_TAG_KEYS', 'AI_INVALID_SUMMARY',
         'AI_INVALID_SUPPLIER', 'AI_INVALID_AMOUNT', 'AI_INVALID_CURRENCY',
@@ -49,7 +51,7 @@ class OperationalSummary
 
     public static function retryable(?string $code): bool
     {
-        if ($code === 'AI_RESPONSE_REFUSED') {
+        if (in_array($code, ['AI_RESPONSE_REFUSED', 'GROQ_BAD_REQUEST', 'GROQ_REQUEST_TOO_LARGE', 'GROQ_UNPROCESSABLE_REQUEST'], true)) {
             return false;
         }
 
