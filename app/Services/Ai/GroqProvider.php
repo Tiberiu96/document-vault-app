@@ -81,13 +81,20 @@ class GroqProvider implements AiProviderInterface
         try {
             $response = $this->checked($this->client()->post('/chat/completions', [
                 'model' => config('ai.groq.model'), 'messages' => $messages,
-                'temperature' => 0, 'max_completion_tokens' => 2048, 'reasoning_effort' => 'low', 'stream' => false,
+                'temperature' => 0, 'max_completion_tokens' => 4096, 'reasoning_effort' => 'low', 'stream' => false,
                 'response_format' => ['type' => 'json_schema', 'json_schema' => ['name' => 'vault_document', 'strict' => true, 'schema' => $this->transportSchema($schema)]],
             ]));
         } catch (ConnectionException) {
             throw new AiProviderException('GROQ_UNAVAILABLE', true);
         }
         $content = $response->json('choices.0.message.content');
+        if ($response->json('choices.0.finish_reason') === 'length') {
+            // Nu accepta JSON partial si nu repeta automat o analiza facturabila.
+            throw new AiProviderException('AI_OUTPUT_TRUNCATED');
+        }
+        if ($response->json('choices.0.message.refusal')) {
+            throw new AiProviderException('AI_RESPONSE_REFUSED');
+        }
         if ($response->json('choices.0.finish_reason') !== 'stop' || ! is_string($content) || strlen($content) > 32000 || $response->json('choices.0.message.refusal')) {
             throw new AiProviderException('INVALID_AI_RESPONSE');
         }

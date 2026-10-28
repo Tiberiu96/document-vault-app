@@ -28,7 +28,7 @@ class GroqProviderTest extends TestCase
         $this->assertSame('Proba fictiva.', app(LocalAiProbe::class)->run('Explica PDF.', 'ro'));
         Http::assertSent(fn ($r) => $r->url() === 'https://api.groq.com/openai/v1/chat/completions'
             && $r->hasHeader('Authorization', 'Bearer fake-test-key') && $r['response_format']['json_schema']['strict'] === true
-            && $r['reasoning_effort'] === 'low' && ! isset($r['tools']) && $r['stream'] === false);
+            && $r['reasoning_effort'] === 'low' && $r['max_completion_tokens'] === 4096 && ! isset($r['tools']) && $r['stream'] === false);
     }
 
     public function test_disabled_or_missing_credentials_fail_without_network(): void
@@ -65,6 +65,27 @@ class GroqProviderTest extends TestCase
     {
         Http::fake(['*' => Http::response(['choices' => [['finish_reason' => 'length', 'message' => ['content' => '{"reply":"partial"}']]]])]);
         $this->expectException(AiProviderException::class);
+        $this->expectExceptionMessage('AI_OUTPUT_TRUNCATED');
         app(LocalAiProbe::class)->run('Explica PDF.', 'ro');
+    }
+
+    public function test_refusal_and_malformed_json_have_safe_distinct_diagnostics(): void
+    {
+        foreach ([
+            ['message' => ['refusal' => 'private-body', 'content' => null], 'code' => 'AI_RESPONSE_REFUSED'],
+            ['message' => ['content' => 'private-body'], 'code' => 'INVALID_AI_RESPONSE'],
+        ] as $case) {
+            Http::swap(new Factory);
+            Http::preventStrayRequests();
+            Http::fake(['*' => Http::response(['choices' => [['finish_reason' => 'stop', 'message' => $case['message']]]])]);
+            try {
+                app(LocalAiProbe::class)->run('Example', 'ro');
+                $this->fail('Expected rejection');
+            } catch (AiProviderException $error) {
+                $this->assertSame($case['code'], $error->reason);
+                $this->assertFalse($error->retryable);
+                $this->assertStringNotContainsString('private-body', $error->getMessage());
+            }
+        }
     }
 }

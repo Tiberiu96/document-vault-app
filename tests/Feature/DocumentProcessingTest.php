@@ -231,6 +231,32 @@ class DocumentProcessingTest extends TestCase
         });
     }
 
+    public function test_insurance_policy_uses_explicit_issue_expiry_and_premium_with_mocked_provider(): void
+    {
+        $this->travelTo(Carbon::parse('2026-10-28 12:00:00', 'UTC'));
+        $this->readyText('CONTRACT DE ASIGURARE RCA. Example SRL. Contract emis in data de 13/10/2026. Valabilitate de la 17/10/2026 pana la 16/10/2027. Prima totala 1250.50 lei. Limita despagubire 3000000 LEI.');
+        $this->fakeAi(['category_key' => 'insurance', 'tag_keys' => [], 'summary' => 'Polita RCA.', 'amount' => '1250.50', 'issued_on' => '13/10/2026', 'expires_on' => '16/10/2027']);
+        $result = app(DocumentAiAnalysis::class)->analyze($this->document->fresh(), 'ro');
+        $this->assertFalse($result['review_required']);
+        $this->assertSame('2026-10-13', $result['fields']['issued_on']);
+        $this->assertSame('2027-10-16', $result['fields']['expires_on']);
+        $this->assertSame('1250.50', $result['fields']['amount']);
+        Http::assertSent(fn ($request) => str_contains($request['messages'][0]['content'], 'total insurance premium'));
+    }
+
+    public function test_invalid_ai_field_diagnostic_contains_only_application_field_name(): void
+    {
+        $this->readyText();
+        $this->fakeAi(['summary' => str_repeat('private-response ', 30)]);
+        try {
+            app(DocumentAiAnalysis::class)->analyze($this->document->fresh(), 'ro');
+            $this->fail('Expected validation rejection');
+        } catch (AiProviderException $error) {
+            $this->assertSame('AI_INVALID_SUMMARY', $error->reason);
+            $this->assertStringNotContainsString('private-response', $error->getMessage());
+        }
+    }
+
     public function test_only_short_summary_is_editable_and_legacy_description_is_preserved(): void
     {
         $this->document->forceFill(['description' => 'Existing private note'])->save();

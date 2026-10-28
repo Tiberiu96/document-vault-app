@@ -4,7 +4,7 @@ GroqProvider implementeaza AiProviderInterface prin API HTTPS fix api.groq.com,
 fara redirecturi, tools, streaming sau fallback catre alt provider.
 Model initial: openai/gpt-oss-20b, reasoning_effort=low, schema JSON stricta.
 Constrangerile de lungime/pattern sunt verificate suplimentar in serviciul de domeniu.
-Timeout45s, maximum2048 tokenuri generate, buget16000 bytes pentru prompt+schema.
+Timeout45s, maximum4096 tokenuri generate, buget16000 bytes pentru prompt+schema.
 
 Configurarea se face numai local in .env (0600):
 
@@ -48,3 +48,5 @@ de fiabilitate/abuz; metadatele de utilizare sunt retinute. Revizuieste Data Con
 termenii si acordurile de procesare inainte de documente confidentiale in productie.
 
 Testarea locala foloseste VAULT_FREE_AI_CALLS=-1 la cererea utilizatorului (fara cota lunara AI); rate limits si limitele de fisiere raman aplicabile.
+
+Diagnostic raspuns: AI_OUTPUT_TRUNCATED pentru limita de generare, AI_RESPONSE_REFUSED pentru refuz si AI_INVALID_<CAMP> pentru validarea unui camp cunoscut. Se pastreaza numai codul, niciodata raspunsul brut sau valori private. Raspunsurile incomplete nu completeaza formularul si nu se retrimit automat. Bugetul de generare mai mare nu garanteaza acceptarea fiecarui document. Politele folosesc prima totala, nu limita despagubirii, si separa data emiterii de perioada de valabilitate.
