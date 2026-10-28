@@ -88,3 +88,5 @@ Auditul pastreaza actor ID, actiune, tip/ID resursa si data. Nu pastreaza parole
 QR, coduri, text OCR, nume private de fisiere, payloaduri sau exceptii brute.
 Executa seederele initiale la instalare; rerularea lor poate recrea elemente
 predefinite sterse intentionat din catalog. Nu sunt parte din fiecare git pull.
+
+Livrari notificari: /admin/notificari afiseaza paginat programarea, starea, destinatarii prin ID si rezultatul in-app/email, fara continut privat.

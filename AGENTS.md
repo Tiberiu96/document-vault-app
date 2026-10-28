@@ -49,3 +49,5 @@ Preferinta utilizatorului pentru ritmul de lucru: ruleaza testele doar la cerere
 Administrarea platformei: guard admin separat, MFA TOTP obligatoriu inclusiv local, QR generat local, secrete criptate si coduri de recuperare de unica folosinta. Nu inspecta/captura secrete MFA reale prin browser tools. Productia cere HTTPS si cookie securizat. Dashboardul operational este sanitizat; Horizon brut ramane inchis. Reprocesarea nu ocoleste permisiunile workspace-ului. Vezi docs/admin.md.
 
 Actiunile secundare din UI se afiseaza ca butoane, nu linkuri subliniate: Inapoi cu sageata stanga si ton neutru cald, Renunta/stergere rosu. Accesul administrativ la contul clientului este numai consultare, cu MFA, parola admin, banner si audit; nu reutiliza sesiunea sau parola clientului.
+
+Inbox web: Laravel Notifications cu workspace_id, deduplicare determinista si autorizare la fiecare citire/actiune. Citit nu rezolva reminderul. Actiunile din notificari verifica ciclul original; nu modifica un ciclu reinnoit. Polling Livewire la 30s numai in tab vizibil/online, fara WebSocket. Vezi docs/notifications.md.

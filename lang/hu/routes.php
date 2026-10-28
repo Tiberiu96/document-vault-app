@@ -1,6 +1,10 @@
 <?php
 
 return [
+    'notifications' => 'ertesitesek',
+    'notifications.read-all' => 'mind-olvasott',
+    'notifications.preferences' => 'beallitasok',
+
     'source.received' => 'eredeti-atveve',
     'documents.scan' => 'dokumentumok/szkenneles',
     'draft.discard' => 'feltoltes-elvetese',

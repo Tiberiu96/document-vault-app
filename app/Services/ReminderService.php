@@ -116,7 +116,9 @@ class ReminderService
     public function deleteNotifications(Document $document): void
     {
         $ids = ReminderDelivery::whereHas('reminder', fn ($q) => $q->where('document_id', $document->id))->pluck('id');
-        DB::table('notifications')->whereIn('id', $ids)->delete();
+        DB::table('notifications')->where(function ($q) use ($ids, $document) {
+            $q->whereIn('id', $ids)->orWhere(fn ($q) => $q->where('workspace_id', $document->workspace_id)->where('data->document_id', $document->id));
+        })->delete();
     }
 
     public function dispatchDue(): int

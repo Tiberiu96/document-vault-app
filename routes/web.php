@@ -7,6 +7,7 @@ use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\DocumentProcessingController;
 use App\Http\Controllers\DocumentScannerController;
 use App\Http\Controllers\LocalAiController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PublicDiscoveryController;
 use App\Http\Controllers\PublicPageController;
 use App\Http\Controllers\RegisteredUserController;
@@ -51,6 +52,10 @@ Route::translate(function () {
             Route::get(Localizer::url('verification.notice'), [AccountSecurityController::class, 'notice'])->name('verification.notice');
             Route::post(Localizer::url('verification.send'), [AccountSecurityController::class, 'resend'])->name('verification.send');
             Route::middleware(['verified', EnsureActiveWorkspace::class])->group(function () {
+                Route::get(Localizer::url('notifications'), [NotificationController::class, 'index'])->name('notifications.index');
+                Route::post(Localizer::url('notifications').'/'.Localizer::url('notifications.read-all'), [NotificationController::class, 'readAll'])->middleware('throttle:notifications')->name('notifications.read-all');
+                Route::patch(Localizer::url('notifications').'/'.Localizer::url('notifications.preferences'), [NotificationController::class, 'preferences'])->middleware('throttle:notifications')->name('notifications.preferences');
+                Route::patch(Localizer::url('notifications').'/{notification}', [NotificationController::class, 'update'])->whereUuid('notification')->middleware('throttle:notifications')->name('notifications.update');
                 Route::get(Localizer::url('reminders'), [ReminderController::class, 'index'])->name('reminders.index');
                 Route::post(Localizer::url('documents').'/{document}/'.Localizer::url('reminders'), [ReminderController::class, 'store'])->whereUuid('document')->middleware('throttle:reminders')->name('reminders.store');
                 Route::patch(Localizer::url('reminders').'/{reminder}', [ReminderController::class, 'update'])->whereUuid('reminder')->middleware('throttle:reminders')->name('reminders.update');

@@ -23,7 +23,7 @@ class DocumentReminder extends Notification
 
     public function toDatabase(object $notifiable): array
     {
-        return ['document_id' => $this->reminder->document_id, 'reminder_id' => $this->reminder->id, 'due_on' => $this->reminder->due_on->toDateString(), 'days_before' => $this->delivery->days_before];
+        return ['document_id' => $this->reminder->document_id, 'reminder_id' => $this->reminder->id, 'due_on' => $this->reminder->due_on->toDateString(), 'days_before' => $this->delivery->days_before, 'cycle' => $this->delivery->cycle];
     }
 
     public function toMail(object $notifiable): MailMessage

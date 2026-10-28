@@ -13,6 +13,7 @@ use App\Models\User;
 use App\Models\Workspace;
 use App\Services\PlanLimitsService;
 use App\Services\ReminderService;
+use App\Services\WorkspaceAlerts;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
@@ -137,6 +138,7 @@ class DocumentLibrary
                 $fresh->forceFill(['metadata_version' => $fresh->metadata_version + 1]);
                 $fresh->forceFill(['status' => 'stored', 'title' => $data['title'], ...$metadata])->save();
                 app(ReminderService::class)->syncDocument($fresh, $user, app()->getLocale());
+                app(WorkspaceAlerts::class)->storage($workspace, $user);
             }, 3);
         } catch (\Throwable $exception) {
             if ($source) {

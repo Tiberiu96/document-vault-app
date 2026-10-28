@@ -1,6 +1,10 @@
 <?php
 
 return [
+    'notifications' => 'notifications',
+    'notifications.read-all' => 'read-all',
+    'notifications.preferences' => 'preferences',
+
     'source.received' => 'source-received',
     'documents.scan' => 'documents/scan',
     'draft.discard' => 'discard-upload',

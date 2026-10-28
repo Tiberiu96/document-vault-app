@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Document;
 use App\Models\ProcessingRun;
 use App\Models\Reminder;
+use App\Models\ReminderDelivery;
 use App\Models\User;
 use App\Models\Workspace;
 use App\Services\Admin\AdminAudit;
@@ -33,6 +34,15 @@ class AdminDashboardController extends Controller
             'queues' => $operations->queues(), 'runs' => $runs,
             'events' => DB::table('admin_audit_events')->latest('id')->limit(15)->get(['id', 'actor_id', 'action', 'target_type', 'target_id', 'created_at']),
         ]);
+    }
+
+    public function notifications()
+    {
+        $deliveries = ReminderDelivery::query()->join('document_reminders', 'document_reminders.id', '=', 'reminder_deliveries.reminder_id')
+            ->select(['reminder_deliveries.id', 'document_reminders.workspace_id', 'document_reminders.user_id', 'reminder_deliveries.status', 'reminder_deliveries.scheduled_for', 'reminder_deliveries.in_app_at', 'reminder_deliveries.email_sent_at', 'reminder_deliveries.attempts'])
+            ->orderByDesc('reminder_deliveries.scheduled_for')->paginate(25);
+
+        return view('admin.notifications', ['deliveries' => $deliveries]);
     }
 
     public function users(Request $request)

@@ -1,6 +1,10 @@
 <?php
 
 return [
+    'notifications' => 'notificari',
+    'notifications.read-all' => 'citeste-toate',
+    'notifications.preferences' => 'preferinte',
+
     'source.received' => 'original-primit',
     'documents.scan' => 'documente/scaneaza',
     'draft.discard' => 'renunta-incarcare',

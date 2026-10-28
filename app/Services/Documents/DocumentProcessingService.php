@@ -10,6 +10,7 @@ use App\Models\User;
 use App\Models\Workspace;
 use App\Services\Ocr\TextQuality;
 use App\Services\PlanLimitsService;
+use App\Services\WorkspaceAlerts;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\ValidationException;
@@ -157,6 +158,7 @@ class DocumentProcessingService
             $run = ProcessingRun::where('workspace_id', $workspaceId)->lockForUpdate()->find($id);
             if ($run) {
                 $this->settle($run, false, $code);
+                app(WorkspaceAlerts::class)->processingFailed($run->refresh());
             }
         }, 3);
         $run = ProcessingRun::find($id);

@@ -1,6 +1,10 @@
 <?php
 
 return [
+    'notifications' => 'izvestiya',
+    'notifications.read-all' => 'procheti-vsichki',
+    'notifications.preferences' => 'predpochitaniya',
+
     'source.received' => 'poluchen-original',
     'documents.scan' => 'dokumenti/skanirane',
     'draft.discard' => 'otkaz-kachvane',

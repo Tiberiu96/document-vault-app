@@ -24,6 +24,7 @@ Route::prefix('admin')->name('admin.')->middleware([AdminSecurity::class, 'throt
         Route::post('mfa/verificare', [AdminAuthController::class, 'verify'])->middleware('throttle:admin.mfa')->name('mfa.verify');
         Route::middleware(RequireAdminMfa::class)->group(function () {
             Route::get('/', [AdminDashboardController::class, 'index'])->name('dashboard');
+            Route::get('notificari', [AdminDashboardController::class, 'notifications'])->name('notifications');
             Route::get('utilizatori', [AdminDashboardController::class, 'users'])->name('users');
             Route::get('utilizatori/creeaza', [AdminClientController::class, 'create'])->name('users.create');
             Route::post('utilizatori', [AdminClientController::class, 'save'])->name('users.store');

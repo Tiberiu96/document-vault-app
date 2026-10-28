@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Models\Workspace;
 use App\Notifications\DocumentReminder;
 use App\Services\LanguageCatalog;
+use App\Services\NotificationPreferences;
 use Illuminate\Contracts\Queue\ShouldBeEncrypted;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -102,16 +103,19 @@ class DeliverReminder implements ShouldBeEncrypted, ShouldBeUnique, ShouldQueue
                 $reminder->locale = $catalog->defaultLocale();
             }
             $notification = new DocumentReminder($reminder, $delivery);
-            if (! $user->notifications()->whereKey($delivery->id)->exists()) {
+            $preferences = app(NotificationPreferences::class)->forUser($user);
+            if ($preferences['reminders_in_app'] && ! $user->notifications()->whereKey($delivery->id)->exists()) {
                 Notification::sendNow($user, $notification, ['database']);
             }
-            $delivery->in_app_at = now();
+            if ($preferences['reminders_in_app']) {
+                $delivery->in_app_at = now();
+            }
             try {
-                if (config('reminders.email_enabled')) {
+                if (config('reminders.email_enabled') && $preferences['reminders_email']) {
                     Notification::sendNow($user, $notification, ['mail']);
                     $delivery->email_sent_at = now();
                 }
-                $delivery->status = 'sent';
+                $delivery->status = $delivery->in_app_at || $delivery->email_sent_at ? 'sent' : 'skipped';
             } catch (\Throwable) {
                 $delivery->status = 'uncertain';
                 $delivery->failure_code = 'MAIL_DELIVERY_UNCERTAIN';

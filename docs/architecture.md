@@ -77,3 +77,5 @@ limitarile retinerii in memoria browserului in document-processing.md.
 Checkpoint notificari: docs/reminders.md. Migrarea 000013 adauga reminderul per
 document, cicluri/livrari deduplicate si notificari database Laravel. Scheduler
 local, high, email Mailpit si actiuni web; programul aprobat este 10/3/1 zile.
+
+Checkpoint inbox: Laravel Notifications + Livewire pentru clopotel, polling la 30s numai in tab vizibil, centru si preferinte localizate. Migrarea 000015; detalii in notifications.md.
