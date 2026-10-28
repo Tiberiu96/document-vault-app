@@ -4,7 +4,7 @@ GroqProvider implementeaza AiProviderInterface prin API HTTPS fix api.groq.com,
 fara redirecturi, tools, streaming sau fallback catre alt provider.
 Model initial: openai/gpt-oss-20b, reasoning_effort=low, schema JSON stricta.
 Constrangerile de lungime/pattern sunt verificate suplimentar in serviciul de domeniu.
-Timeout45s, maximum4096 tokenuri generate, buget16000 bytes pentru prompt+schema.
+Timeout45s, maximum4096 tokenuri generate, buget64000 bytes pentru prompt+schema. Textul compactat se trimite integral, fara taierea mijlocului documentului. Bugetul este o limita conservatoare in bytes, nu un calcul exact de tokenuri. Documentele peste buget esueaza explicit cu PROMPT_TOO_LARGE inainte de apelul extern; OCR si completarea manuala raman disponibile. Analiza pe sectiuni nu este implementata. Ollama pastreaza extrasul de 3000 bytes pentru contextul local redus.
 
 Configurarea se face numai local in .env (0600):
 

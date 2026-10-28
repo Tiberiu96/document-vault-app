@@ -257,6 +257,22 @@ class DocumentProcessingTest extends TestCase
         }
     }
 
+    public function test_groq_receives_complete_long_document_including_middle_pages(): void
+    {
+        config(['ai.provider' => 'groq', 'ai.groq.api_key' => 'fake-test-key']);
+        $text = $this->text."\n".str_repeat("Conditii contractuale de asigurare.\n", 450)."MIDDLE_PAGE_EVIDENCE\n".str_repeat("Continuare conditii de asigurare.\n", 450);
+        $this->readyText($text);
+        Http::fake(['api.groq.com/openai/v1/chat/completions' => Http::response(['choices' => [['finish_reason' => 'stop', 'message' => ['content' => json_encode($this->response())]]]])]);
+        $result = app(DocumentAiAnalysis::class)->analyze($this->document->fresh(), 'ro');
+        $this->assertFalse($result['partial']);
+        Http::assertSent(function ($request) use ($text) {
+            $input = json_decode($request['messages'][1]['content'], true);
+
+            return $input['partial'] === false && $input['ocr'] === trim($text)
+                && str_contains($input['ocr'], 'MIDDLE_PAGE_EVIDENCE');
+        });
+    }
+
     public function test_only_short_summary_is_editable_and_legacy_description_is_preserved(): void
     {
         $this->document->forceFill(['description' => 'Existing private note'])->save();

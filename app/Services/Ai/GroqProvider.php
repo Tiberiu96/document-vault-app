@@ -75,7 +75,7 @@ class GroqProvider implements AiProviderInterface
 
     public function structured(array $messages, array $schema): array
     {
-        if (strlen(json_encode([$messages, $schema], JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE)) > 16000) {
+        if (strlen(json_encode([$messages, $schema], JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE)) > config('ai.groq.max_prompt_bytes', 64000)) {
             throw new AiProviderException('PROMPT_TOO_LARGE');
         }
         try {

@@ -43,6 +43,18 @@ class GroqProviderTest extends TestCase
         Http::assertNothingSent();
     }
 
+    public function test_oversized_prompt_is_rejected_without_external_request_or_truncation(): void
+    {
+        try {
+            app(AiProviderInterface::class)->structured([['role' => 'user', 'content' => str_repeat('x', 64000)]], ['type' => 'object']);
+            $this->fail('Expected prompt limit');
+        } catch (AiProviderException $error) {
+            $this->assertSame('PROMPT_TOO_LARGE', $error->reason);
+            $this->assertFalse($error->retryable);
+        }
+        Http::assertNothingSent();
+    }
+
     public function test_errors_are_sanitized_with_bounded_retry_after(): void
     {
         foreach ([401 => false, 429 => true, 503 => true] as $status => $retryable) {

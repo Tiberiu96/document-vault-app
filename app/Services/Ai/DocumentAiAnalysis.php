@@ -47,8 +47,10 @@ class DocumentAiAnalysis
             'expires_on' => $nullable(['maxLength' => 40]),
         ], 'additionalProperties' => false];
         $schema['required'] = array_keys($schema['properties']);
-        $textBudget = config('ai.provider') === 'groq' ? 9000 : 3000;
-        $partial = strlen($text) > $textBudget;
+        // Groq primeste textul integral; providerul respinge explicit un payload prea mare.
+        // Ollama pastreaza extrasul pentru fereastra locala redusa.
+        $textBudget = 3000;
+        $partial = config('ai.provider') !== 'groq' && strlen($text) > $textBudget;
         $excerpt = $partial ? mb_strcut($text, 0, $textBudget - 800, 'UTF-8')."\n[... fragment omis ...]\n".mb_strcut($text, max(0, strlen($text) - 800), 800, 'UTF-8') : $text;
         $language = ['ro' => 'Romanian without diacritics', 'en' => 'English', 'hu' => 'Hungarian', 'bg' => 'Bulgarian'][$locale] ?? 'Romanian without diacritics';
         $data = app(AiProviderInterface::class)->structured([
