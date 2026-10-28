@@ -202,6 +202,7 @@ class ReminderTest extends TestCase
 
     public function test_manual_creation_for_existing_document_requires_current_version(): void
     {
+        $this->document->forceFill(['expires_on' => null])->save();
         $this->post('/ro/documente/'.$this->document->id.'/remindere', ['date' => '2026-11-01', 'metadata_version' => 4])->assertSessionHasErrors('reminder');
         $this->assertSame(0, Reminder::count());
         $this->post('/ro/documente/'.$this->document->id.'/remindere', ['date' => '2026-11-01', 'metadata_version' => 0])->assertSessionHasNoErrors()->assertRedirect();
@@ -291,6 +292,29 @@ class ReminderTest extends TestCase
     {
         $this->travelTo(CarbonImmutable::parse('2026-10-02 00:30', 'Europe/Bucharest'));
         $this->post('/ro/documente/'.$this->document->id.'/remindere', ['date' => '2026-10-02', 'metadata_version' => 0])->assertSessionHasErrors('date');
+        $this->assertSame(0, Reminder::count());
+    }
+
+    public function test_activation_inherits_existing_expiry_without_asking_or_overwriting_it(): void
+    {
+        $html = $this->get('/ro/documente/'.$this->document->id)->assertOk()->getContent();
+        $panel = explode('id="reminders"', $html, 2)[1];
+        $this->assertStringContainsString('25.10.2026', $panel);
+        $this->assertStringNotContainsString('name="date"', $panel);
+        $this->assertStringNotContainsString('(ora Romaniei)', $panel);
+        $this->post('/ro/documente/'.$this->document->id.'/remindere', ['metadata_version' => 0, 'date' => '2026-12-01'])->assertSessionHasNoErrors()->assertRedirect();
+        $this->assertSame('2026-10-25', Reminder::sole()->due_on->toDateString());
+        $this->assertSame('2026-10-25', $this->document->fresh()->expires_on->toDateString());
+        $this->assertSame(0, $this->document->fresh()->metadata_version);
+    }
+
+    public function test_existing_past_expiry_is_visible_but_never_scheduled_and_missing_date_requires_input(): void
+    {
+        $this->document->forceFill(['expires_on' => '2026-09-25'])->save();
+        $this->get('/ro/documente/'.$this->document->id)->assertOk()->assertSee('25.09.2026')->assertSee(__('reminders.past_note'))->assertDontSee(__('reminders.create'));
+        $this->post('/ro/documente/'.$this->document->id.'/remindere', ['metadata_version' => 0])->assertSessionHasErrors('date');
+        $this->document->forceFill(['expires_on' => null])->save();
+        $this->post('/ro/documente/'.$this->document->id.'/remindere', ['metadata_version' => 0])->assertSessionHasErrors('date');
         $this->assertSame(0, Reminder::count());
     }
 

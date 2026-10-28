@@ -90,3 +90,9 @@ ferestre omise, email dezactivat cu livrare in-app, limba dezactivata si UTC/loc
 la miezul noptii. Testele folosesc transporturi in memorie, fara SMTP extern.
 Un test separat real local a verificat Redis/high/Horizon, o singura livrare
 Mailpit si in-app, apoi finalizarea cu anularea celor doua sloturi viitoare.
+
+Activarea unui reminder pentru un document existent preia expires_on direct din
+document. Nu cere o a doua data si nu o suprascrie cu un camp trimis de client.
+Numai documentele fara expires_on afiseaza selectorul; datele trecute raman
+vizibile, fara activare. Eticheta orarului nu mai include fusul in paranteza;
+calculul ramane Europe/Bucharest si stocarea UTC.

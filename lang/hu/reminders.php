@@ -3,7 +3,7 @@
 return [
     'title' => 'Emlékeztetők',
     'intro' => 'Közelgő értesítések és dokumentumelőzmények.',
-    'schedule' => '10, 3 és 1 nappal előtte, 09:00-kor (romániai idő szerint).',
+    'schedule' => '10, 3 és 1 nappal előtte, 09:00-kor.',
     'next' => 'Közelgő értesítések',
     'none' => 'Nincs ütemezett közelgő értesítés.',
     'empty' => 'Nincs emlékeztető ebben a listában.',

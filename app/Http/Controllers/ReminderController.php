@@ -41,7 +41,14 @@ class ReminderController extends Controller
             if ($record->metadata_version !== (int) $request->validated('metadata_version') || Reminder::where('document_id', $record->id)->exists()) {
                 throw ValidationException::withMessages(['reminder' => __('reminders.stale')]);
             }
-            $record->forceFill(['expires_on' => $request->validated('date'), 'metadata_version' => $record->metadata_version + 1])->save();
+            // Data documentului este autoritatea; activarea nu o suprascrie.
+            $date = $record->expires_on?->toDateString() ?? $request->validated('date');
+            if (! $date || $date <= now(config('reminders.timezone'))->toDateString()) {
+                throw ValidationException::withMessages(['date' => __('reminders.future_date')]);
+            }
+            if (! $record->expires_on) {
+                $record->forceFill(['expires_on' => $date, 'metadata_version' => $record->metadata_version + 1])->save();
+            }
             $service->syncDocument($record, $request->user(), app()->getLocale());
         }, 3);
 

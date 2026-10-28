@@ -22,8 +22,18 @@
     @endcan
     @if($reminder->deliveries->contains(fn ($d) => $d->status !== 'pending'))<details class="reminder-history"><summary>{{ __('reminders.history') }}</summary><ul class="reminder-timeline">@foreach($reminder->deliveries->where('status', '!=', 'pending')->sortByDesc('scheduled_for')->take(20) as $delivery)<li><time>{{ $delivery->scheduled_for->timezone(config('reminders.timezone'))->format('d.m.Y H:i') }}</time><span>{{ __('reminders.status_'.$delivery->status) }}@if($delivery->email_sent_at) · Email @elseif($delivery->in_app_at) · {{ __('reminders.in_app') }}@endif</span></li>@endforeach</ul></details>@endif
 @else
-    <p class="field-help">{{ __('reminders.no_date') }}</p>
-    @can('update', $document)<form class="reminder-create" method="POST" action="{{ route('reminders.store', ['document' => $document->id]) }}">@csrf<input type="hidden" name="metadata_version" value="{{ $document->metadata_version }}"><label>{{ __('reminders.date') }}<input type="date" name="date" min="{{ now(config('reminders.timezone'))->addDay()->toDateString() }}" value="{{ ($document->expires_on && $document->expires_on->toDateString() > now(config('reminders.timezone'))->toDateString()) ? $document->expires_on->toDateString() : '' }}" required></label><button class="library-small-button" type="submit">{{ __('reminders.create') }}</button></form>@endcan
+    @if($document->expires_on)
+        <p>{{ __('reminders.due', ['date' => $document->expires_on->format('d.m.Y')]) }}</p>
+        @if($document->expires_on->toDateString() > now(config('reminders.timezone'))->toDateString())
+            @can('update', $document)<form method="POST" action="{{ route('reminders.store', ['document' => $document->id]) }}">@csrf<input type="hidden" name="metadata_version" value="{{ $document->metadata_version }}"><button class="library-small-button" type="submit">{{ __('reminders.create') }}</button></form>@endcan
+        @else
+            <p class="field-help">{{ __('reminders.past_note') }}</p>
+            @can('update', $document)<a class="inline-link" href="{{ route('documents.edit', ['document' => $document->id]) }}">{{ __('documents.edit') }}</a>@endcan
+        @endif
+    @else
+        <p class="field-help">{{ __('reminders.no_date') }}</p>
+        @can('update', $document)<form class="reminder-create" method="POST" action="{{ route('reminders.store', ['document' => $document->id]) }}">@csrf<input type="hidden" name="metadata_version" value="{{ $document->metadata_version }}"><label>{{ __('reminders.date') }}<input type="date" name="date" min="{{ now(config('reminders.timezone'))->addDay()->toDateString() }}" required></label><button class="library-small-button" type="submit">{{ __('reminders.create') }}</button></form>@endcan
+    @endif
 @endif
 <p class="field-help">{{ __('reminders.schedule') }}</p>
 </div></section>

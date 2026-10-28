@@ -3,7 +3,7 @@
 return [
     'title' => 'Remindere',
     'intro' => 'Notificarile viitoare si istoricul documentelor tale.',
-    'schedule' => 'Cu 10, 3 si 1 zi inainte, la 09:00 (ora Romaniei).',
+    'schedule' => 'Cu 10, 3 si 1 zi inainte, la 09:00.',
     'next' => 'Notificari viitoare',
     'none' => 'Nu sunt notificari viitoare programate.',
     'empty' => 'Nu exista remindere in aceasta lista.',

@@ -43,3 +43,5 @@ Fluxul de upload este in doua faze: copia serverului pentru analiza si preview-u
 Documentele confirmate se sterg definitiv numai dupa confirmare explicita Da/Nu. Fara cos sau restaurare publica; marcajele interne sunt doar pentru retry de curatare. Accesul se opreste imediat, iar cota se elibereaza numai dupa eliminarea fisierelor. Nu sterge retroactiv fisiere din vechiul cos fara instructiune explicita.
 
 Remindere: programul aprobat este cu 10, 3 si 1 zi inainte, la 09:00 Europe/Bucharest (stocare UTC), fara ziua expirarii implicita. Numai documente confirmate/date viitoare. Rezolvarea/opririle anuleaza si sloturile deja queued/claimed; ciclul si lockurile protejeaza reinnoirea. SMTP incert nu se retrimite orb; starea uncertain cere reconciliere. Vezi docs/reminders.md.
+
+Preferinta utilizatorului pentru ritmul de lucru: ruleaza testele doar la cererea explicita sau in etapa finala dinaintea commit/push; grupeaza verificarile relevante, fara repetare dupa fiecare editare.

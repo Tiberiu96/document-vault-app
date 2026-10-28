@@ -3,7 +3,7 @@
 return [
     'title' => 'Reminders',
     'intro' => 'Upcoming notifications and your document history.',
-    'schedule' => '10, 3 and 1 days before, at 09:00 (Romania time).',
+    'schedule' => '10, 3 and 1 days before, at 09:00.',
     'next' => 'Upcoming notifications',
     'none' => 'No upcoming notifications are scheduled.',
     'empty' => 'There are no reminders in this list.',
