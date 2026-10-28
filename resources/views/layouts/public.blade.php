@@ -45,6 +45,7 @@
     @endif
 </head>
 <body id="top" class="{{ $page === 'demo' ? 'demo-body' : '' }}">
+@include('admin.partials.impersonation-banner')
     <a href="#main" class="skip-link">{{ __('site.a11y.skip') }}</a>
     @if($page !== 'demo')
     <header class="site-header wrap">

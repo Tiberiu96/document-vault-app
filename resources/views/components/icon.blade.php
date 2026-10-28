@@ -4,6 +4,7 @@
         'rotate' => '<path d="M3 10a9 9 0 1 1 2 8M3 4v6h6"/>',
         'trash' => '<path d="M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7M14 10v7"/>',
         'info' => '<circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7h.01"/>',
+        'back' => '<path d="M20 12H4m6-6-6 6 6 6"/>',
         'arrow' => '<path d="M4 12h16m-6-6 6 6-6 6"/>',
         'document' => '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h5"/>',
         'scan' => '<path d="M8 3H5a2 2 0 0 0-2 2v3m13-5h3a2 2 0 0 1 2 2v3M3 16v3a2 2 0 0 0 2 2h3m8 0h3a2 2 0 0 0 2-2v-3M8 8h8v8H8z"/>',

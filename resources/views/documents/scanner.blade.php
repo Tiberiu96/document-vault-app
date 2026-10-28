@@ -1,6 +1,6 @@
 @extends('layouts.workspace')
 @section('content')
-<a class="inline-link" href="{{ route('documents.create') }}">← {{ __('documents.back') }}</a>
+<a class="action-button" href="{{ route('documents.create') }}" data-action="back"><x-icon name="back" :size="18"/>{{ __('documents.back') }}</a>
 <div class="library-heading"><div><h1>{{ __('scanner.title') }}</h1><p>{{ __('scanner.compact_intro') }}</p></div></div>
 <section class="document-scanner scan-compact" data-scanner data-max-pages="{{ $limits['max_pages'] }}" data-max-bytes="{{ $limits['max_file_bytes'] }}" data-failed="{{ __('scanner.failed') }}" data-invalid="{{ __('scanner.invalid') }}" data-limit="{{ __('scanner.limit') }}" data-fallback="{{ __('scanner.camera_fallback') }}" data-page-label="{{ __('scanner.pages') }}">
     <div class="scan-viewer library-panel">
@@ -15,7 +15,7 @@
     </div>
     <form data-scan-submit method="POST" action="{{ route('documents.scan-store') }}" class="scan-confirm-form">@csrf
         @if(config('ai.enabled'))<label class="remember"><input type="checkbox" name="analyze_with_ai" value="1" checked>{{ __('processing.auto_ai') }}</label>@if(config('ai.provider') === 'groq')<p class="field-help">{{ __('scanner.remote_notice') }}</p>@endif @endif
-        <details class="scan-details"><summary>{{ __('scanner.details') }}</summary><p>{{ __('documents.limit') }}</p><p>{{ __('scanner.drag_hint') }}</p><p>{{ __('scanner.manual') }}</p></details>
+        <details class="scan-details"><summary>{{ __('scanner.details') }}</summary><p>{{ app(\App\Services\PlanLimitsService::class)->message() }}</p><p>{{ __('scanner.drag_hint') }}</p><p>{{ __('scanner.manual') }}</p></details>
         <div class="scan-continue"><div class="upload-progress" data-scan-loading role="status" hidden><span class="processing-spinner" aria-hidden="true"></span>{{ __('scanner.uploading') }}</div><x-button type="submit" icon="arrow" disabled>{{ __('scanner.continue') }}</x-button></div>
     </form>
     <noscript><div class="form-alert"><a href="{{ route('documents.create') }}">{{ __('documents.upload') }}</a></div></noscript>

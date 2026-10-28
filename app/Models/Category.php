@@ -5,10 +5,16 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Attributes\Guarded;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Lang;
 
 #[Guarded(['*'])]
 class Category extends Model
 {
+    protected function casts(): array
+    {
+        return ['translations' => 'array'];
+    }
+
     public function scopeForWorkspace(Builder $query, Workspace $workspace): void
     {
         $query->where(fn ($q) => $q->where('workspace_id', $workspace->id)->orWhere(fn ($system) => $system->whereNull('workspace_id')->where('scope', $workspace->type)->whereNotNull('system_key')));
@@ -16,6 +22,14 @@ class Category extends Model
 
     public function label(): string
     {
-        return $this->system_key ? __('documents.system.'.$this->system_key) : $this->name;
+        if (! $this->system_key) {
+            return $this->name;
+        }
+        if (isset($this->translations[app()->getLocale()])) {
+            return $this->translations[app()->getLocale()];
+        }
+        $key = 'documents.system.'.$this->system_key;
+
+        return Lang::has($key) ? __($key) : ($this->name ?: $this->system_key);
     }
 }

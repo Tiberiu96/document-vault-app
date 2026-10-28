@@ -9,11 +9,11 @@
             @csrf
             <div><label for="email">{{ __('auth.email') }}</label><input id="email" name="email" type="email" autocomplete="username" required maxlength="255" value="{{ is_string(old('email')) ? old('email') : '' }}" @if($errors->has('email')) aria-invalid="true" @endif></div>
             <div><label for="password">{{ __('auth.password') }}</label><input id="password" name="password" type="password" autocomplete="current-password" required maxlength="256"></div>
-            <a class="inline-link" href="{{ route('password.request') }}">{{ __('account_mail.forgot_title') }}</a>
+            <a class="action-button" href="{{ route('password.request') }}">{{ __('account_mail.forgot_title') }}</a>
             <label class="remember"><input type="checkbox" name="remember" value="1">{{ __('auth.remember') }}</label>
             <x-button type="submit" icon="arrow">{{ __('site.nav.login') }}</x-button>
         </form>
-        <p class="auth-help">{{ __('registration.no_account') }} <a class="inline-link" href="{{ route('register') }}">{{ __('registration.create') }}</a></p><a class="text-link" href="{{ route('demo') }}">{{ __('site.nav.demo') }} <x-icon name="arrow" :size="16"/></a>
+        <p class="auth-help">{{ __('registration.no_account') }} <a class="action-button" href="{{ route('register') }}">{{ __('registration.create') }}</a></p><a class="action-button" href="{{ route('demo') }}">{{ __('site.nav.demo') }} <x-icon name="arrow" :size="16"/></a>
     </div>
 </section>
 @endsection

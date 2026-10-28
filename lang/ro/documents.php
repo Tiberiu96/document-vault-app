@@ -26,7 +26,7 @@ return [
     'by_title' => 'Dupa titlu',
     'empty_title' => 'Spatiu pentru ce conteaza',
     'empty_text' => 'Incarca primul document. Il vei gasi aici, doar in spatiul tau.',
-    'limit' => 'Planul Free accepta maximum 5 MB si 10 pagini per document.',
+    'limit' => 'Planul Free accepta maximum :size MB si :pages pagini per document.',
     'invalid_file' => 'Fisier invalid. Foloseste PDF, JPEG sau PNG, maximum 5 MB. PDF-ul trebuie sa fie valid, fara parola, scripturi, formulare sau atasamente.',
     'invalid_amount' => 'Introdu suma cu punct si maximum doua zecimale.',
     'invalid_tags' => 'Foloseste maximum 10 etichete, fiecare de cel mult 40 de caractere.',

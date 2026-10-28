@@ -26,7 +26,7 @@ return [
     'by_title' => 'Cím szerint',
     'empty_title' => 'Hely a fontos dolgoknak',
     'empty_text' => 'Töltsd fel az első dokumentumodat. Itt találod majd, a saját privát teredben.',
-    'limit' => 'A Free csomag dokumentumonként legfeljebb 5 MB-ot és 10 oldalt enged.',
+    'limit' => 'A Free csomag dokumentumonként legfeljebb :size MB-ot és :pages oldalt enged.',
     'invalid_file' => 'Érvénytelen fájl. Legfeljebb 5 MB-os PDF, JPEG vagy PNG tölthető fel. A PDF nem tartalmazhat jelszót, szkriptet, űrlapot vagy mellékletet.',
     'invalid_amount' => 'Az összeget tizedesponttal és legfeljebb két tizedesjeggyel add meg.',
     'invalid_tags' => 'Legfeljebb 10 címkét használj, egyenként legfeljebb 40 karakterrel.',

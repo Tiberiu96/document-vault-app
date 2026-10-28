@@ -18,7 +18,7 @@
             <div class="form-trap" aria-hidden="true"><label for="website">Website</label><input id="website" name="website" type="text" tabindex="-1" autocomplete="off"></div>
             <x-button type="submit" icon="arrow">{{ __('registration.create') }}</x-button>
         </form>
-        <p class="auth-help">{{ __('registration.have_account') }} <a class="inline-link" href="{{ route('login') }}">{{ __('site.nav.login') }}</a></p>
+        <p class="auth-help">{{ __('registration.have_account') }} <a class="action-button" href="{{ route('login') }}">{{ __('site.nav.login') }}</a></p>
     </div>
 </section>
 @endsection

@@ -83,7 +83,7 @@ class CreateAdministrator extends Command
             return self::FAILURE;
         }
 
-        $this->info('Administrator creat. Accesul web admin ramane blocat pana la implementarea autentificarii si MFA.');
+        $this->info('Administrator creat. Deschide /admin/autentificare si configureaza MFA pentru a continua.');
 
         return self::SUCCESS;
     }

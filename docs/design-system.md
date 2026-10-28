@@ -53,3 +53,5 @@ logo-ul transparent 720x240 si iconurile 16/32/48/180/192/512px. favicon.ico inc
 Componentele brand/favicons sunt comune paginilor publice si panoului, inclusiv
 antetul mobil. APP_NAME ramane configurabil: alt nume foloseste wordmark text.
 Emailurile de cont includ logo-ul inline CID; varianta text ramane text simplu.
+
+Actiunile secundare (Inapoi, Resetare filtre, Previzualizare, Vezi toate) sunt butoane vizibile cu fond neutru cald si contur. Navigatia pastreaza linkuri semantice; nu folosi linkuri subliniate in locul butoanelor de actiune. Renunta/stergere folosesc varianta rosie.

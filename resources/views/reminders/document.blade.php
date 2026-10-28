@@ -1,5 +1,5 @@
 <section class="library-panel reminder-panel" id="reminders">
-<div class="panel-heading"><h2>{{ __('reminders.title') }}</h2><a class="inline-link" href="{{ route('reminders.index') }}">{{ __('documents.view_all') }}</a></div>
+<div class="panel-heading"><h2>{{ __('reminders.title') }}</h2><a class="action-button" href="{{ route('reminders.index') }}">{{ __('documents.view_all') }}</a></div>
 <div class="reminder-panel-body">
 @if(!config('reminders.enabled'))<p class="field-help">{{ __('reminders.paused') }}</p>@endif
 @if($reminder)
@@ -28,7 +28,7 @@
             @can('update', $document)<form method="POST" action="{{ route('reminders.store', ['document' => $document->id]) }}">@csrf<input type="hidden" name="metadata_version" value="{{ $document->metadata_version }}"><button class="library-small-button" type="submit">{{ __('reminders.create') }}</button></form>@endcan
         @else
             <p class="field-help">{{ __('reminders.past_note') }}</p>
-            @can('update', $document)<a class="inline-link" href="{{ route('documents.edit', ['document' => $document->id]) }}">{{ __('documents.edit') }}</a>@endcan
+            @can('update', $document)<a class="action-button" href="{{ route('documents.edit', ['document' => $document->id]) }}">{{ __('documents.edit') }}</a>@endcan
         @endif
     @else
         <p class="field-help">{{ __('reminders.no_date') }}</p>

@@ -26,7 +26,7 @@ return [
     'by_title' => 'By title',
     'empty_title' => 'Room for what matters',
     'empty_text' => 'Upload your first document. You will find it here, in your private space.',
-    'limit' => 'The Free plan allows up to 5 MB and 10 pages per document.',
+    'limit' => 'The Free plan allows up to :size MB and :pages pages per document.',
     'invalid_file' => 'Invalid file. Use PDF, JPEG or PNG, up to 5 MB. PDFs must be valid, without passwords, scripts, forms or attachments.',
     'invalid_amount' => 'Enter the amount with a decimal point and up to two decimal places.',
     'invalid_tags' => 'Use up to 10 tags, each at most 40 characters long.',

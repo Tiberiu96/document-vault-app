@@ -447,6 +447,7 @@ class DocumentProcessingTest extends TestCase
         $this->assertSame('quota_exceeded', $this->document->fresh()->ai_status);
         $this->get('/ro/documente/'.$this->document->id)->assertOk()->assertSee('Cota lunara de procesare');
         $this->assertNull($this->document->fresh()->ai_run_id);
+        $this->app->detectEnvironment(fn () => 'local');
         config(['vault.plans.free.monthly_ai_calls' => -1]);
         $run = $service->request($this->user, $this->document, 'ai');
         $this->assertSame('queued', $run->status);

@@ -22,7 +22,7 @@ class FoundationSecurityTest extends TestCase
         $this->get('/horizon')->assertNotFound();
     }
 
-    public function test_horizon_is_closed_to_a_super_admin_until_mfa_is_implemented(): void
+    public function test_raw_horizon_is_closed_even_to_a_web_super_admin(): void
     {
         $user = User::factory()->create();
         $user->is_super_admin = true;

@@ -45,3 +45,7 @@ Documentele confirmate se sterg definitiv numai dupa confirmare explicita Da/Nu.
 Remindere: programul aprobat este cu 10, 3 si 1 zi inainte, la 09:00 Europe/Bucharest (stocare UTC), fara ziua expirarii implicita. Numai documente confirmate/date viitoare. Rezolvarea/opririle anuleaza si sloturile deja queued/claimed; ciclul si lockurile protejeaza reinnoirea. SMTP incert nu se retrimite orb; starea uncertain cere reconciliere. Vezi docs/reminders.md.
 
 Preferinta utilizatorului pentru ritmul de lucru: ruleaza testele doar la cererea explicita sau in etapa finala dinaintea commit/push; grupeaza verificarile relevante, fara repetare dupa fiecare editare.
+
+Administrarea platformei: guard admin separat, MFA TOTP obligatoriu inclusiv local, QR generat local, secrete criptate si coduri de recuperare de unica folosinta. Nu inspecta/captura secrete MFA reale prin browser tools. Productia cere HTTPS si cookie securizat. Dashboardul operational este sanitizat; Horizon brut ramane inchis. Reprocesarea nu ocoleste permisiunile workspace-ului. Vezi docs/admin.md.
+
+Actiunile secundare din UI se afiseaza ca butoane, nu linkuri subliniate: Inapoi cu sageata stanga si ton neutru cald, Renunta/stergere rosu. Accesul administrativ la contul clientului este numai consultare, cu MFA, parola admin, banner si audit; nu reutiliza sesiunea sau parola clientului.

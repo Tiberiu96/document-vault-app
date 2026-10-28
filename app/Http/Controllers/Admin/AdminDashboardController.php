@@ -1,0 +1,74 @@
+<?php
+
+namespace App\Http\Controllers\Admin;
+
+use App\Http\Controllers\Controller;
+use App\Models\Document;
+use App\Models\ProcessingRun;
+use App\Models\Reminder;
+use App\Models\User;
+use App\Models\Workspace;
+use App\Services\Admin\AdminAudit;
+use App\Services\Admin\OperationalSummary;
+use App\Services\Documents\DocumentProcessingService;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Validation\ValidationException;
+
+class AdminDashboardController extends Controller
+{
+    public function index(OperationalSummary $operations)
+    {
+        $runs = ProcessingRun::where('status', 'failed')->latest()->limit(15)->get(['id', 'document_id', 'workspace_id', 'kind', 'attempts', 'duration_ms', 'error_code', 'created_at']);
+        $actor = Auth::guard('admin')->user();
+        foreach ($runs as $run) {
+            $doc = Document::find($run->document_id, ['id', 'workspace_id', 'uploaded_by', 'status']);
+            $run->setAttribute('can_retry', $actor->hasVerifiedEmail() && $doc && $doc->status === 'stored' && Gate::forUser($actor)->allows('update', $doc) && OperationalSummary::retryable($run->error_code));
+        }
+
+        return view('admin.dashboard', [
+            'stats' => ['Utilizatori' => User::count(), 'Spatii de lucru' => Workspace::count(), 'Documente confirmate' => Document::where('status', 'stored')->count(), 'Stocare utilizata (MB)' => number_format(Workspace::sum('storage_used_bytes') / 1048576, 2), 'Remindere active' => Reminder::where('status', 'active')->count(), 'Joburi esuate' => DB::table('failed_jobs')->count()],
+            'queues' => $operations->queues(), 'runs' => $runs,
+            'events' => DB::table('admin_audit_events')->latest('id')->limit(15)->get(['id', 'actor_id', 'action', 'target_type', 'target_id', 'created_at']),
+        ]);
+    }
+
+    public function users(Request $request)
+    {
+        $q = $request->validate(['q' => ['nullable', 'string', 'max:100']])['q'] ?? '';
+        $users = User::query()->select(['id', 'name', 'email', 'email_verified_at', 'is_super_admin', 'admin_mfa_confirmed_at', 'created_at']);
+        if ($q !== '') {
+            $term = '%'.addcslashes($q, '%_\\').'%';
+            $users->where(fn ($query) => $query->where('name', 'like', $term)->orWhere('email', 'like', $term));
+        }
+
+        return view('admin.users', ['users' => $users->latest()->paginate(25)->withQueryString(), 'q' => $q]);
+    }
+
+    public function workspaces()
+    {
+        return view('admin.workspaces', ['workspaces' => Workspace::with('owner:id,name,email')->withCount('members')->latest()->paginate(25)]);
+    }
+
+    public function retry(Request $request, string $run, DocumentProcessingService $processing)
+    {
+        $request->validate(['confirm' => ['required', 'accepted']]);
+        DB::transaction(function () use ($run, $processing) {
+            $candidate = ProcessingRun::findOrFail($run);
+            Workspace::lockForUpdate()->findOrFail($candidate->workspace_id);
+            $document = Document::lockForUpdate()->findOrFail($candidate->document_id);
+            $record = ProcessingRun::lockForUpdate()->findOrFail($run);
+            Gate::authorize('update', $document);
+            abort_unless(Auth::guard('admin')->user()->hasVerifiedEmail() && $document->status === 'stored', 403);
+            if ($record->status !== 'failed' || $document->{$record->kind.'_run_id'} !== $record->id || ! OperationalSummary::retryable($record->error_code)) {
+                throw ValidationException::withMessages(['retry' => 'Aceasta procesare nu poate fi reluata in starea curenta.']);
+            }
+            $processing->request(Auth::guard('admin')->user(), $document, $record->kind);
+            AdminAudit::record(Auth::guard('admin')->user(), 'processing.retry_requested', 'processing_run', $record->id);
+        }, 3);
+
+        return back()->with('admin_status', 'Reprocesarea a fost solicitata cu permisiunile si cotele workspace-ului.');
+    }
+}

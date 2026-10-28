@@ -12,7 +12,7 @@
             @auth<form method="POST" action="{{ route('logout') }}">@csrf<input type="hidden" name="switch_account" value="1"><x-button type="submit">{{ __('account_mail.switch_account') }}</x-button></form>@else<x-button :href="route('login')">{{ __('site.nav.login') }}</x-button>@endauth
         @elseif($mode === 'verify')
             <form action="{{ route('verification.send') }}" method="POST" class="auth-form" data-resend-form data-seconds="{{ $resendAvailableIn ?? 0 }}" data-label="{{ __('account_mail.resend') }}" data-countdown="{{ __('account_mail.resend_countdown', ['seconds' => '{seconds}']) }}" data-minutes="{{ __('account_mail.resend_countdown_minutes', ['minutes' => '{minutes}', 'seconds' => '{seconds}']) }}">@csrf<x-button type="submit" icon="arrow" :disabled="($resendAvailableIn ?? 0) > 0"><span data-resend-label>{{ ($resendAvailableIn ?? 0) > 0 ? __('account_mail.resend_countdown', ['seconds' => $resendAvailableIn]) : __('account_mail.resend') }}</span></x-button></form>
-            <p class="auth-help"><a class="inline-link" href="{{ route('dashboard') }}">{{ __('account_mail.back_account') }}</a></p>
+            <p class="auth-help"><a class="action-button" href="{{ route('dashboard') }}" data-action="back"><x-icon name="back" :size="18"/>{{ __('account_mail.back_account') }}</a></p>
         @else
             <form action="{{ route($mode === 'forgot' ? 'password.email' : 'password.update') }}" method="POST" class="auth-form">
                 @csrf
@@ -24,8 +24,8 @@
                 @endif
                 <x-button type="submit" icon="arrow">{{ __('account_mail.'.($mode === 'forgot' ? 'forgot_action' : 'reset_action')) }}</x-button>
             </form>
-            <p class="auth-help"><a class="inline-link" href="{{ route('login') }}">{{ __('account_mail.back_login') }}</a></p>
-            @if($mode === 'reset')<a class="text-link" href="{{ route('password.request') }}">{{ __('account_mail.forgot_action') }}</a>@endif
+            <p class="auth-help"><a class="action-button" href="{{ route('login') }}" data-action="back"><x-icon name="back" :size="18"/>{{ __('account_mail.back_login') }}</a></p>
+            @if($mode === 'reset')<a class="action-button" href="{{ route('password.request') }}">{{ __('account_mail.forgot_action') }}</a>@endif
         @endif
     </div>
 </section>

@@ -10,7 +10,7 @@ Horizon dashboard numai pentru admin autorizat, romana/noindex si MFA in product
 
 Windows: Horizon necesita Linux/WSL2 din cauza pcntl/posix; fara Docker si fara ignorarea platform requirements. Configuratia finala va fi publicata din pachetul instalat si verificata prin teste de retry/idempotenta si test Redis real.
 
-Configuratia supervisorilor este livrata in config/horizon.php; retry_after Redis=360s, timeout maxim OCR=300s, after_commit=true. In fiecare grup exista un worker separat, inclusiv high. Testele verifica bugetele si cozile. Workeri reali nu au fost porniti; dashboardul refuza tot accesul pana la auth/MFA.
+Configuratia supervisorilor este livrata in config/horizon.php; retry_after Redis=360s, timeout maxim OCR=300s, after_commit=true. In fiecare grup exista un worker separat, inclusiv high. Testele verifica bugetele si cozile. Workerii locali sunt supravegheati prin systemd user. Horizon brut ramane inchis; dashboardul propriu /admin afiseaza statistici sanitizate dupa autentificare globala si MFA.
 
 Notificarile de cont AccountMail sunt in high, afterCommit si ShouldBeEncrypted;
 3 incercari, timeout 30s, backoff 10/60/180s. Workerii locali Horizon ruleaza prin

@@ -10,6 +10,7 @@
     "license": "proprietary",
     "require": {
         "php": "^8.3",
+        "bacon/bacon-qr-code": "^3.0",
         "laravel/framework": "^13.17",
         "laravel/horizon": "^5.0",
         "laravel/sanctum": "^4.0",
@@ -17,6 +18,7 @@
         "laravel/tinker": "^3.0",
         "livewire/livewire": "^4.0",
         "niels-numbers/laravel-localizer": "^1.4",
+        "pragmarx/google2fa": "^9.1",
         "setasign/fpdf": "^1.9"
     },
     "require-dev": {

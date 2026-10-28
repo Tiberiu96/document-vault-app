@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="{{ asset('css/app.css') }}?v={{ filemtime(public_path('css/app.css')) }}">
 </head>
 <body @class(['library-body', 'scanner-body' => ($section ?? '') === 'scan', 'upload-body' => ($section ?? '') === 'upload'])>
+@include('admin.partials.impersonation-banner')
 <a href="#main" class="skip-link">{{ __('site.a11y.skip') }}</a>
 <div class="library-shell">
     <aside class="library-sidebar">
@@ -23,7 +24,7 @@
         @if(app()->environment('local') && config('ai.enabled') && $workspace && Gate::allows('manage', [App\Models\Document::class, $workspace]))<a href="{{ route('ai.playground') }}" @if($section === 'ai') aria-current="page" @endif><x-icon name="sparkle"/>{{ __('ai.title') }}</a>@endif
         </nav>
         <div class="library-botanical"><x-branch/><p>{{ __('site.life.quote') }}</p><span>{{ __('documents.private') }}</span></div>
-        <a class="inline-link library-public-link" href="{{ route('home') }}">{{ config('app.name') }} ↗</a>
+        <a class="action-button library-public-link" href="{{ route('home') }}">{{ config('app.name') }} ↗</a>
     </aside>
     <div class="library-main">
         <header class="library-topbar">
@@ -36,7 +37,7 @@
             @if(session('library_status'))<div class="security-notice" role="status">{{ session('library_status') }}</div>@endif
             @if(session('security_status'))<div class="security-notice" role="status">{{ session('security_status') }}</div>@endif
             @if($errors->any())<div class="form-alert" role="alert">{{ $errors->first() }}</div>@endif
-            @unless(auth()->user()->hasVerifiedEmail())<div class="security-notice"><x-icon name="shield"/><p>{{ __('account_mail.verify_banner') }}</p><a class="inline-link" href="{{ route('verification.notice') }}">{{ __('account_mail.verify_action') }}</a></div>@endunless
+            @unless(auth()->user()->hasVerifiedEmail())<div class="security-notice"><x-icon name="shield"/><p>{{ __('account_mail.verify_banner') }}</p><a class="action-button" href="{{ route('verification.notice') }}">{{ __('account_mail.verify_action') }}</a></div>@endunless
             @yield('content')
         </main>
     </div>

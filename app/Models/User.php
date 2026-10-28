@@ -15,7 +15,7 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
 #[Fillable(['name', 'email', 'password'])]
-#[Hidden(['password', 'remember_token', 'is_super_admin'])]
+#[Hidden(['password', 'remember_token', 'is_super_admin', 'admin_mfa_secret', 'admin_recovery_hashes', 'admin_mfa_confirmed_at', 'admin_mfa_last_counter', 'admin_mfa_version'])]
 class User extends Authenticatable implements MustVerifyEmail
 {
     /** @use HasFactory<UserFactory> */
@@ -52,6 +52,11 @@ class User extends Authenticatable implements MustVerifyEmail
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'is_super_admin' => 'boolean',
+            'admin_mfa_secret' => 'encrypted',
+            'admin_recovery_hashes' => 'encrypted:array',
+            'admin_mfa_confirmed_at' => 'datetime',
+            'admin_mfa_last_counter' => 'integer',
+            'admin_mfa_version' => 'integer',
         ];
     }
 }

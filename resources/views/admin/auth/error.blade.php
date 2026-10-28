@@ -1,0 +1,3 @@
+@extends('layouts.admin')
+@section('title','Acces administrare')
+@section('content')<section class="library-panel admin-auth-card"><span class="eyebrow">Administrare</span><h1>{{ $status === 403 ? 'Acces nepermis.' : ($status === 404 ? 'Pagina nu exista.' : 'Actiunea nu poate fi finalizata.') }}</h1><p>{{ $status === 503 ? 'Verifica HTTPS, cookie-urile securizate si disponibilitatea serviciilor.' : ($status === 419 ? 'Sesiunea a expirat. Reincarca pagina si autentifica-te din nou.' : 'Verifica sesiunea si permisiunile contului. Daca problema continua, verifica serviciile din terminal.') }}</p><a class="action-button" href="{{ route('admin.login') }}">Autentificare administrare</a></section>@endsection

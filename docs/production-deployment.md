@@ -113,8 +113,11 @@ php artisan db:seed --force
 
 key:generate este numai pentru o instalare goala, fara date criptate existente.
 Seeder-ele creeaza limbile/categoriile/etichetele, fara conturi sau parole implicite.
-Administratorul se creeaza interactiv cu php artisan vault:admin:create; panoul web
-admin ramane blocat pana la implementarea MFA/autorizarii complete.
+Administratorul se creeaza interactiv cu php artisan vault:admin:create; apoi
+acceseaza /admin/autentificare prin HTTPS si configureaza MFA. Este obligatoriu
+SESSION_SECURE_COOKIE=true. Salveaza codurile de recuperare privat; vezi admin.md.
+Ruleaza db:seed numai la instalarea initiala: poate recrea elemente predefinite
+sterse intentionat din catalog.
 
 CSS NU este inclus in Git. Instaleaza binarul Tailwind standalone versionat dupa
 instructiunile si checksumul din web-foundation.md (Linux x64), apoi ruleaza:

@@ -85,3 +85,5 @@ Route::translate(function () {
         });
     });
 });
+
+require __DIR__.'/admin.php';

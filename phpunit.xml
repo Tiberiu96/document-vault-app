@@ -18,6 +18,9 @@
         </include>
     </source>
     <php>
+        <env name="VAULT_FREE_AI_CALLS" value="10" force="true"/>
+        <env name="VAULT_FREE_OCR_PAGES" value="50" force="true"/>
+        <env name="VAULT_FREE_STORAGE_BYTES" value="104857600" force="true"/>
         <env name="AI_PROVIDER" value="ollama" force="true"/>
         <env name="GROQ_API_KEY" value="" force="true"/>
         <env name="APP_ENV" value="testing" force="true"/>

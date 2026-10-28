@@ -1,0 +1,5 @@
+@extends('layouts.admin')
+@section('title','Configureaza MFA')
+@section('content')
+<section class="library-panel admin-auth-card"><span class="eyebrow">Pasul 2 · Securitate</span><h1>Configureaza autentificarea in doi pasi.</h1><p>Pe telefon, deschide Google Authenticator sau aplicatia TOTP pe care o folosesti. Alege + / Adauga cont, apoi Scaneaza cod QR. Scaneaza codul de mai jos si introdu cele 6 cifre generate. Nu trimite QR-ul sau cheia in conversatii ori capturi.</p><div class="admin-qr" role="img" aria-label="Cod QR pentru configurarea MFA">{!! $qr !!}</div><details><summary>Introdu cheia manual</summary><input aria-label="Cheie MFA" type="text" readonly value="{{ $secret }}" autocomplete="off" spellcheck="false"></details><form class="auth-form" method="POST" action="{{ route('admin.mfa.enroll') }}">@csrf<label for="mfa-code">Codul de 6 cifre</label><input id="mfa-code" name="code" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" required><x-button type="submit">Confirma MFA</x-button></form></section>
+@endsection

@@ -7,7 +7,7 @@
     <p>{{ __('documents.delete_warning') }}</p>
     <div class="library-actions">
         <form method="POST" action="{{ route('documents.destroy', ['document' => $document->id]) }}">@csrf @method('DELETE')<button type="submit" name="confirm" value="1" class="danger-button">{{ __('documents.delete_yes') }}</button></form>
-        <a class="inline-link" href="{{ route('documents.show', ['document' => $document->id]) }}">{{ __('documents.delete_no') }}</a>
+        <a class="action-button" href="{{ route('documents.show', ['document' => $document->id]) }}">{{ __('documents.delete_no') }}</a>
     </div>
 </section>
 @endsection
