@@ -4,7 +4,7 @@
     <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <title>{{ $section === 'ai' ? __('ai.title') : __('documents.'.($section === 'dashboard' ? 'dashboard' : ($section === 'categories' ? 'categories' : 'title'))) }} — {{ config('app.name') }}</title>
     <meta name="robots" content="noindex, nofollow"><meta name="referrer" content="no-referrer">
-    <link rel="icon" type="image/svg+xml" href="{{ asset('images/favicon.svg') }}">
+    <x-favicons/>
     <link rel="stylesheet" href="{{ asset('css/app.css') }}?v={{ filemtime(public_path('css/app.css')) }}">
 </head>
 <body @class(['library-body', 'scanner-body' => ($section ?? '') === 'scan', 'upload-body' => ($section ?? '') === 'upload'])>
@@ -27,7 +27,7 @@
     <div class="library-main">
         <header class="library-topbar">
             @if($workspace)<x-workspace-picker :workspace="$workspace" :workspaces="$workspaces" class="library-mobile-workspace"/>@endif
-            <a class="library-mobile-brand" href="{{ route('dashboard') }}">{{ config('app.name') }}<span>.</span></a>
+            <x-brand class="library-mobile-brand" :href="route('dashboard')"/>
             <form action="{{ route('documents.index') }}" class="library-search" role="search"><x-icon name="search"/><input type="search" name="q" maxlength="100" placeholder="{{ __('documents.search') }}" aria-label="{{ __('documents.search') }}" value="{{ is_string(request('q')) ? request('q') : '' }}"><button type="submit" aria-label="{{ __('documents.search') }}"><x-icon name="arrow"/></button></form>
             <details class="library-account"><summary><span class="library-avatar">{{ mb_substr(auth()->user()->name, 0, 1) }}</span><span>{{ auth()->user()->name }}</span><x-icon name="chevron" :size="16"/></summary><div class="library-account-menu"><x-language-switcher :languages="$languages"/><a href="{{ route('verification.notice') }}">{{ __('account_mail.status') }}</a><form action="{{ route('logout') }}" method="POST">@csrf<button type="submit">{{ __('site.nav.logout') }}</button></form></div></details>
         </header>

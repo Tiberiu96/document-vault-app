@@ -42,3 +42,14 @@ Contul din antet este acum un icon de utilizator intr-un cerc de 44px, cu accent
 BG foloseste Noto Serif/Noto Sans self-hosted in subseturi WOFF2, cu licente OFL incluse, descarcate de la Google Fonts. Au fost verificate glyphurile alfabetului bulgar, inclusiv U+040D/U+045D, pe toate cele trei fisiere. Checksumuri: Noto Sans 400 4ddba4e887629f9ac1a1d44f91e32ad32aa713e07a69c1a8652a3e7bb98b8b97; Noto Sans 700 704540f0618003c75deb13712b740099744e82918a88fd2c90e06065d8f1d060; Noto Serif 0ec886d8ef321fb3231c4df38ca39a59ecf79d2368fa094207b179137587cdd0. Fonturile DM pentru ro/en/hu sunt pastrate.
 
 Verificarea vizuala directa ramane neefectuata: instrumentul refuza originea chiar dupa captura cu Always allow. Nu raporta o verificare in browser reusita pana la un rezultat real; nu ocoli politica prin alte mecanisme.
+
+## Identitate aprobata — Editorial Folded V
+
+Varianta 01 este aprobata: emblema V din doua pagini si wordmark serif Vaulty.
+Masterele PNG cu alpha si iconul bronz sunt in design-layouts/branding/selected/,
+generate din conceptul aprobat cu imagegen integrat. public/images/brand/ contine
+logo-ul transparent 720x240 si iconurile 16/32/48/180/192/512px. favicon.ico include
+16, 32 si 48px. Exporturile GD pastreaza alpha si proportiile; nu sunt SVG-uri vectoriale.
+Componentele brand/favicons sunt comune paginilor publice si panoului, inclusiv
+antetul mobil. APP_NAME ramane configurabil: alt nume foloseste wordmark text.
+Emailurile de cont includ logo-ul inline CID; varianta text ramane text simplu.

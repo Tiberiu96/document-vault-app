@@ -1,1 +1,2 @@
-<a href="{{ route('home') }}" {{ $attributes->class(['brand']) }} aria-label="{{ config('app.name') }} — {{ __('site.nav.home') }}">{{ config('app.name') }}<span class="brand-dot">.</span></a>
+@props(['href' => null])
+<a href="{{ $href ?? route('home') }}" {{ $attributes->class(['brand']) }} aria-label="{{ config('app.name') }} — {{ __('site.nav.home') }}">@if(mb_strtolower(config('app.name')) === 'vaulty')<img src="{{ asset('images/brand/vaulty-logo.png') }}" width="180" height="60" alt="{{ config('app.name') }}" decoding="async">@else{{ config('app.name') }}<span class="brand-dot">.</span>@endif</a>

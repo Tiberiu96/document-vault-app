@@ -885,3 +885,10 @@
 .button.button-danger { color:#fff; background:#a34035; border:1px solid #a34035; display:inline-flex; justify-content:center; align-items:center; min-height:48px; font-size:16px; cursor:pointer; }
 .button.button-danger:hover { background:#86342b; border-color:#86342b; }
 @media(max-width:480px){.review-source{gap:12px;padding:12px}.review-source-thumb{width:72px;height:96px}.library-form>.library-actions{display:grid;grid-template-columns:minmax(0,1fr);gap:12px}.library-form>.library-actions>.button{width:100%;margin:0}}
+
+/* Identitatea editoriala Vaulty, varianta 01 aprobata. */
+.brand { align-items:center; }
+.brand img { display:block; width:180px; height:60px; max-width:100%; object-fit:contain; }
+.site-footer .brand img { width:156px; height:52px; }
+@media(max-width:800px){.library-mobile-brand img{width:150px;height:50px}}
+@media(max-width:600px){.site-header .brand img{width:156px;height:52px}}

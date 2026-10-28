@@ -37,7 +37,7 @@
     <meta name="twitter:title" content="{{ $title }}">
     <meta name="twitter:description" content="{{ $description }}">
     <meta name="twitter:image" content="{{ rtrim(config('app.url'), '/') }}/images/social-card.png">
-    <link rel="icon" type="image/svg+xml" href="{{ asset('images/favicon.svg') }}">
+    <x-favicons/>
     <link rel="preload" href="{{ asset(app()->getLocale() === 'bg' ? 'fonts/noto-serif-bg.woff2' : 'fonts/dm-serif-display.ttf') }}" as="font" type="{{ app()->getLocale() === 'bg' ? 'font/woff2' : 'font/ttf' }}" crossorigin>
     <link rel="stylesheet" href="{{ asset('css/app.css') }}?v={{ filemtime(public_path('css/app.css')) }}">
     @if($indexable)

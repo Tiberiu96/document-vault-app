@@ -6,7 +6,7 @@
 <div style="display:none;max-height:0;overflow:hidden;mso-hide:all">{{ __('account_mail.'.$kind.'_title') }}</div>
 <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#F7F5F0"><tr><td align="center" class="outer" style="padding:48px 20px">
 <table role="presentation" width="600" cellspacing="0" cellpadding="0" border="0" style="width:100%;max-width:600px">
-<tr><td style="padding:0 0 28px;font-family:Georgia,'Times New Roman',serif;font-size:36px;font-weight:bold;letter-spacing:-1px">{{ $brand }}<span style="color:#8B7355">.</span></td></tr>
+<tr><td style="padding:0 0 28px;font-family:Georgia,'Times New Roman',serif;font-size:36px;font-weight:bold;letter-spacing:-1px">@if(mb_strtolower($brand) === 'vaulty')<img src="{{ isset($message) ? $message->embed(public_path('images/brand/vaulty-logo.png')) : rtrim(config('app.url'), '/').'/images/brand/vaulty-logo.png' }}" width="180" height="60" alt="{{ $brand }}" style="display:block;width:180px;height:60px;border:0">@else{{ $brand }}<span style="color:#8B7355">.</span>@endif</td></tr>
 <tr><td style="border:1px solid #E6E2DA;border-top:4px solid #8B7355;background:#FFFFFF;border-radius:4px">
 <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0"><tr><td class="card-body" style="padding:44px 40px">
 <p style="margin:0 0 24px;color:#8B7355;font-size:16px;letter-spacing:1px">{{ __('account_mail.eyebrow') }}</p>
