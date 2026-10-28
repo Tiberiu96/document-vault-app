@@ -19,7 +19,7 @@ return [
     'discarded' => 'Incarcarea a fost anulata. Documentul nu a fost adaugat in biblioteca.',
     'already_analyzed' => 'Analiza a fost deja finalizata. Foloseste rezultatul existent.',
 
-    'remote_ai_hint' => 'Textul extras este trimis catre Groq pentru propuneri AI. Verifica sugestiile inainte de salvare. Debifeaza pentru a pastra doar procesarea OCR locala.',
+    'remote_ai_hint' => 'Textul extras este trimis catre AI pentru analiza.',
     'auto_ai_hint' => 'AI propune informatii pe baza documentului. Verifica sugestiile inainte de salvare. Debifeaza pentru completare manuala.',
     'uploading' => 'Se incarca documentul. Nu inchide pagina.',
     'checking' => 'Originalul este pastrat. Verificam progresul automat.',
@@ -54,6 +54,9 @@ return [
     'ready' => 'Sugestiile sunt pregatite. Niciun camp nu a fost schimbat automat.',
     'reject' => 'Respinge sugestiile',
     'states' => [
+        'waiting_ocr' => 'Asteapta extragerea textului',
+        'waiting_ai' => 'Se pregateste analiza',
+        'blocked_ocr' => 'Indisponibil: textul nu a putut fi extras',
         'quota_exceeded' => 'Cota de procesare atinsa',
         'idle' => 'Nepornit',
         'queued' => 'In coada',

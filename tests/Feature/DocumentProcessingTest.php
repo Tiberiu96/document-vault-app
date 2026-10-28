@@ -373,6 +373,22 @@ class DocumentProcessingTest extends TestCase
         $this->get('/ro/documente/'.$this->document->id.'/stare-procesare')->assertOk()->assertJsonPath('ready_for_review', false);
     }
 
+    public function test_ai_waiting_for_ocr_is_presented_without_changing_job_state(): void
+    {
+        foreach ([
+            ['queued', true, 'Asteapta extragerea textului', true],
+            ['running', true, 'Asteapta extragerea textului', true],
+            ['ready', true, 'Se pregateste analiza', true],
+            ['failed', true, 'Indisponibil: textul nu a putut fi extras', false],
+            ['ready', false, 'Nepornit', false],
+        ] as [$ocr, $requested, $label, $pending]) {
+            $this->document->forceFill(['ocr_status' => $ocr, 'ai_status' => 'idle', 'ai_requested' => $requested])->save();
+            $this->get('/ro/documente/'.$this->document->id.'/stare-procesare')->assertOk()
+                ->assertJsonPath('ai_status', 'idle')->assertJsonPath('ai_label', $label)->assertJsonPath('pending', $pending);
+            $this->get('/ro/documente/'.$this->document->id)->assertOk()->assertSee($label);
+        }
+    }
+
     public function test_upload_remains_private_draft_until_explicit_confirmation(): void
     {
         $this->post('/ro/documente', ['file' => UploadedFile::fake()->image('private-draft.png', 55, 66), 'analyze_with_ai' => '0'])->assertSessionHasNoErrors();

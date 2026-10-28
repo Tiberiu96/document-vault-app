@@ -19,7 +19,7 @@ return [
     'discarded' => 'Upload cancelled. The document was not added to the library.',
     'already_analyzed' => 'Analysis is already complete. Use the existing result.',
 
-    'remote_ai_hint' => 'Extracted text is sent to Groq for AI suggestions. Review suggestions before saving. Uncheck to use local OCR only.',
+    'remote_ai_hint' => 'Extracted text is sent to AI for analysis.',
     'auto_ai_hint' => 'AI suggests information based on the document. Review suggestions before saving. Uncheck for manual entry.',
     'uploading' => 'Uploading the document. Keep this page open.',
     'checking' => 'Your original is saved. Progress updates automatically.',
@@ -54,6 +54,9 @@ return [
     'ready' => 'Suggestions are ready. No field was changed automatically.',
     'reject' => 'Reject suggestions',
     'states' => [
+        'waiting_ocr' => 'Waiting for text extraction',
+        'waiting_ai' => 'Preparing analysis',
+        'blocked_ocr' => 'Unavailable: text could not be extracted',
         'quota_exceeded' => 'Processing quota reached',
         'idle' => 'Not started',
         'queued' => 'Queued',

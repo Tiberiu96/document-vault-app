@@ -27,6 +27,20 @@ class Document extends Model
         return $this->status === 'draft';
     }
 
+    public function aiDisplayState(): string
+    {
+        if ($this->ai_requested && $this->ai_status === 'idle') {
+            return match ($this->ocr_status) {
+                'queued', 'running' => 'waiting_ocr',
+                'ready' => 'waiting_ai',
+                'failed', 'empty', 'quota_exceeded' => 'blocked_ocr',
+                default => 'idle',
+            };
+        }
+
+        return $this->ai_status;
+    }
+
     public function workspace(): BelongsTo
     {
         return $this->belongsTo(Workspace::class);

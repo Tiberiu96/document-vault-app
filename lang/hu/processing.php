@@ -19,7 +19,7 @@ return [
     'discarded' => 'Feltöltés megszakítva. A dokumentum nem került a könyvtárba.',
     'already_analyzed' => 'Az elemzés már elkészült. Használd a meglévő eredményt.',
 
-    'remote_ai_hint' => 'A kinyert szöveget a Groq kapja meg AI-javaslatokhoz. Mentés előtt ellenőrizd őket. Csak helyi OCR-hez vedd ki a jelölést.',
+    'remote_ai_hint' => 'A kinyert szöveget az AI kapja meg elemzésre.',
     'auto_ai_hint' => 'Az AI a dokumentum alapján javasol adatokat. Mentés előtt ellenőrizd a javaslatokat. Kézi kitöltéshez vedd ki a jelölést.',
     'uploading' => 'A dokumentum feltöltése folyamatban. Ne zárd be az oldalt.',
     'checking' => 'Az eredeti mentve van. Az állapot automatikusan frissül.',
@@ -54,6 +54,9 @@ return [
     'ready' => 'A javaslatok elkészültek. Egyetlen mező sem változott automatikusan.',
     'reject' => 'Javaslatok elutasítása',
     'states' => [
+        'waiting_ocr' => 'Várakozás a szövegkinyerésre',
+        'waiting_ai' => 'Elemzés előkészítése',
+        'blocked_ocr' => 'Nem érhető el: a szövegkinyerés sikertelen',
         'quota_exceeded' => 'A feldolgozási keret elfogyott',
         'idle' => 'Nem indult el',
         'queued' => 'Sorban áll',

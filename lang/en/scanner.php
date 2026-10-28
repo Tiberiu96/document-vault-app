@@ -6,7 +6,7 @@ return [
     'compact_intro' => 'Photograph or upload your document.',
     'tap_capture' => 'Tap to take a photo',
     'drag_hint' => 'Drag the corners to crop. Changes also apply when you continue.',
-    'remote_notice' => 'Extracted text is sent to Groq for analysis.',
+    'remote_notice' => 'Extracted text is sent to AI for analysis.',
     'details' => 'Scan details',
     'continue' => 'Continue',
     'corner_tl' => 'Top left corner',

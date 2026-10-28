@@ -6,7 +6,7 @@ return [
     'compact_intro' => 'Fotografiaza sau incarca documentul.',
     'tap_capture' => 'Atinge pentru a fotografia',
     'drag_hint' => 'Trage colturile pentru a decupa. Ajustarile se aplica si la Continua.',
-    'remote_notice' => 'Textul extras este trimis la Groq pentru analiza.',
+    'remote_notice' => 'Textul extras este trimis catre AI pentru analiza.',
     'details' => 'Detalii scanare',
     'continue' => 'Continua',
     'corner_tl' => 'Coltul din stanga sus',

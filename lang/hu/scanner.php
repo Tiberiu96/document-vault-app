@@ -6,7 +6,7 @@ return [
     'compact_intro' => 'Fényképezd le vagy töltsd fel a dokumentumot.',
     'tap_capture' => 'Koppints a fényképezéshez',
     'drag_hint' => 'Húzd a sarkokat a körbevágáshoz. A módosítások folytatáskor is érvényesülnek.',
-    'remote_notice' => 'A kinyert szöveget a Groq kapja meg elemzésre.',
+    'remote_notice' => 'A kinyert szöveget az AI kapja meg elemzésre.',
     'details' => 'Szkennelés részletei',
     'continue' => 'Folytatás',
     'corner_tl' => 'Bal felső sarok',

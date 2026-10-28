@@ -22,7 +22,7 @@ Verificare conexiune/model: php artisan vault:ai:check.
 Proba fictiva: php artisan vault:ai:check --infer.
 
 OCR si originalele raman locale. Textul extras din document este transmis catre
-Groq numai pentru analize solicitate. UI declara providerul remote langa optiunea AI.
+Groq numai pentru analize solicitate. UI foloseste formularea generala de trimitere a textului catre AI, fara nume de provider. Providerul si caracterul remote sunt documentate aici.
 Debifarea pastreaza numai OCR local si completarea manuala. Nu declara ca inferenta
 remote ramane pe laptop sau ca datele sunt gazduite in UE.
 Fiecare run fixeaza providerul ales la solicitare, inclusiv lantul OCR→AI;
@@ -50,3 +50,5 @@ termenii si acordurile de procesare inainte de documente confidentiale in produc
 Testarea locala foloseste VAULT_FREE_AI_CALLS=-1 la cererea utilizatorului (fara cota lunara AI); rate limits si limitele de fisiere raman aplicabile.
 
 Diagnostic raspuns: AI_OUTPUT_TRUNCATED pentru limita de generare, AI_RESPONSE_REFUSED pentru refuz si AI_INVALID_<CAMP> pentru validarea unui camp cunoscut. Se pastreaza numai codul, niciodata raspunsul brut sau valori private. Raspunsurile incomplete nu completeaza formularul si nu se retrimit automat. Bugetul de generare mai mare nu garanteaza acceptarea fiecarui document. Politele folosesc prima totala, nu limita despagubirii, si separa data emiterii de perioada de valabilitate.
+
+Afisarea progresului diferentiaza asteptarea OCR de pregatirea analizei; starea jobului AI ramane idle pana la crearea lui efectiva. Sumarul este text generat: promptul cere formulari simple si corectitudine gramaticala, dar verificarea utilizatorului ramane necesara. Nu se aplica un dictionar automat de inlocuiri peste documente sau OCR.
