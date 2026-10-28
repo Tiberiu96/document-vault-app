@@ -195,7 +195,8 @@ class DocumentLibrary
         }
 
         return [
-            'category_id' => $category?->id, 'summary' => $data['summary'] ?? null, 'description' => $data['description'] ?? null,
+            'category_id' => $category?->id, 'summary' => $data['summary'] ?? null,
+            ...(array_key_exists('description', $data) ? ['description' => $data['description']] : []),
             'supplier' => $data['supplier'] ?? null, 'amount_minor' => $minor,
             'currency' => $minor === null ? null : $data['currency'],
             'issued_on' => $data['issued_on'] ?? null, 'expires_on' => $data['expires_on'] ?? null,

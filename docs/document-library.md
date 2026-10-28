@@ -25,7 +25,8 @@ contor corect. Datele acelui test au fost eliminate.
   documente; Accountant are acces de citire. Un super_admin nu ocoleste izolarea.
 - Sumele originale se pastreaza in minor units intregi, impreuna cu moneda originala.
 - Descrierea scurta are maximum 240 caractere si apare ca ultima coloana Sumar.
-  Descrierea detaliata este separata. Nu exista rezumate AI inventate.
+  Formularul foloseste numai descrierea scurta. Descrierile detaliate existente
+  se pastreaza la editare pentru a evita pierderea datelor. Nu exista rezumate AI inventate.
 
 ## Previzualizare si stergere
 

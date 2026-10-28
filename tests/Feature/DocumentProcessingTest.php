@@ -215,6 +215,33 @@ class DocumentProcessingTest extends TestCase
         $this->assertSame('2026-12-01', $result['fields']['expires_on']);
     }
 
+    public function test_invoice_without_expiry_or_status_evidence_keeps_optional_suggestions_empty(): void
+    {
+        $this->readyText($this->text.' Data scadentei: 01.01.2020.');
+        $this->fakeAi(['tag_keys' => []]);
+        $result = app(DocumentAiAnalysis::class)->analyze($this->document->fresh(), 'ro');
+        $this->assertFalse($result['review_required']);
+        $this->assertSame([], $result['fields']['tag_keys']);
+        $this->assertNull($result['fields']['expires_on']);
+        Http::assertSent(function ($request) {
+            $catalog = json_decode($request['messages'][1]['content'], true)['tag_catalog'];
+
+            return str_contains($catalog['paid'], 'payment method')
+                && str_contains($request['messages'][0]['content'], 'payment due date');
+        });
+    }
+
+    public function test_only_short_summary_is_editable_and_legacy_description_is_preserved(): void
+    {
+        $this->document->forceFill(['description' => 'Existing private note'])->save();
+        $this->get('/ro/documente/'.$this->document->id.'/editeaza')
+            ->assertOk()->assertSee('name="summary"', false)->assertDontSee('name="description"', false);
+        $this->patch('/ro/documente/'.$this->document->id, ['title' => 'Updated', 'summary' => 'Short summary', 'metadata_version' => 0])
+            ->assertSessionHasNoErrors()->assertRedirect();
+        $this->assertSame('Short summary', $this->document->fresh()->summary);
+        $this->assertSame('Existing private note', $this->document->fresh()->description);
+    }
+
     public function test_upload_option_is_checked_beside_file_and_can_be_declined(): void
     {
         $page = $this->get('/ro/documente/incarca')->assertOk();

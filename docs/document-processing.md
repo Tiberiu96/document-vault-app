@@ -185,3 +185,8 @@ Promptul AI accepta fotografii/capturi lizibile de documente si ignora interfata
 vizualizatorului. Campurile optionale absente raman null. Scadenta unei facturi nu
 este tratata drept expirarea documentului. Captura Altex furnizata a fost verificata
 manual prin OCR si providerul configurat, fara recrearea draftului anulat.
+
+AI primeste definitiile etichetelor globale, nu doar cheile lor. Lista poate ramane
+goala: metoda de plata nu dovedeste achitarea, iar o factura nu este automat urgenta,
+semnata sau recurenta. Expirarea se extrage numai daca este mentionata; scadenta
+facturii ramane un concept separat.
