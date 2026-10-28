@@ -33,4 +33,5 @@ return [
     'processing.status' => 'stare-procesare',
     'suggestions' => 'sugestii',
     'suggestions.reject' => 'respinge-sugestii',
+    'delete.confirm' => 'sterge',
 ];

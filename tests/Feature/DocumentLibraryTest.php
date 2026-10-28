@@ -136,14 +136,14 @@ class DocumentLibraryTest extends TestCase
         $this->assertEmpty(Storage::disk('local')->allFiles());
     }
 
-    public function test_duplicate_upload_including_trash_is_not_counted_twice(): void
+    public function test_duplicate_is_rejected_but_permanently_deleted_file_can_be_uploaded_again(): void
     {
         $document = $this->upload();
         $this->post('/ro/documente', $this->payload())->assertSessionHasErrors('file');
-        $this->delete('/ro/documente/'.$document->id)->assertRedirect();
-        $this->post('/ro/documente', $this->payload())->assertSessionHasErrors('file');
+        $this->delete('/ro/documente/'.$document->id, ['confirm' => 1])->assertRedirect();
+        $this->assertSame(0, Document::withTrashed()->count());
+        $this->post('/ro/documente', $this->payload())->assertSessionHasNoErrors()->assertRedirect();
         $this->assertSame(1, Document::withTrashed()->count());
-        $this->assertSame($document->size_bytes + $document->preview_bytes, (int) $this->workspace->fresh()->storage_used_bytes);
     }
 
     public function test_verification_and_current_workspace_membership_are_required(): void
@@ -243,25 +243,67 @@ class DocumentLibraryTest extends TestCase
         $this->assertDatabaseCount('documents', 1);
     }
 
-    public function test_trash_restore_and_idempotent_purge_release_storage_only_after_file_removal(): void
+    public function test_permanent_deletion_requires_confirmation_and_removes_source_metadata_and_quota(): void
     {
         Queue::fake();
         $document = $this->upload();
-        $this->delete('/ro/documente/'.$document->id)->assertRedirect();
+        $this->get('/ro/documente/'.$document->id.'/sterge')->assertOk()->assertSee('Da, sterge definitiv')->assertSee('Nu, pastreaza documentul');
+        $this->assertNotNull($document->fresh());
+        $this->delete('/ro/documente/'.$document->id)->assertSessionHasErrors('confirm');
+        $this->delete('/ro/documente/'.$document->id, ['confirm' => 0])->assertSessionHasErrors('confirm');
+        Storage::disk('local')->assertExists($document->storage_path);
+        $this->delete('/ro/documente/'.$document->id, ['confirm' => 1])->assertSessionHasNoErrors()->assertRedirect();
+        $this->get('/ro/documente/'.$document->id)->assertNotFound();
         $this->get('/ro/documente/'.$document->id.'/descarca')->assertNotFound();
-        $this->post('/ro/documente/'.$document->id.'/restaureaza')->assertRedirect();
-        $this->assertFalse($document->fresh()->trashed());
-        $this->delete('/ro/documente/'.$document->id)->assertRedirect();
-        $this->delete('/ro/documente/'.$document->id.'/sterge-definitiv')->assertSessionHasErrors('confirm');
-        $this->delete('/ro/documente/'.$document->id.'/sterge-definitiv', ['confirm' => 1])->assertRedirect();
-        Queue::assertPushedOn('low', PurgeDocument::class);
-        $this->post('/ro/documente/'.$document->id.'/restaureaza')->assertStatus(409);
-        $job = new PurgeDocument($document->id, $document->workspace_id);
-        $job->handle();
-        $job->handle();
+        $this->post('/ro/documente/'.$document->id.'/restaureaza')->assertNotFound();
+        (new PurgeDocument($document->id, $document->workspace_id))->handle();
         Storage::disk('local')->assertMissing($document->storage_path);
         $this->assertSame(0, Document::withTrashed()->count());
         $this->assertSame(0, (int) $this->workspace->fresh()->storage_used_bytes);
+        $this->assertDatabaseMissing('document_tag', ['document_id' => $document->id]);
+    }
+
+    public function test_failed_file_removal_is_inaccessible_and_retried_without_releasing_quota_early(): void
+    {
+        Queue::fake();
+        $document = $this->upload();
+        $used = $this->workspace->fresh()->storage_used_bytes;
+        $disk = Storage::disk('local');
+        $failingDisk = \Mockery::mock($disk)->makePartial();
+        $failingDisk->shouldReceive('deleteDirectory')->once()->andReturn(false);
+        Storage::shouldReceive('disk')->with('local')->andReturn($failingDisk, $disk);
+        $this->delete('/ro/documente/'.$document->id, ['confirm' => 1])->assertRedirect();
+        Queue::assertPushedOn('low', PurgeDocument::class);
+        $this->get('/ro/documente/'.$document->id)->assertNotFound();
+        $this->get('/ro/documente/'.$document->id.'/descarca')->assertNotFound();
+        $this->assertSame($used, $this->workspace->fresh()->storage_used_bytes);
+        (new PurgeDocument($document->id, $document->workspace_id))->handle();
+        $this->assertSame(0, (int) $this->workspace->fresh()->storage_used_bytes);
+        $this->assertNull(Document::withTrashed()->find($document->id));
+    }
+
+    public function test_mobile_cards_hide_empty_metadata_and_trash_is_not_available(): void
+    {
+        $document = $this->upload();
+        $page = $this->get('/ro/documente?trash=1')->assertOk();
+        $page->assertSee('document-mobile-card')->assertDontSee('>Cos<', false)->assertDontSee('name="trash"', false);
+        $cards = explode('document-mobile-list', $page->getContent(), 2)[1];
+        $this->assertStringNotContainsString('Fara categorie', $cards);
+        $this->assertStringNotContainsString('Stocat', $cards);
+        $this->assertStringNotContainsString('mobile-document-summary', $cards);
+        $this->assertStringContainsString('/'.$document->id.'/sterge', $cards);
+    }
+
+    public function test_member_can_delete_only_owned_documents_and_accountant_cannot_confirm_deletion(): void
+    {
+        $document = $this->upload();
+        $member = User::factory()->create();
+        $this->workspace->members()->attach($member->id, ['role' => 'member']);
+        $this->actingAs($member)->get('/ro/documente/'.$document->id.'/sterge')->assertForbidden();
+        $this->delete('/ro/documente/'.$document->id, ['confirm' => 1])->assertForbidden();
+        $this->workspace->members()->updateExistingPivot($member->id, ['role' => 'accountant']);
+        $this->get('/ro/documente/'.$document->id.'/sterge')->assertForbidden();
+        $this->assertNotNull($document->fresh());
     }
 
     public function test_upload_limit_is_shared_across_locales(): void

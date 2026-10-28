@@ -33,4 +33,5 @@ return [
     'processing.status' => 'processing-status',
     'suggestions' => 'suggestions',
     'suggestions.reject' => 'reject-suggestions',
+    'delete.confirm' => 'delete',
 ];

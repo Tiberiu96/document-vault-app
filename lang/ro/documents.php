@@ -131,4 +131,11 @@ return [
         'company' => 'Acte firma',
         'purchases' => 'Achizitii',
     ],
+    'delete_question' => 'Stergi definitiv documentul?',
+    'delete_warning' => 'Originalul, previzualizarile si datele asociate vor fi eliminate. Actiunea nu poate fi anulata.',
+    'delete_yes' => 'Da, sterge definitiv',
+    'delete_no' => 'Nu, pastreaza documentul',
+    'deleted' => 'Documentul a fost sters definitiv.',
+    'delete_pending' => 'Documentul nu mai este accesibil. Eliminarea fisierelor se reincearca automat.',
+    'page_count' => '{1} pagina|[2,*] pagini',
 ];

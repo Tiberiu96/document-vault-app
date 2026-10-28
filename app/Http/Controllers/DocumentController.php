@@ -33,12 +33,9 @@ class DocumentController extends Controller
         ];
     }
 
-    private function document(Request $request, string $id, bool $trashed = false): Document
+    private function document(Request $request, string $id): Document
     {
         $query = Document::where('workspace_id', $request->attributes->get('workspace')->id)->with(['category', 'tags']);
-        if ($trashed) {
-            $query->withTrashed();
-        }
         $document = $query->findOrFail($id);
         Gate::authorize('view', $document);
 
@@ -47,11 +44,8 @@ class DocumentController extends Controller
 
     public function index(Request $request)
     {
-        $filters = $request->validate(['q' => ['nullable', 'string', 'max:100'], 'category' => ['nullable', 'integer'], 'tag' => ['nullable', 'integer'], 'trash' => ['nullable', 'in:1'], 'sort' => ['nullable', 'in:newest,oldest,title']]);
+        $filters = $request->validate(['q' => ['nullable', 'string', 'max:100'], 'category' => ['nullable', 'integer'], 'tag' => ['nullable', 'integer'], 'sort' => ['nullable', 'in:newest,oldest,title']]);
         $query = Document::where('workspace_id', $request->attributes->get('workspace')->id)->where('status', 'stored')->with(['category', 'tags']);
-        if ($request->boolean('trash')) {
-            $query->onlyTrashed();
-        }
         if (! empty($filters['q'])) {
             $term = '%'.addcslashes($filters['q'], '%_\\').'%';
             $query->where(fn ($q) => $q->where('title', 'like', $term)->orWhere('original_name', 'like', $term)->orWhere('supplier', 'like', $term));
@@ -101,7 +95,7 @@ class DocumentController extends Controller
 
     public function show(Request $request, string $document)
     {
-        $record = $this->document($request, $document, true);
+        $record = $this->document($request, $document);
         if ($request->boolean('review') && ! $record->trashed() && Gate::allows('update', $record)) {
             if ($record->ai_status === 'ready') {
                 return redirect()->route('documents.suggestions', ['document' => $record->id]);
@@ -176,54 +170,36 @@ class DocumentController extends Controller
         return redirect()->route('documents.index')->with('library_status', __('processing.discarded'));
     }
 
-    public function destroy(Request $request, string $document, DocumentLibrary $library)
+    public function confirmDeletion(Request $request, string $document)
+    {
+        $record = $this->document($request, $document);
+        Gate::authorize('delete', $record);
+
+        return view('documents.delete', [...$this->context($request, 'documents'), 'document' => $record]);
+    }
+
+    public function destroy(Request $request, string $document)
     {
         $candidate = $this->document($request, $document);
-        if ($candidate->isDraft()) {
-            Gate::authorize('update', $candidate);
-            abort_unless($library->discardDraft($candidate), 409);
-
-            if ($request->expectsJson()) {
-                return response()->json(['redirect' => route('documents.index')])->header('Cache-Control', 'no-store, private');
-            }
-
-            return redirect()->route('documents.index')->with('library_status', __('processing.discarded'));
-        }
+        Gate::authorize('delete', $candidate);
+        $request->validate(['confirm' => ['required', 'accepted']]);
         DB::transaction(function () use ($request, $document) {
             Workspace::lockForUpdate()->findOrFail($request->attributes->get('workspace')->id);
             $record = $this->document($request, $document);
             Gate::authorize('delete', $record);
+            app(DocumentProcessingService::class)->cancel($record);
+            // Marcaj intern pentru retry de curatare; nu exista restaurare sau cos public.
+            $record->forceFill(['status' => 'deleting', 'purge_requested_at' => now()])->save();
             $record->delete();
-        });
+        }, 3);
+        try {
+            (new PurgeDocument($candidate->id, $candidate->workspace_id))->handle();
+        } catch (\Throwable) {
+            PurgeDocument::dispatch($candidate->id, $candidate->workspace_id);
 
-        return redirect()->route('documents.index')->with('library_status', __('documents.trashed'));
-    }
+            return redirect()->route('documents.index')->with('library_status', __('documents.delete_pending'));
+        }
 
-    public function restore(Request $request, string $document)
-    {
-        DB::transaction(function () use ($request, $document) {
-            Workspace::lockForUpdate()->findOrFail($request->attributes->get('workspace')->id);
-            $record = $this->document($request, $document, true);
-            Gate::authorize('update', $record);
-            abort_if($record->purge_requested_at, 409);
-            $record->restore();
-        });
-
-        return redirect()->route('documents.show', ['document' => $document])->with('library_status', __('documents.restored'));
-    }
-
-    public function purge(Request $request, string $document)
-    {
-        $request->validate(['confirm' => ['accepted']]);
-        DB::transaction(function () use ($request, $document) {
-            Workspace::lockForUpdate()->findOrFail($request->attributes->get('workspace')->id);
-            $record = $this->document($request, $document, true);
-            Gate::authorize('manage', [Document::class, $record->workspace]);
-            abort_unless($record->trashed(), 409);
-            $record->forceFill(['purge_requested_at' => now()])->save();
-            PurgeDocument::dispatch($record->id, $record->workspace_id);
-        });
-
-        return redirect()->route('documents.index', ['trash' => 1])->with('library_status', __('documents.purge_queued'));
+        return redirect()->route('documents.index')->with('library_status', __('documents.deleted'));
     }
 }

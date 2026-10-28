@@ -2,14 +2,14 @@
 
 Etapa 4 este implementata pentru web, in ro/en/hu/bg: dashboard cu date reale,
 lista cu cautare/filtre/paginare, upload drag-and-drop, metadate, sumar, categorii,
-etichete, descarcare privata, cos/restaurare si stergere definitiva autorizata.
+etichete, descarcare privata, stergere definitiva autorizata, cu confirmare explicita.
 
 ## Limite si securitate
 
 Free: 10 pagini per document si 5 MiB per fisier, conform deciziei utilizatorului.
 PlanLimitsService este autoritatea pentru limite. Cota beta de stocare este
 configurabila prin VAULT_FREE_STORAGE_BYTES, implicit 100 MiB per workspace.
-Contorul include originalele, imaginile de previzualizare si documentele din cos.
+Contorul include originalele si imaginile de previzualizare pana la eliminarea fizica.
 Rezervarile folosesc tranzactii si lockForUpdate pe workspace. Test MySQL real:
 doua uploaduri simultane la o cota de un singur fisier, unul acceptat, unul respins,
 contor corect. Datele acelui test au fost eliminate.
@@ -36,10 +36,19 @@ Jobul este idempotent, cu maximum doua incercari si timeout 180s. Supervisorul
 default are timeout 200s, sub retry_after Redis 360s. Cota insuficienta este
 permanenta si nu se reincerca. Imaginile JPEG/PNG pot fi afisate direct dupa Policy.
 
-Stergerea normala este reversibila (cos). Stergerea definitiva necesita confirmare
-si Owner/Admin; PurgeDocument ruleaza pe low, elimina originalul si preview-urile,
-apoi elibereaza cota. Un retry nu scade contorul de doua ori. Nu exista retentie
-automata care sa elimine documente fara o politica aprobata.
+Stergerea este definitiva: linkul Sterge deschide un ecran cu titlul documentului,
+consecintele si actiunile Da/Nu. GET nu modifica date; DELETE cere confirm=1, CSRF
+si Policy delete sub lock de workspace. Nu exista rute de restaurare sau cos public.
+Dupa confirmare se opresc procesarile si accesul dispare. PurgeDocument elimina
+imediat originalul, preview-urile si inregistrarea cu relatiile sale. Numai la esec
+IO se reincearca pe low; contorul scade dupa eliminarea efectiva. Marcajul intern
+soft-delete este exclusiv pentru curatarea sigura si nu permite restaurare.
+Doua inregistrari din vechiul cos, anterioare schimbarii, nu sunt eliminate automat;
+o schimbare de interfata nu autorizeaza stergerea retroactiva a fisierelor existente.
+
+Pe mobil, lista are carduri separate cu titlu/furnizor, categorie si suma daca exista,
+sumar optional, format/pagini si data. Campurile goale si statusul repetitiv Stocat
+nu sunt afisate. Tabelul desktop ramane disponibil la peste 800px.
 
 ## Catalog comun
 

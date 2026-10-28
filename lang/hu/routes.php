@@ -33,4 +33,5 @@ return [
     'processing.status' => 'feldolgozasi-allapot',
     'suggestions' => 'javaslatok',
     'suggestions.reject' => 'javaslatok-elutasitasa',
+    'delete.confirm' => 'torles',
 ];

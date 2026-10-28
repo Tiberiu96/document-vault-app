@@ -131,4 +131,11 @@ return [
         'company' => 'Céges iratok',
         'purchases' => 'Beszerzések',
     ],
+    'delete_question' => 'Véglegesen törlöd a dokumentumot?',
+    'delete_warning' => 'Az eredeti fájl, az előnézetek és a kapcsolódó adatok törlődnek. A művelet nem vonható vissza.',
+    'delete_yes' => 'Igen, végleges törlés',
+    'delete_no' => 'Nem, megtartom',
+    'deleted' => 'A dokumentum véglegesen törölve.',
+    'delete_pending' => 'A dokumentum már nem érhető el. A fájlok törlése automatikusan újrapróbálkozik.',
+    'page_count' => '{1} oldal|[2,*] oldal',
 ];

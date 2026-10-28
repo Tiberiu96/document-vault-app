@@ -64,11 +64,10 @@ Route::translate(function () {
                 Route::patch(Localizer::url('documents').'/{document}', [DocumentController::class, 'update'])->whereUuid('document')->name('documents.update');
                 Route::post(Localizer::url('documents').'/{document}/'.Localizer::url('source.received'), [DocumentController::class, 'sourceReceived'])->whereUuid('document')->middleware('throttle:document.upload')->name('documents.source-received');
                 Route::delete(Localizer::url('documents').'/{document}/'.Localizer::url('draft.discard'), [DocumentController::class, 'discard'])->whereUuid('document')->name('documents.discard');
+                Route::get(Localizer::url('documents').'/{document}/'.Localizer::url('delete.confirm'), [DocumentController::class, 'confirmDeletion'])->whereUuid('document')->name('documents.delete-confirmation');
                 Route::delete(Localizer::url('documents').'/{document}', [DocumentController::class, 'destroy'])->whereUuid('document')->name('documents.destroy');
                 Route::get(Localizer::url('documents').'/{document}/'.Localizer::url('preview'), [DocumentController::class, 'file'])->whereUuid('document')->name('documents.preview');
                 Route::get(Localizer::url('documents').'/{document}/'.Localizer::url('download'), [DocumentController::class, 'file'])->whereUuid('document')->defaults('download', true)->name('documents.download');
-                Route::post(Localizer::url('documents').'/{document}/'.Localizer::url('restore'), [DocumentController::class, 'restore'])->whereUuid('document')->name('documents.restore');
-                Route::delete(Localizer::url('documents').'/{document}/'.Localizer::url('purge'), [DocumentController::class, 'purge'])->whereUuid('document')->name('documents.purge');
                 Route::get(Localizer::url('categories'), [TaxonomyController::class, 'index'])->name('categories.index');
                 foreach (['category' => 'categories', 'tag' => 'tags'] as $kind => $slug) {
                     Route::post(Localizer::url($slug), [TaxonomyController::class, 'save'])->defaults('taxonomy', $kind)->middleware('throttle:taxonomy')->name($slug.'.store');

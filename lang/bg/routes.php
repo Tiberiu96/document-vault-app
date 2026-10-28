@@ -33,4 +33,5 @@ return [
     'processing.status' => 'status-obrabotka',
     'suggestions' => 'predlozheniya',
     'suggestions.reject' => 'otkaz-predlozheniya',
+    'delete.confirm' => 'iztrivane',
 ];

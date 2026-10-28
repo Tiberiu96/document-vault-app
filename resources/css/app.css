@@ -836,3 +836,38 @@
 [data-source-upload][hidden],[data-retained-source][hidden] { display:none!important; }
 
 .scanner-body .library-search { display:none; }
+
+/* Biblioteca: carduri mobile compacte; tabelul ramane pentru desktop. */
+.document-mobile-list { display:none; }
+.library-count { color:var(--color-secondary-text,#77766f); margin:0 0 20px; font-size:16px; }
+.delete-confirmation { max-width:640px; margin:32px auto; padding:32px; }
+.delete-confirmation h1 { font-size:clamp(28px,5vw,40px); margin:20px 0 16px; }
+.delete-confirmation p { font-size:16px; line-height:1.65; color:#77766f; }
+.delete-confirmation .delete-document-name { color:#242724; font-weight:600; overflow-wrap:anywhere; }
+.delete-confirmation .library-actions { margin-top:28px; }
+.delete-symbol { display:inline-flex; padding:16px; border-radius:50%; background:#faefeb; color:#9b5547; }
+@media(max-width:800px) {
+    .document-desktop-list { display:none; }
+    .document-mobile-list { display:grid; gap:14px; }
+    .document-mobile-card { min-width:0; padding:18px; border:1px solid #e6e2da; border-radius:14px; background:#fff; }
+    .mobile-document-heading { display:flex; align-items:center; gap:12px; text-decoration:none; min-width:0; }
+    .mobile-document-heading .file-symbol { width:42px; height:48px; border-radius:10px; flex:none; }
+    .mobile-document-name { min-width:0; flex:1; display:grid; gap:5px; }
+    .mobile-document-name strong { font-size:17px; font-weight:600; line-height:1.45; overflow-wrap:anywhere; }
+    .mobile-document-name>span { font-size:16px; color:#77766f; overflow-wrap:anywhere; line-height:1.4; }
+    .mobile-document-chevron { color:#8b7355; font-size:24px; flex:none; }
+    .mobile-document-facts { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px; margin-top:16px; }
+    .mobile-document-facts .document-chip { font-size:16px; padding:5px 10px; border-radius:7px; overflow-wrap:anywhere; white-space:normal; }
+    .mobile-document-amount { margin-left:auto; font-size:20px; font-weight:600; color:#242724; font-variant-numeric:tabular-nums; }
+    .mobile-document-amount>span { font-size:16px; font-weight:400; color:#77766f; }
+    .mobile-document-summary { margin:14px 0 0; font-size:16px; line-height:1.6; color:#77766f; overflow-wrap:anywhere; }
+    .mobile-document-footer { display:flex; flex-wrap:wrap; align-items:center; gap:8px 12px; border-top:1px solid #efede7; margin-top:16px; padding-top:12px; color:#77766f; font-size:16px; }
+    .mobile-document-footer time { margin-left:auto; font-variant-numeric:tabular-nums; }
+    .mobile-document-delete { display:flex; align-items:center; justify-content:center; min-width:44px; min-height:44px; border-radius:9px; color:#9b5547; }
+    .mobile-document-delete:hover { background:#faefeb; }
+    .delete-confirmation { padding:24px; margin:12px 0; }
+    .delete-confirmation .library-actions { align-items:stretch; flex-direction:column; }
+    .delete-confirmation button { width:100%; min-height:48px; }
+}
+
+@media(max-width:800px){.library-documents-panel{background:transparent;border:0;overflow:visible}.library-documents-panel .document-mobile-card{margin:0}}

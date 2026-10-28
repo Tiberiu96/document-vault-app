@@ -131,4 +131,11 @@ return [
         'company' => 'Company records',
         'purchases' => 'Purchases',
     ],
+    'delete_question' => 'Permanently delete this document?',
+    'delete_warning' => 'The original, previews and associated data will be removed. This action cannot be undone.',
+    'delete_yes' => 'Yes, delete permanently',
+    'delete_no' => 'No, keep document',
+    'deleted' => 'The document was permanently deleted.',
+    'delete_pending' => 'The document is no longer accessible. File removal will retry automatically.',
+    'page_count' => '{1} page|[2,*] pages',
 ];
