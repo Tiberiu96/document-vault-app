@@ -11,14 +11,18 @@ use App\Notifications\Channels\WorkspaceDatabaseChannel;
 use App\Services\Ai\AiProviderException;
 use App\Services\Ai\GroqProvider;
 use App\Services\Ai\OllamaProvider;
+use App\Services\Backup\BackupBarrier;
 use App\Services\Ocr\LocalOcrProvider;
 use App\Services\WebsiteContext;
 use Illuminate\Auth\Middleware\EnsureEmailIsVerified;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Notifications\Channels\DatabaseChannel;
+use Illuminate\Queue\Events\WorkerIdle;
 use Illuminate\Session\Middleware\AuthenticateSession;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
@@ -47,6 +51,12 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        $this->app->singleton(BackupBarrier::class);
+        Event::listen(WorkerIdle::class, fn () => app(BackupBarrier::class)->idle());
+        Queue::looping(fn () => app(BackupBarrier::class)->loop());
+        Queue::before(fn ($event) => app(BackupBarrier::class)->jobStart($event->job));
+        Queue::after(fn ($event) => app(BackupBarrier::class)->jobEnd($event->job));
+        Queue::exceptionOccurred(fn ($event) => app(BackupBarrier::class)->jobEnd($event->job));
         Livewire::setUpdateRoute(fn ($handle, $path) => Route::post($path, $handle)->middleware(['web', 'auth:web', 'auth.session', 'verified', 'throttle:notifications.livewire']));
         RateLimiter::for('notifications.livewire', fn (Request $request) => Limit::perMinute(120)->by($request->user('web')?->id ?? $request->ip()));
         Livewire::addPersistentMiddleware([SetLocale::class, AuthenticateSession::class, EnsureEmailIsVerified::class, EnsureActiveWorkspace::class, EnsureAvailableLanguage::class]);

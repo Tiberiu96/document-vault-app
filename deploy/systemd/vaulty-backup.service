@@ -1,0 +1,22 @@
+[Unit]
+Description=Vaulty production backup
+After=network-online.target mysql.service redis-server.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=vaulty
+Group=vaulty
+WorkingDirectory=/var/www/vaulty
+ExecStart=/usr/bin/php artisan vault:backup run
+Nice=15
+IOSchedulingClass=best-effort
+IOSchedulingPriority=7
+CPUQuota=50%
+MemoryMax=768M
+TimeoutStartSec=5h
+TimeoutStopSec=30
+KillMode=control-group
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true

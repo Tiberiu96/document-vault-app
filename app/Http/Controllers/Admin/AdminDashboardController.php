@@ -11,6 +11,7 @@ use App\Models\User;
 use App\Models\Workspace;
 use App\Services\Admin\AdminAudit;
 use App\Services\Admin\OperationalSummary;
+use App\Services\Backup\BackupState;
 use App\Services\Documents\DocumentProcessingService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -34,6 +35,13 @@ class AdminDashboardController extends Controller
             'queues' => $operations->queues(), 'runs' => $runs,
             'events' => DB::table('admin_audit_events')->latest('id')->limit(15)->get(['id', 'actor_id', 'action', 'target_type', 'target_id', 'created_at']),
         ]);
+    }
+
+    public function backup()
+    {
+        $allowed = ['status', 'phase', 'started_at', 'finished_at', 'last_success_at', 'duration_seconds', 'error_code', 'alert_reason', 'alert_at', 'monitor_error', 'bytes_processed', 'bytes_added'];
+
+        return view('admin.backup', ['enabled' => app()->environment('production') && config('backup.enabled'), 'state' => array_intersect_key(app(BackupState::class)->read(), array_flip($allowed))]);
     }
 
     public function notifications()

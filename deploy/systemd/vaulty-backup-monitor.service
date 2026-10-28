@@ -1,0 +1,14 @@
+[Unit]
+Description=Vaulty independent backup monitor
+After=network-online.target
+
+[Service]
+Type=oneshot
+User=vaulty
+Group=vaulty
+WorkingDirectory=/var/www/vaulty
+ExecStart=/usr/bin/php artisan vault:backup monitor
+TimeoutStartSec=45
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true

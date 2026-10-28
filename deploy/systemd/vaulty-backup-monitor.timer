@@ -1,0 +1,10 @@
+[Unit]
+Description=Check Vaulty backup every minute
+
+[Timer]
+OnBootSec=1min
+OnUnitActiveSec=1min
+Unit=vaulty-backup-monitor.service
+
+[Install]
+WantedBy=timers.target

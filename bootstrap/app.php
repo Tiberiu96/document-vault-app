@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\BackupSnapshotBarrier;
 use App\Http\Middleware\BlockNonLocalAiRoutes;
 use App\Http\Middleware\PreventFoundationIndexing;
 use App\Http\Middleware\ProtectAdminImpersonation;
@@ -25,6 +26,7 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->prepend(BlockNonLocalAiRoutes::class);
+        $middleware->prepend(BackupSnapshotBarrier::class);
         $middleware->append(PreventFoundationIndexing::class);
         $middleware->web(remove: [SubstituteBindings::class]);
         $middleware->web(append: [SetLocale::class, RedirectLocale::class, SubstituteBindings::class, ProtectAdminImpersonation::class]);

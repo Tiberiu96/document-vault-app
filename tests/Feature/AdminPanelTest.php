@@ -194,7 +194,7 @@ class AdminPanelTest extends TestCase
         ProcessingRun::forceCreate(['workspace_id' => $document->workspace_id, 'document_id' => $document->id, 'requested_by' => $document->uploaded_by, 'provider' => 'fake', 'kind' => 'ai', 'status' => 'failed', 'period' => now()->startOfMonth()->toDateString(), 'units' => 1, 'base_version' => 0, 'locale' => 'ro', 'error_code' => 'PRIVATE-ERROR', 'result' => ['text' => 'PRIVATE-OCR']]);
         DB::table('failed_jobs')->insert(['uuid' => 'fake-failure-uuid', 'connection' => 'redis', 'queue' => 'ai', 'payload' => 'PRIVATE-PAYLOAD', 'exception' => 'PRIVATE-EXCEPTION', 'failed_at' => now()]);
         $this->enter($user);
-        foreach (['/admin', '/admin/utilizatori', '/admin/spatii', '/admin/categorii', '/admin/etichete', '/admin/limbi', '/admin/limite', '/admin/securitate'] as $path) {
+        foreach (['/admin', '/admin/backup', '/admin/notificari', '/admin/utilizatori', '/admin/spatii', '/admin/categorii', '/admin/etichete', '/admin/limbi', '/admin/limite', '/admin/securitate'] as $path) {
             $this->get($path)->assertOk()->assertSee('lang="ro"', false)->assertDontSee('PRIVATE-')->assertDontSee('private-sensitive-path');
         }
         $this->get('/admin/horizon')->assertForbidden();

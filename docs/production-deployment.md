@@ -196,3 +196,5 @@ Rutinele de backup, monitorizarea si hardeningul de productie raman de configura
 acest ghid nu declara platforma complet auditata pentru lansare comerciala.
 
 Surse: https://laravel.com/framework/docs/deployment si https://packages.ubuntu.com/noble/php/.
+
+Backupul suplimentar Restic/R2 este pregatit, oprit implicit: vezi backups.md. Activarea cere verificarea single-host, restartarea tuturor proceselor pe noul cod, credentiale locale si restaurare de proba. Modelele systemd de backup/monitor sunt separate de Scheduler.
