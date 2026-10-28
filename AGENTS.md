@@ -38,6 +38,8 @@ Emailuri de cont (confirmare/resetare/alerta parola): notificari asincrone pe hi
 
 Documentele expirate pot fi precompletate si salvate, cu avertisment neblocant. Datele de expirare deja trecute nu programeaza notificari viitoare. Calitatea slaba si informatiile fara dovezi raman blocante pentru sugestii.
 
+expires_on este data pentru reminder: la facturi preia scadenta/ultima zi de plata explicita; la polite, garantii si acte preia sfarsitul valabilitatii. Nu crea alt camp pentru scadenta. Data emiterii, sfarsitul perioadei facturate si datele fara legatura nu sunt substitute; nu calcula termene lipsa.
+
 Ollama: context local implicit 16K, un singur worker AI si OLLAMA_NUM_PARALLEL=1. Fara taierea tacita a textului; text integral sau maximum 4 sectiuni UTF-8 suprapuse, cu plan validat inainte de inferenta si combinare determinista. Conflictele intre sectiuni blocheaza precompletarea. Pastreaza timeout job < Horizon < Redis retry_after si timpul de oprire systemd peste durata jobului. Vezi docs/local-ai.md.
 
 Gemini optional: cheia numai in header x-goog-api-key, host HTTPS fix, fara tools sau fallback implicit. Text OCR integral cu limita explicita, JSON si dovezi validate, fara gandire interna expusa. Providerele joburilor existente nu se schimba dupa configurare. Testele forteaza GEMINI_API_KEY gol. Vezi docs/gemini.md pentru configurare, cote si conditiile de productie.

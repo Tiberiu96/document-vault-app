@@ -217,7 +217,7 @@ class DocumentProcessingTest extends TestCase
 
     public function test_invoice_without_expiry_or_status_evidence_keeps_optional_suggestions_empty(): void
     {
-        $this->readyText($this->text.' Data scadentei: 01.01.2020.');
+        $this->readyText($this->text.' Perioada facturata: 01.12.2019 - 31.12.2019.');
         $this->fakeAi(['tag_keys' => []]);
         $result = app(DocumentAiAnalysis::class)->analyze($this->document->fresh(), 'ro');
         $this->assertFalse($result['review_required']);
@@ -227,7 +227,7 @@ class DocumentProcessingTest extends TestCase
             $catalog = json_decode($request['messages'][1]['content'], true)['tag_catalog'];
 
             return str_contains($catalog['paid'], 'payment method')
-                && str_contains($request['messages'][0]['content'], 'payment due date');
+                && str_contains($request['messages'][0]['content'], 'Never substitute the issue date, billing/service period end');
         });
     }
 
@@ -242,6 +242,20 @@ class DocumentProcessingTest extends TestCase
         $this->assertSame('2027-10-16', $result['fields']['expires_on']);
         $this->assertSame('1250.50', $result['fields']['amount']);
         Http::assertSent(fn ($request) => str_contains($request['messages'][0]['content'], 'total insurance premium'));
+    }
+
+    public function test_invoice_payment_deadline_uses_existing_expiry_field_even_when_past(): void
+    {
+        $this->travelTo(Carbon::parse('2026-10-28 12:00:00', 'UTC'));
+        $this->readyText('FACTURA. Furnizor Example SRL. Total 149.99 RON. Data facturii: 16.09.2026. Ultima zi de plata: 30.09.2026. Perioada facturata: 15.09.2026 - 14.10.2026.');
+        $this->fakeAi(['issued_on' => '16.09.2026', 'expires_on' => '30.09.2026', 'tag_keys' => []]);
+        $result = app(DocumentAiAnalysis::class)->analyze($this->document->fresh(), 'ro');
+        $this->assertFalse($result['review_required']);
+        $this->assertSame('2026-09-16', $result['fields']['issued_on']);
+        $this->assertSame('2026-09-30', $result['fields']['expires_on']);
+        $this->assertContains('expired', $result['warnings']);
+        Http::assertSent(fn ($request) => str_contains($request['messages'][0]['content'], 'put the explicit payment due date')
+            && str_contains($request['format']['properties']['expires_on']['description'], 'ultima zi de plata'));
     }
 
     public function test_invalid_ai_field_diagnostic_contains_only_application_field_name(): void

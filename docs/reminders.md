@@ -96,3 +96,5 @@ document. Nu cere o a doua data si nu o suprascrie cu un camp trimis de client.
 Numai documentele fara expires_on afiseaza selectorul; datele trecute raman
 vizibile, fara activare. Eticheta orarului nu mai include fusul in paranteza;
 calculul ramane Europe/Bucharest si stocarea UTC.
+
+Campul expires_on este comun pentru data relevanta notificarii: scadenta/ultima zi de plata explicita la facturi, sfarsitul valabilitatii la polite/garantii/acte. AI nu foloseste data emiterii sau sfarsitul perioadei facturate ca substitute. O scadenta trecuta poate fi salvata, dar nu creeaza notificari viitoare. Nu se modifica retroactiv documentele existente.
