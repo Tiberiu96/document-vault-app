@@ -53,3 +53,5 @@ Actiunile secundare din UI se afiseaza ca butoane, nu linkuri subliniate: Inapoi
 Inbox web: Laravel Notifications cu workspace_id, deduplicare determinista si autorizare la fiecare citire/actiune. Citit nu rezolva reminderul. Actiunile din notificari verifica ciclul original; nu modifica un ciclu reinnoit. Polling Livewire la 30s numai in tab vizibil/online, fara WebSocket. Vezi docs/notifications.md.
 
 Backup: numai productie, oprit implicit, single-host confirmat. Snapshotul DB/fisiere cere bariera partajata HTTP/joburi si drenare inainte de copia locala; uploadul se face dupa reluarea aplicatiei. Fara rulari R2 reale pana la configurare confirmata. Retentie numai prin Restic, ultimele doua copii verificate; niciun TTL R2 arbitrar. Vezi docs/backups.md.
+
+Turnstile: oprit implicit; cand este activat, login/inregistrare/cerere reset necesita Siteverify server-side, hostname de incredere si action exact. Fara fallback automat la erori, fara tokenuri in old input/loguri, fara chei dummy in productie. Vezi docs/turnstile.md.

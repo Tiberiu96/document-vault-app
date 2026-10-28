@@ -16,6 +16,7 @@
             <div><label for="password">{{ __('registration.password') }}</label><input id="password" name="password" type="password" autocomplete="new-password" minlength="12" maxlength="72" required aria-describedby="password-hint"><small id="password-hint" class="field-hint">{{ __('registration.password_requirements') }}</small></div>
             <div><label for="password_confirmation">{{ __('registration.password_confirmation') }}</label><input id="password_confirmation" name="password_confirmation" type="password" autocomplete="new-password" minlength="12" maxlength="72" required></div>
             <div class="form-trap" aria-hidden="true"><label for="website">Website</label><input id="website" name="website" type="text" tabindex="-1" autocomplete="off"></div>
+            <x-turnstile action="register"/>
             <x-button type="submit" icon="arrow">{{ __('registration.create') }}</x-button>
         </form>
         <p class="auth-help">{{ __('registration.have_account') }} <a class="action-button" href="{{ route('login') }}">{{ __('site.nav.login') }}</a></p>

@@ -11,6 +11,7 @@
             <div><label for="password">{{ __('auth.password') }}</label><input id="password" name="password" type="password" autocomplete="current-password" required maxlength="256"></div>
             <a class="action-button" href="{{ route('password.request') }}">{{ __('account_mail.forgot_title') }}</a>
             <label class="remember"><input type="checkbox" name="remember" value="1">{{ __('auth.remember') }}</label>
+            <x-turnstile action="login"/>
             <x-button type="submit" icon="arrow">{{ __('site.nav.login') }}</x-button>
         </form>
         <p class="auth-help">{{ __('registration.no_account') }} <a class="action-button" href="{{ route('register') }}">{{ __('registration.create') }}</a></p><a class="action-button" href="{{ route('demo') }}">{{ __('site.nav.demo') }} <x-icon name="arrow" :size="16"/></a>

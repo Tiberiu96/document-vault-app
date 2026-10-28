@@ -17,6 +17,7 @@ use App\Http\Controllers\TaxonomyController;
 use App\Http\Middleware\EnsureActiveWorkspace;
 use App\Http\Middleware\EnsureAvailableLanguage;
 use App\Http\Middleware\EnsureLocalEnvironment;
+use App\Http\Middleware\VerifyTurnstile;
 use App\Services\LanguageCatalog;
 use Illuminate\Support\Facades\Route;
 use NielsNumbers\LaravelLocalizer\Facades\Localizer;
@@ -40,13 +41,13 @@ Route::translate(function () {
         Route::get(Localizer::url('verification.verify').'/{id}/{hash}', [AccountSecurityController::class, 'verify'])->whereNumber('id')->where('hash', '[a-f0-9]{40}')->middleware(['signed:relative', 'throttle:verification.verify'])->name('verification.verify');
         Route::middleware('guest')->group(function () {
             Route::get(Localizer::url('password.request'), [AccountSecurityController::class, 'forgot'])->name('password.request');
-            Route::post(Localizer::url('password.request'), [AccountSecurityController::class, 'sendReset'])->middleware('throttle:password.email')->name('password.email');
+            Route::post(Localizer::url('password.request'), [AccountSecurityController::class, 'sendReset'])->middleware(['throttle:password.email', 'throttle:turnstile.forms', VerifyTurnstile::class.':password_reset'])->name('password.email');
             Route::get(Localizer::url('password.reset').'/{token}', [AccountSecurityController::class, 'resetForm'])->name('password.reset');
             Route::post(Localizer::url('password.reset'), [AccountSecurityController::class, 'reset'])->middleware('throttle:password.reset')->name('password.update');
             Route::get(Localizer::url('login'), [AuthenticatedSessionController::class, 'create'])->name('login');
-            Route::post(Localizer::url('login'), [AuthenticatedSessionController::class, 'store'])->name('login.store');
+            Route::post(Localizer::url('login'), [AuthenticatedSessionController::class, 'store'])->middleware(['throttle:turnstile.forms', VerifyTurnstile::class.':login'])->name('login.store');
             Route::get(Localizer::url('register'), [RegisteredUserController::class, 'create'])->name('register');
-            Route::post(Localizer::url('register'), [RegisteredUserController::class, 'store'])->middleware('throttle:registration')->name('register.store');
+            Route::post(Localizer::url('register'), [RegisteredUserController::class, 'store'])->middleware(['throttle:registration', 'throttle:turnstile.forms', VerifyTurnstile::class.':register'])->name('register.store');
         });
         Route::middleware(['auth', 'auth.session'])->group(function () {
             Route::get(Localizer::url('verification.notice'), [AccountSecurityController::class, 'notice'])->name('verification.notice');

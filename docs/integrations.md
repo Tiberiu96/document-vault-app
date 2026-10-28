@@ -62,3 +62,5 @@ inchis pana la implementarea MFA, chiar daca workerii functioneaza.
 
 Providerul de email real pentru beta/productie se alege si configureaza separat,
 cu domeniu verificat, SPF/DKIM/DMARC si credentiale numai in mediul securizat.
+
+Turnstile este pregatit pe formularele publice de login/inregistrare/cerere reset, oprit implicit. Activarea si validarea reala a cheilor sunt descrise in turnstile.md; nicio conexiune reala nu este declarata verificata.

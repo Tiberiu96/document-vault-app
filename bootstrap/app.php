@@ -60,7 +60,7 @@ return Application::configure(basePath: dirname(__DIR__))
                 ], 403);
             }
         });
-        $exceptions->dontFlash(['current_password', 'password', 'password_confirmation', 'token', 'code', 'recovery_code']);
+        $exceptions->dontFlash(['current_password', 'password', 'password_confirmation', 'token', 'code', 'recovery_code', 'cf-turnstile-response']);
         $exceptions->shouldRenderJsonWhen(
             fn (Request $request) => $request->is('api/*') || $request->expectsJson(),
         );

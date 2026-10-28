@@ -22,6 +22,7 @@
                     <div><label for="password">{{ __('account_mail.new_password') }}</label><input id="password" name="password" type="password" autocomplete="new-password" required minlength="16" maxlength="72" aria-describedby="password-help"><p id="password-help" class="field-help">{{ __('account_mail.password_rules') }}</p></div>
                     <div><label for="password_confirmation">{{ __('account_mail.confirm_password') }}</label><input id="password_confirmation" name="password_confirmation" type="password" autocomplete="new-password" required minlength="16" maxlength="72"></div>
                 @endif
+                @if($mode === 'forgot')<x-turnstile action="password_reset"/>@endif
                 <x-button type="submit" icon="arrow">{{ __('account_mail.'.($mode === 'forgot' ? 'forgot_action' : 'reset_action')) }}</x-button>
             </form>
             <p class="auth-help"><a class="action-button" href="{{ route('login') }}" data-action="back"><x-icon name="back" :size="18"/>{{ __('account_mail.back_login') }}</a></p>

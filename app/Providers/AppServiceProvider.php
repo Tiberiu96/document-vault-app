@@ -73,6 +73,7 @@ class AppServiceProvider extends ServiceProvider
         RateLimiter::for('admin.mfa', fn (Request $request) => Limit::perMinute(config('admin.mfa_per_minute'))->by('admin-mfa:'.$request->user('admin')->id)->response($adminThrottle));
         // Horizon brut ramane inchis: dashboardul admin prezinta numai date sanitizate.
         Horizon::auth(fn (Request $request): bool => false);
+        RateLimiter::for('turnstile.forms', fn (Request $request) => config('turnstile.enabled') ? Limit::perMinute(10)->by('turnstile:'.$request->ip()) : Limit::none());
         RateLimiter::for('password.email', function (Request $request) {
             $email = is_string($request->input('email')) ? mb_strtolower(trim($request->input('email'))) : '';
 
