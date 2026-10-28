@@ -14,7 +14,7 @@
         <div data-scan-page-section class="scan-page-section" hidden><p>{{ __('scanner.pages') }} <span data-scan-count>0 / {{ $limits['max_pages'] }}</span></p><div data-scan-pages class="scan-thumbnails"></div></div>
     </div>
     <form data-scan-submit method="POST" action="{{ route('documents.scan-store') }}" class="scan-confirm-form">@csrf
-        @if(config('ai.enabled'))<label class="remember"><input type="checkbox" name="analyze_with_ai" value="1" checked>{{ __('processing.auto_ai') }}</label>@if(config('ai.provider') === 'groq')<p class="field-help">{{ __('scanner.remote_notice') }}</p>@endif @endif
+        @if(config('ai.enabled'))<label class="remember"><input type="checkbox" name="analyze_with_ai" value="1" checked>{{ __('processing.auto_ai') }}</label>@if(in_array(config('ai.provider'), ['groq', 'gemini'], true))<p class="field-help">{{ __('scanner.remote_notice') }}</p>@endif @endif
         <details class="scan-details"><summary>{{ __('scanner.details') }}</summary><p>{{ app(\App\Services\PlanLimitsService::class)->message() }}</p><p>{{ __('scanner.drag_hint') }}</p><p>{{ __('scanner.manual') }}</p></details>
         <div class="scan-continue"><div class="upload-progress" data-scan-loading role="status" hidden><span class="processing-spinner" aria-hidden="true"></span>{{ __('scanner.uploading') }}</div><x-button type="submit" icon="arrow" disabled>{{ __('scanner.continue') }}</x-button></div>
     </form>

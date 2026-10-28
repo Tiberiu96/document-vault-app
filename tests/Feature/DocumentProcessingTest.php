@@ -273,6 +273,24 @@ class DocumentProcessingTest extends TestCase
         });
     }
 
+    public function test_gemini_receives_full_text_in_encrypted_ai_job_and_keeps_original_provider(): void
+    {
+        config(['ai.provider' => 'gemini', 'ai.gemini.api_key' => 'fake-gemini-key', 'ai.gemini.model' => 'gemini-3.8-flash']);
+        $text = $this->text."\n".str_repeat("Conditii pentru servicii documentare.\n", 350).'FINAL_PAGE_EVIDENCE';
+        $this->readyText($text);
+        Http::fake(['generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent' => Http::response(['candidates' => [['finishReason' => 'STOP', 'content' => ['parts' => [['text' => json_encode($this->response(['tag_keys' => []]))]]]]]])]);
+        $run = app(DocumentProcessingService::class)->request($this->user, $this->document, 'ai');
+        $this->assertSame('gemini', $run->provider);
+        Queue::assertPushedOn('ai', ProcessDocument::class);
+        config(['ai.provider' => 'ollama']);
+        $this->execute($run);
+        $this->assertSame('ready', $this->document->fresh()->ai_status);
+        $this->assertSame('ollama', config('ai.provider'));
+        $this->assertFalse($run->fresh()->result['partial']);
+        Http::assertSent(fn ($request) => json_decode($request['contents'][0]['parts'][0]['text'], true)['ocr'] === $text);
+        $this->assertSame('Manual title', $this->document->fresh()->title);
+    }
+
     public function test_ollama_sections_cover_long_document_and_merge_only_supported_fields(): void
     {
         config(['ai.ollama.context_length' => 16384, 'ai.ollama.max_output_tokens' => 1024]);

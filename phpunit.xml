@@ -24,6 +24,7 @@
         <env name="TURNSTILE_ENABLED" value="false" force="true"/>
         <env name="AI_PROVIDER" value="ollama" force="true"/>
         <env name="GROQ_API_KEY" value="" force="true"/>
+        <env name="GEMINI_API_KEY" value="" force="true"/>
         <env name="APP_ENV" value="testing" force="true"/>
         <env name="APP_KEY" value="base64:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=" force="true"/>
         <env name="APP_MAINTENANCE_DRIVER" value="file"/>

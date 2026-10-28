@@ -9,6 +9,7 @@ use App\Http\Middleware\EnsureAvailableLanguage;
 use App\Models\User;
 use App\Notifications\Channels\WorkspaceDatabaseChannel;
 use App\Services\Ai\AiProviderException;
+use App\Services\Ai\GeminiProvider;
 use App\Services\Ai\GroqProvider;
 use App\Services\Ai\OllamaProvider;
 use App\Services\Backup\BackupBarrier;
@@ -41,6 +42,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(AiProviderInterface::class, fn ($app) => match (config('ai.provider')) {
             'ollama' => $app->make(OllamaProvider::class),
             'groq' => $app->make(GroqProvider::class),
+            'gemini' => $app->make(GeminiProvider::class),
             default => throw new AiProviderException('UNSUPPORTED_AI_PROVIDER'),
         });
         $this->app->bind(OcrProviderInterface::class, LocalOcrProvider::class);
