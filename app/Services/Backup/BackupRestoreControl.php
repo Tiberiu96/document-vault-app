@@ -50,7 +50,7 @@ class BackupRestoreControl
         rename($temp, $path);
     }
 
-    public function request(string $snapshot, string $scope, ?int $actor): void
+    public function request(string $snapshot, string $scope, ?int $actor): string
     {
         if (! config('backup.restore_enabled') || ! config('backup.restore_dedicated_redis') || ! in_array($scope, ['all', 'mysql', 'documents'], true)) {
             throw new \RuntimeException('RESTORE_DISABLED');
@@ -70,6 +70,8 @@ class BackupRestoreControl
             $payload = ['id' => $id, 'snapshot' => $snapshot, 'scope' => $scope, 'actor' => $actor, 'at' => now()->timestamp];
             $this->write('status', ['id' => $id, 'snapshot' => $snapshot, 'scope' => $scope, 'actor' => $actor, 'at' => now()->timestamp, 'phase' => 'queued']);
             $this->write('request', ['encrypted' => Crypt::encryptString(json_encode($payload, JSON_THROW_ON_ERROR))]);
+
+            return $id;
         } finally {
             flock($lock, LOCK_UN);
             fclose($lock);

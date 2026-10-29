@@ -51,11 +51,11 @@ class AdminBackupController extends Controller
             throw ValidationException::withMessages(['code' => 'Parola sau codul MFA este invalid. Foloseste un cod nou.']);
         }
         try {
-            app(BackupRestoreControl::class)->request($data['snapshot'], $data['scope'], $user->id);
+            $restoreId = app(BackupRestoreControl::class)->request($data['snapshot'], $data['scope'], $user->id);
         } catch (\Throwable) {
             return back()->withErrors(['backup' => 'Cererea nu a fost acceptata. Actualizeaza lista copiilor si verifica starea restaurarii.']);
         }
-        AdminAudit::record($user, 'backup.restore_requested_'.$data['scope'], 'backup', $data['snapshot']);
+        AdminAudit::record($user, 'backup.restore_requested_'.$data['scope'], 'backup', $restoreId);
 
         return back()->with('admin_status', 'Restaurare solicitata. Aplicatia va intra in mentenanta. Dupa succes vei fi deconectat; autentifica-te din nou. La esec, mentenanta ramane activa.');
     }

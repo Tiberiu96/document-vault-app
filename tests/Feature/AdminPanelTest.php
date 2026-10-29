@@ -490,10 +490,12 @@ class AdminPanelTest extends TestCase
         config(['backup.enabled' => true, 'backup.restore_enabled' => true, 'session.secure' => true]);
         $this->withoutMiddleware(PreventRequestForgery::class);
         $user = $this->administrator();
-        $this->mock(BackupRestoreControl::class)->shouldReceive('request')->once()->with(str_repeat('a', 64), 'all', $user->id);
+        $this->mock(BackupRestoreControl::class)->shouldReceive('request')->once()->with(str_repeat('a', 64), 'all', $user->id)->andReturn(str_repeat('b', 32));
         $data = ['snapshot' => str_repeat('a', 64), 'scope' => 'all', 'password' => self::PASSWORD,
             'code' => $this->otp($user), 'confirmation' => 'RESTAUREAZA', 'confirm' => '1'];
         $this->enter($user)->post('https://localhost/admin/backup/restaureaza', $data)->assertSessionHasNoErrors();
+        $this->assertDatabaseHas('admin_audit_events', ['action' => 'backup.restore_requested_all', 'target_type' => 'backup', 'target_id' => str_repeat('b', 32)]);
+        $this->assertLessThanOrEqual(60, strlen(DB::table('admin_audit_events')->where('action', 'backup.restore_requested_all')->value('target_id')));
         $this->enter($user->fresh())->post('https://localhost/admin/backup/restaureaza', $data)->assertSessionHasErrors('code');
     }
 
