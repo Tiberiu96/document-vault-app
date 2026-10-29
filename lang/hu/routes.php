@@ -1,6 +1,8 @@
 <?php
 
 return [
+    'members' => 'tagok',
+    'invitations' => 'meghivasok',
     'notifications' => 'ertesitesek',
     'notifications.read-all' => 'mind-olvasott',
     'notifications.preferences' => 'beallitasok',

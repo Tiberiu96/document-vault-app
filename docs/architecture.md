@@ -81,3 +81,7 @@ local, high, email Mailpit si actiuni web; programul aprobat este 10/3/1 zile.
 Checkpoint inbox: Laravel Notifications + Livewire pentru clopotel, polling la 30s numai in tab vizibil, centru si preferinte localizate. Migrarea 000015; detalii in notifications.md.
 
 Checkpoint backup productie: runner Restic/R2, bariera filesystem single-host pentru snapshot coerent, monitor separat si pagina admin. Configurarea externa/conexiunea si restaurarea reala raman de verificat in productie; vezi backups.md.
+
+Checkpoint colaborare: migrarea 000016, invitatii business cu token hash, email verificat,
+acceptare atomica, roluri si revocare. Notificari email high si inbox pentru primire si
+acceptare; vezi workspace-invitations.md.

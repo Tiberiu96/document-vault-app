@@ -90,6 +90,7 @@ class AppServiceProvider extends ServiceProvider
         RateLimiter::for('document.search', fn (Request $request) => Limit::perMinute(60)->by($request->user()->id));
         RateLimiter::for('reminders', fn (Request $request) => Limit::perMinute(config('reminders.changes_per_minute'))->by($request->user()->id));
         RateLimiter::for('notifications', fn (Request $request) => Limit::perMinute(30)->by($request->user()->id));
+        RateLimiter::for('invitations', fn (Request $request) => Limit::perMinute(10)->by('invitations:'.$request->user()->id));
         RateLimiter::for('taxonomy', fn (Request $request) => Limit::perMinute(30)->by($request->user()->id));
         RateLimiter::for('admin', fn (Request $request) => Limit::perMinute(30)->by($request->ip()));
         RateLimiter::for('demo', fn (Request $request) => Limit::perMinute(60)->by($request->ip()));

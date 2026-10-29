@@ -1,6 +1,8 @@
 <?php
 
 return [
+    'members' => 'membri',
+    'invitations' => 'invitatii',
     'notifications' => 'notificari',
     'notifications.read-all' => 'citeste-toate',
     'notifications.preferences' => 'preferinte',

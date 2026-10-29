@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Actions\Auth\RegisterUser;
 use App\Http\Requests\RegisterRequest;
 use App\Services\WebsiteContext;
+use App\Services\WorkspaceInvitations;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Http\Request;
@@ -26,11 +27,16 @@ class RegisteredUserController extends Controller
                 ->withInput($request->safe()->except(['password']));
         }
 
+        app(WorkspaceInvitations::class)->attachIncoming($user);
         event(new Registered($user));
         Auth::login($user);
         $request->session()->regenerate();
         $request->session()->put('active_workspace_id', $user->workspaces()
             ->where('type', $request->input('account_type') === 'pj' ? 'business' : 'personal')->value('workspaces.id'));
+
+        if (is_string($request->session()->get('pending_invitation'))) {
+            return redirect()->route('invitations.show', ['invitation' => $request->session()->get('pending_invitation')]);
+        }
 
         return redirect()->route('dashboard');
     }

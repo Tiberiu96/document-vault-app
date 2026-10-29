@@ -40,6 +40,10 @@ class AuthenticatedSessionController extends Controller
         $request->session()->regenerate();
 
         // Destinatie localizata fixa; nu accepta redirect arbitrar din input.
+        if (is_string($request->session()->get('pending_invitation'))) {
+            return redirect()->route('invitations.show', ['invitation' => $request->session()->get('pending_invitation')]);
+        }
+
         return redirect()->route('dashboard');
     }
 

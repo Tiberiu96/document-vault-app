@@ -1,6 +1,8 @@
 <?php
 
 return [
+    'members' => 'members',
+    'invitations' => 'invitations',
     'notifications' => 'notifications',
     'notifications.read-all' => 'read-all',
     'notifications.preferences' => 'preferences',

@@ -14,6 +14,8 @@ use App\Http\Controllers\RegisteredUserController;
 use App\Http\Controllers\ReminderController;
 use App\Http\Controllers\SwitchWorkspaceController;
 use App\Http\Controllers\TaxonomyController;
+use App\Http\Controllers\WorkspaceInvitationController;
+use App\Http\Controllers\WorkspaceMemberController;
 use App\Http\Middleware\EnsureActiveWorkspace;
 use App\Http\Middleware\EnsureAvailableLanguage;
 use App\Http\Middleware\EnsureLocalEnvironment;
@@ -39,6 +41,7 @@ Route::translate(function () {
         });
         Route::get(Localizer::url('demo'), [PublicPageController::class, 'demo'])->middleware('throttle:demo')->name('demo');
         Route::get(Localizer::url('verification.verify').'/{id}/{hash}', [AccountSecurityController::class, 'verify'])->whereNumber('id')->where('hash', '[a-f0-9]{40}')->middleware(['signed:relative', 'throttle:verification.verify'])->name('verification.verify');
+        Route::get(Localizer::url('invitations').'/{invitation}/{token}', [WorkspaceInvitationController::class, 'link'])->whereUuid('invitation')->where('token', '[A-Za-z0-9]{64}')->middleware('throttle:30,1')->name('invitations.link');
         Route::middleware('guest')->group(function () {
             Route::get(Localizer::url('password.request'), [AccountSecurityController::class, 'forgot'])->name('password.request');
             Route::post(Localizer::url('password.request'), [AccountSecurityController::class, 'sendReset'])->middleware(['throttle:password.email', 'throttle:turnstile.forms', VerifyTurnstile::class.':password_reset'])->name('password.email');
@@ -52,7 +55,18 @@ Route::translate(function () {
         Route::middleware(['auth', 'auth.session'])->group(function () {
             Route::get(Localizer::url('verification.notice'), [AccountSecurityController::class, 'notice'])->name('verification.notice');
             Route::post(Localizer::url('verification.send'), [AccountSecurityController::class, 'resend'])->name('verification.send');
+            Route::middleware('verified')->group(function () {
+                Route::get(Localizer::url('invitations'), [WorkspaceInvitationController::class, 'index'])->name('invitations.index');
+                Route::get(Localizer::url('invitations').'/{invitation}', [WorkspaceInvitationController::class, 'show'])->whereUuid('invitation')->name('invitations.show');
+                Route::post(Localizer::url('invitations').'/{invitation}', [WorkspaceInvitationController::class, 'accept'])->whereUuid('invitation')->middleware('throttle:invitations')->name('invitations.accept');
+            });
             Route::middleware(['verified', EnsureActiveWorkspace::class])->group(function () {
+                Route::get(Localizer::url('members'), [WorkspaceMemberController::class, 'index'])->name('members.index');
+                Route::post(Localizer::url('members'), [WorkspaceMemberController::class, 'store'])->middleware('throttle:invitations')->name('members.invite');
+                Route::post(Localizer::url('members').'/invitations/{invitation}/{action}', [WorkspaceMemberController::class, 'invitation'])->whereUuid('invitation')->where('action', 'resend|revoke')->middleware('throttle:invitations')->name('members.invitation');
+                Route::patch(Localizer::url('members').'/{member}', [WorkspaceMemberController::class, 'member'])->whereNumber('member')->middleware('throttle:invitations')->name('members.update');
+                Route::delete(Localizer::url('members').'/{member}', [WorkspaceMemberController::class, 'member'])->whereNumber('member')->middleware('throttle:invitations')->name('members.remove');
+
                 Route::get(Localizer::url('notifications'), [NotificationController::class, 'index'])->name('notifications.index');
                 Route::post(Localizer::url('notifications').'/'.Localizer::url('notifications.read-all'), [NotificationController::class, 'readAll'])->middleware('throttle:notifications')->name('notifications.read-all');
                 Route::patch(Localizer::url('notifications').'/'.Localizer::url('notifications.preferences'), [NotificationController::class, 'preferences'])->middleware('throttle:notifications')->name('notifications.preferences');

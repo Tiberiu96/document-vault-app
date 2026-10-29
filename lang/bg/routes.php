@@ -1,6 +1,8 @@
 <?php
 
 return [
+    'members' => 'chlenove',
+    'invitations' => 'pokani',
     'notifications' => 'izvestiya',
     'notifications.read-all' => 'procheti-vsichki',
     'notifications.preferences' => 'predpochitaniya',
