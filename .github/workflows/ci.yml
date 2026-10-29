@@ -1,0 +1,96 @@
+name: Vaulty CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  tests:
+    name: Teste Laravel si build CSS
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+
+    env:
+      APP_ENV: testing
+      APP_DEBUG: "false"
+      APP_KEY: "base64:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="
+      APP_URL: http://localhost
+      DB_CONNECTION: sqlite
+      DB_DATABASE: ":memory:"
+      CACHE_STORE: array
+      SESSION_DRIVER: array
+      QUEUE_CONNECTION: sync
+      MAIL_MAILER: array
+      AI_ENABLED: "false"
+      GEMINI_API_KEY: ""
+      GROQ_API_KEY: ""
+      BACKUP_ENABLED: "false"
+      TURNSTILE_ENABLED: "false"
+
+    steps:
+      - name: Descarca proiectul
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+
+      - name: Configureaza PHP 8.3
+        uses: shivammathur/setup-php@d52fc211a0436f8839a587b3b5b8efddab4744ea # v2
+        with:
+          php-version: "8.3"
+          extensions: mbstring, intl, bcmath, gd, zip, pdo_mysql, pdo_sqlite, redis, pcntl, posix
+          coverage: none
+          tools: composer:v2
+
+      - name: Instaleaza utilitarele PDF
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y qpdf poppler-utils ghostscript
+
+      - name: Pregateste mediul izolat
+        run: cp .env.example .env
+
+      - name: Valideaza Composer
+        run: composer validate --strict --no-check-publish
+
+      - name: Instaleaza dependintele
+        run: composer install --prefer-dist --no-interaction --no-progress --optimize-autoloader
+
+      - name: Verifica stilul PHP
+        run: vendor/bin/pint --test
+
+      - name: Ruleaza testele
+        run: php artisan test --compact
+
+      - name: Instaleaza Tailwind standalone
+        run: |
+          mkdir -p .tools
+          curl --fail --silent --show-error --location \
+            https://github.com/tailwindlabs/tailwindcss/releases/download/v4.3.3/tailwindcss-linux-x64 \
+            --output .tools/tailwindcss
+          echo "dc61b3ac6b8c9ca874c0cc4c57b2409791a64c5540404ca5f5367360babc313a  .tools/tailwindcss" \
+            | sha256sum --check
+          chmod +x .tools/tailwindcss
+
+      - name: Construieste CSS
+        run: composer css:build
+
+      - name: Verifica instalarea fara dependinte de dezvoltare
+        run: |
+          composer install --no-dev --prefer-dist --no-interaction --no-progress --optimize-autoloader
+          composer check-platform-reqs --no-dev
+
+      - name: Verifica cache-ul pentru productie
+        run: |
+          APP_ENV=production php artisan config:cache
+          APP_ENV=production php artisan route:cache
+          APP_ENV=production php artisan view:cache
