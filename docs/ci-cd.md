@@ -73,6 +73,15 @@ Pastreaza AUTO_DEPLOY_ENABLED absent/false pana la instalare si verificare SSH.
 Dupa true, urmatorul push main livreaza automat dupa CI verde. False opreste
 pornirile viitoare, fara sa anuleze un deploy deja pornit.
 
+## Prima verificare a livrarii automate
+
+Foloseste un commit numai de documentatie pe main pentru prima rulare completa.
+In Actions, verifica succesul joburilor CI si Deploy productie, inclusiv mesajul
+`Deploy reusit: SHA`. Un job verde cu `deploy omis` nu confirma livrarea.
+Pe VM, `git rev-parse HEAD` trebuie sa corespunda commitului testat; verifica apoi
+HTTPS /up si starea FPM, Horizon si scheduler. Nu executa git pull manual in timpul
+acestui test: actualizarea trebuie facuta de CD.
+
 ## Esecuri
 
 Inainte de down, refuzul nu modifica aplicatia. Dupa down, un esec pastreaza
