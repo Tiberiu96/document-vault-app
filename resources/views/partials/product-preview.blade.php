@@ -1,4 +1,4 @@
-<div class="product-preview" role="img" aria-label="{{ __('site.common.preview') }} — {{ __('site.common.demo') }}">
+<div class="product-preview" role="img" aria-label="{{ __('site.common.preview') }} — {{ __('site.preview_ui.example') }}">
     <div class="preview-chrome"><span></span><span></span><span></span><p>{{ config('app.name') }} / {{ __('site.common.personal') }}</p><x-icon name="shield" :size="12"/></div>
     <div class="preview-shell">
         <aside class="preview-sidebar"><strong>{{ config('app.name') }}<b>.</b></strong><div class="preview-workspace"><span>P</span>{{ __('site.common.personal') }}<small>⌄</small></div>
@@ -7,8 +7,8 @@
         </aside>
         <div class="preview-main">
             <div class="preview-search"><x-icon name="search" :size="12"/>{{ __('site.common.search') }}<span>⌘ K</span></div>
-            <span class="eyebrow">{{ __('site.demo.greeting') }}</span>
-            <h2>{{ __('site.demo.title') }}</h2><p class="preview-subtitle">{{ __('site.demo.subtitle') }}</p>
+            <span class="eyebrow">{{ __('site.preview_ui.greeting') }}</span>
+            <h2>{{ __('site.preview_ui.title') }}</h2><p class="preview-subtitle">{{ __('site.preview_ui.subtitle') }}</p>
             <div class="preview-stats">
                 @foreach([['document','4','total'],['database','2,4 MB','storage'],['bell','1','active']] as [$icon,$value,$label])
                 <div><span class="mini-icon {{ $icon }}"><x-icon :name="$icon" :size="15"/></span><strong>{{ $value }}</strong><small>{{ __('site.common.'.$label) }}</small></div>
@@ -21,5 +21,5 @@
             </div>
         </div>
     </div>
-    <div class="preview-caption"><span class="live-dot"></span>{{ __('site.common.preview') }}<span>{{ __('site.common.demo') }}</span></div>
+    <div class="preview-caption"><span class="live-dot"></span>{{ __('site.common.preview') }}<span>{{ __('site.preview_ui.example') }}</span></div>
 </div>

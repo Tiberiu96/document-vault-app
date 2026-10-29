@@ -15,7 +15,6 @@ return [
     'features' => 'features',
     'pricing' => 'pricing',
     'faq' => 'faq',
-    'demo' => 'demo',
     'login' => 'login',
     'dashboard' => 'dashboard',
     'logout' => 'logout',

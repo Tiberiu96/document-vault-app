@@ -3,7 +3,7 @@
     <summary aria-label="{{ __('site.nav.menu') }}"><x-icon name="menu" :size="23"/></summary>
     <div class="mobile-menu-panel">
         <nav class="mobile-menu-links" aria-label="{{ __('site.nav.menu') }}">
-            @foreach(['features', 'pricing', 'faq', 'demo'] as $item)<a href="{{ route($item) }}" @if($page === $item) aria-current="page" @endif>{{ __('site.nav.'.$item) }}</a>@endforeach
+            @foreach(['features', 'pricing', 'faq'] as $item)<a href="{{ route($item) }}" @if($page === $item) aria-current="page" @endif>{{ __('site.nav.'.$item) }}</a>@endforeach
         </nav>
         <div class="mobile-menu-languages"><x-language-switcher :languages="$languages"/></div>
         @auth

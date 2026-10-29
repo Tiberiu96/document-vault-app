@@ -13,6 +13,7 @@ use App\Services\Admin\AdminAudit;
 use App\Services\Admin\OperationalSummary;
 use App\Services\Backup\BackupState;
 use App\Services\Documents\DocumentProcessingService;
+use Carbon\CarbonImmutable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -21,9 +22,13 @@ use Illuminate\Validation\ValidationException;
 
 class AdminDashboardController extends Controller
 {
-    public function index(OperationalSummary $operations)
+    public function index(Request $request, OperationalSummary $operations)
     {
-        $runs = ProcessingRun::where('status', 'failed')->latest()->limit(15)->get(['id', 'document_id', 'workspace_id', 'kind', 'attempts', 'duration_ms', 'error_code', 'created_at']);
+        $filters = $request->validate(['failed_kind' => ['nullable', 'in:ocr,ai'], 'failed_workspace' => ['nullable', 'integer', 'min:1'], 'audit_actor' => ['nullable', 'integer', 'min:1']]);
+        $runs = ProcessingRun::where('status', 'failed')
+            ->when($filters['failed_kind'] ?? null, fn ($q, $kind) => $q->where('kind', $kind))
+            ->when($filters['failed_workspace'] ?? null, fn ($q, $id) => $q->where('workspace_id', $id))
+            ->latest()->orderByDesc('id')->paginate(15, ['id', 'document_id', 'workspace_id', 'kind', 'attempts', 'duration_ms', 'error_code', 'created_at'], 'failed_page')->withQueryString();
         $actor = Auth::guard('admin')->user();
         foreach ($runs as $run) {
             $doc = Document::find($run->document_id, ['id', 'workspace_id', 'uploaded_by', 'status']);
@@ -33,7 +38,7 @@ class AdminDashboardController extends Controller
         return view('admin.dashboard', [
             'stats' => ['Utilizatori' => User::count(), 'Spatii de lucru' => Workspace::count(), 'Documente confirmate' => Document::where('status', 'stored')->count(), 'Stocare utilizata (MB)' => number_format(Workspace::sum('storage_used_bytes') / 1048576, 2), 'Remindere active' => Reminder::where('status', 'active')->count(), 'Joburi esuate' => DB::table('failed_jobs')->count()],
             'queues' => $operations->queues(), 'runs' => $runs,
-            'events' => DB::table('admin_audit_events')->latest('id')->limit(15)->get(['id', 'actor_id', 'action', 'target_type', 'target_id', 'created_at']),
+            'events' => DB::table('admin_audit_events')->when($filters['audit_actor'] ?? null, fn ($q, $id) => $q->where('actor_id', $id))->latest('id')->paginate(15, ['id', 'actor_id', 'action', 'target_type', 'target_id', 'created_at'], 'audit_page')->withQueryString(), 'filters' => $filters,
         ]);
     }
 
@@ -44,30 +49,50 @@ class AdminDashboardController extends Controller
         return view('admin.backup', ['enabled' => app()->environment('production') && config('backup.enabled'), 'state' => array_intersect_key(app(BackupState::class)->read(), array_flip($allowed))]);
     }
 
-    public function notifications()
+    public function notifications(Request $request)
     {
+        $filters = $request->validate(['status' => ['nullable', 'in:pending,processing,sent,cancelled,skipped,uncertain'], 'workspace_id' => ['nullable', 'integer', 'min:1'], 'from' => ['nullable', 'date_format:Y-m-d'], 'to' => ['nullable', 'date_format:Y-m-d', ...($request->filled('from') ? ['after_or_equal:from'] : [])]]);
         $deliveries = ReminderDelivery::query()->join('document_reminders', 'document_reminders.id', '=', 'reminder_deliveries.reminder_id')
             ->select(['reminder_deliveries.id', 'document_reminders.workspace_id', 'document_reminders.user_id', 'reminder_deliveries.status', 'reminder_deliveries.scheduled_for', 'reminder_deliveries.in_app_at', 'reminder_deliveries.email_sent_at', 'reminder_deliveries.attempts'])
-            ->orderByDesc('reminder_deliveries.scheduled_for')->paginate(25);
+            ->when($filters['status'] ?? null, fn ($q, $status) => $q->where('reminder_deliveries.status', $status))
+            ->when($filters['workspace_id'] ?? null, fn ($q, $id) => $q->where('document_reminders.workspace_id', $id))
+            ->when($filters['from'] ?? null, fn ($q, $date) => $q->where('reminder_deliveries.scheduled_for', '>=', CarbonImmutable::parse($date, config('vault.display_timezone'))->utc()))
+            ->when($filters['to'] ?? null, fn ($q, $date) => $q->where('reminder_deliveries.scheduled_for', '<', CarbonImmutable::parse($date, config('vault.display_timezone'))->addDay()->utc()))
+            ->orderByDesc('reminder_deliveries.scheduled_for')->orderByDesc('reminder_deliveries.id')->paginate(25)->withQueryString();
 
-        return view('admin.notifications', ['deliveries' => $deliveries]);
+        return view('admin.notifications', ['deliveries' => $deliveries, 'filters' => $filters]);
     }
 
     public function users(Request $request)
     {
-        $q = $request->validate(['q' => ['nullable', 'string', 'max:100']])['q'] ?? '';
+        $filters = $request->validate(['q' => ['nullable', 'string', 'max:100'], 'verified' => ['nullable', 'in:yes,no'], 'role' => ['nullable', 'in:client,admin']]);
+        $q = $filters['q'] ?? '';
         $users = User::query()->select(['id', 'name', 'email', 'email_verified_at', 'is_super_admin', 'admin_mfa_confirmed_at', 'created_at']);
+        if (! empty($filters['verified'])) {
+            $filters['verified'] === 'yes' ? $users->whereNotNull('email_verified_at') : $users->whereNull('email_verified_at');
+        }
+        if (! empty($filters['role'])) {
+            $users->where('is_super_admin', $filters['role'] === 'admin');
+        }
         if ($q !== '') {
             $term = '%'.addcslashes($q, '%_\\').'%';
             $users->where(fn ($query) => $query->where('name', 'like', $term)->orWhere('email', 'like', $term));
         }
 
-        return view('admin.users', ['users' => $users->latest()->paginate(25)->withQueryString(), 'q' => $q]);
+        return view('admin.users', ['users' => $users->latest()->orderByDesc('id')->paginate(25)->withQueryString(), 'q' => $q, 'filters' => $filters]);
     }
 
-    public function workspaces()
+    public function workspaces(Request $request)
     {
-        return view('admin.workspaces', ['workspaces' => Workspace::with('owner:id,name,email')->withCount('members')->latest()->paginate(25)]);
+        $filters = $request->validate(['q' => ['nullable', 'string', 'max:100'], 'type' => ['nullable', 'in:personal,business'], 'plan' => ['nullable', 'in:free,pro']]);
+        $query = Workspace::with('owner:id,name,email')->withCount('members');
+        if (! empty($filters['q'])) {
+            $term = '%'.addcslashes($filters['q'], '%_\\').'%';
+            $query->where(fn ($q) => $q->where('name', 'like', $term)->orWhereHas('owner', fn ($owner) => $owner->where('name', 'like', $term)->orWhere('email', 'like', $term)));
+        }
+        $query->when($filters['type'] ?? null, fn ($q, $type) => $q->where('type', $type))->when($filters['plan'] ?? null, fn ($q, $plan) => $q->where('plan_code', $plan));
+
+        return view('admin.workspaces', ['workspaces' => $query->latest()->orderByDesc('id')->paginate(25)->withQueryString(), 'filters' => $filters]);
     }
 
     public function retry(Request $request, string $run, DocumentProcessingService $processing)

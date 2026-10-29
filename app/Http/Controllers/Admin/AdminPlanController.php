@@ -50,11 +50,14 @@ class AdminPlanController extends Controller
         return back()->with('admin_status', 'Planul a fost actualizat. Documentele si consumul existent au fost pastrate.');
     }
 
-    public function workspace(Workspace $workspace, PlanLimitsService $limits)
+    public function workspace(Request $request, Workspace $workspace, PlanLimitsService $limits)
     {
+        $filters = $request->validate(['kind' => ['nullable', 'in:ocr,ai'], 'status' => ['nullable', 'in:queued,running,succeeded,failed']]);
+
         return view('admin.workspace-plan', ['workspace' => $workspace, 'usage' => $limits->usage($workspace), 'proEnabled' => $limits->definition('pro')['enabled'],
             'processing' => DB::table('processing_runs')->where('workspace_id', $workspace->id)->where('period', now('UTC')->startOfMonth()->toDateString())
-                ->selectRaw('kind, provider, status, SUM(units) as units, SUM(attempts) as attempts')->groupBy('kind', 'provider', 'status')->get()]);
+                ->when($filters['kind'] ?? null, fn ($q, $kind) => $q->where('kind', $kind))->when($filters['status'] ?? null, fn ($q, $status) => $q->where('status', $status))
+                ->selectRaw('kind, provider, status, SUM(units) as units, SUM(attempts) as attempts')->groupBy('kind', 'provider', 'status')->orderBy('kind')->orderBy('provider')->orderBy('status')->paginate(20)->withQueryString(), 'filters' => $filters]);
     }
 
     public function assign(Request $request, Workspace $workspace, PlanLimitsService $limits)

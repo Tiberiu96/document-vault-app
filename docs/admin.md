@@ -90,3 +90,12 @@ Executa seederele initiale la instalare; rerularea lor poate recrea elemente
 predefinite sterse intentionat din catalog. Nu sunt parte din fiecare git pull.
 
 Livrari notificari: /admin/notificari afiseaza paginat programarea, starea, destinatarii prin ID si rezultatul in-app/email, fara continut privat.
+
+Liste si filtre: spatii (nume/proprietar/email, tip, plan atribuit), utilizatori
+(nume/email, confirmare email, rol global), livrari (stare, ID spatiu, interval
+programare), catalog (nume/cheie si tip), limbi (nume/cod si disponibilitate).
+Procesarile esuate si auditul au filtre si paginatoare independente failed_page/audit_page.
+Tabelul agregat de consum are filtru tip/stare si paginare. Listele pastreaza query-ul
+filtrelor, folosesc ordine stabila si nu schimba permisiunile sau datele afisate.
+Tabelele admin impun incadrarea textului in celula; cel de spatii are coloane
+proportionale si derulare orizontala pe ecrane inguste.

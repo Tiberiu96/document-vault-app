@@ -1,11 +1,16 @@
 <?php
 
 return [
+    'preview_ui' => [
+        'title' => 'Documentele tale',
+        'subtitle' => 'Un loc pentru lucrurile importante.',
+        'greeting' => 'SPATIUL TAU, IN ORDINE',
+        'example' => 'Exemplu de interfata',
+    ],
     'nav' => [
         'features' => 'Functionalitati',
         'pricing' => 'Planuri',
         'faq' => 'Intrebari frecvente',
-        'demo' => 'Vezi demo',
         'home' => 'Acasa',
         'language' => 'Limba interfetei',
         'menu' => 'Meniu',
@@ -22,10 +27,9 @@ return [
         'description' => 'Un spatiu pentru actele, facturile si lucrurile care conteaza. Gandit sa aduca simplitate in viata personala si in afacerea ta.',
         'cta' => 'Exploreaza Vaulty',
         'secondary' => 'Descopera ideea',
-        'note' => 'In dezvoltare. Poti explora acum interfata demonstrativa.',
+        'note' => 'Documente private, OCR si remindere intr-un singur loc.',
     ],
     'common' => [
-        'demo' => 'DEMO INTERACTIV',
         'preview' => 'Previzualizare produs',
         'personal' => 'Personal',
         'workspace' => 'Spatiu personal',
@@ -70,7 +74,7 @@ return [
             'title' => 'Timp pentru ce conteaza',
             'text' => 'Remindere pentru scadente si expirari, intr-un singur loc.',
         ],
-        'status' => 'Functionalitati planificate. Demo-ul ilustreaza directia produsului.',
+        'status' => 'Organizare, OCR si remindere pentru documentele tale.',
     ],
     'life' => [
         'kicker' => 'PENTRU VIATA TA. PENTRU AFACEREA TA.',
@@ -102,27 +106,13 @@ intotdeauna la indemana.',
     'faq' => [
         'title' => 'Cateva lucruri, pe scurt.',
         'q1' => 'Pot incarca deja documente?',
-        'a1' => 'Inregistrarea si autentificarea sunt disponibile. Uploadul documentelor urmeaza intr-o etapa viitoare; demo-ul foloseste doar date fictive.',
+        'a1' => 'Da. Creeaza un cont pentru a incarca documente private. Textul este extras prin OCR, iar analiza AI este optionala. Verifica informatiile propuse inainte de salvare.',
         'q2' => 'Va fi obligatorie folosirea AI?',
         'a2' => 'Nu. Analiza AI va fi optionala. Informatiile propuse vor putea fi verificate si corectate manual.',
         'q3' => 'Va exista aplicatie pentru telefon?',
-        'a3' => 'Aplicatiile Android si iOS sunt planificate. Deocamdata poti explora demo-ul web, inclusiv de pe telefon.',
+        'a3' => 'Poti folosi aplicatia web de pe telefon, inclusiv scannerul. Aplicatiile native Android si iOS sunt planificate.',
         'q4' => 'Ce limbi sunt disponibile?',
         'a4' => 'Interfata este disponibila in romana, engleza, maghiara si bulgara. Limba documentelor ramane independenta de limba interfetei.',
-    ],
-    'demo' => [
-        'title' => 'Documentele tale',
-        'subtitle' => 'Un loc pentru lucrurile importante.',
-        'notice' => 'Demo cu date fictive. Nu incarca documente personale. Scanarea si procesarea nu sunt inca disponibile.',
-        'scan' => 'Scaneaza',
-        'upload' => 'Incarca fisier',
-        'unavailable' => 'Disponibil intr-o etapa viitoare',
-        'search' => 'Cauta',
-        'reset' => 'Reseteaza',
-        'allcategories' => 'Toate categoriile',
-        'empty' => 'Niciun document demonstrativ gasit.',
-        'greeting' => 'BINE AI VENIT IN DEMO',
-        'storage' => 'Date ilustrative',
     ],
     'documents' => [
         'energy' => 'Factura energie electrica',
@@ -141,7 +131,7 @@ intotdeauna la indemana.',
     'seo' => [
         'home' => [
             'title' => 'Documentele importante, la locul lor',
-            'description' => 'Descopera Vaulty, proiectul pentru organizarea documentelor personale si business. Exploreaza demo-ul si planurile pentru scanare, OCR si remindere.',
+            'description' => 'Organizeaza documentele personale si ale firmei in Vaulty: stocare privata, scanare, OCR, analiza AI optionala si remindere.',
         ],
         'features' => [
             'title' => 'Functionalitati pentru o viata mai organizata',
@@ -154,10 +144,6 @@ intotdeauna la indemana.',
         'faq' => [
             'title' => 'Intrebari frecvente',
             'description' => 'Raspunsuri despre stadiul Vaulty, disponibilitatea documentelor, analiza AI optionala, limbile si aplicatiile mobile.',
-        ],
-        'demo' => [
-            'title' => 'Demo documente',
-            'description' => 'Exploreaza interfata demonstrativa Vaulty cu documente fictive.',
         ],
         'login' => [
             'title' => 'Autentificare',

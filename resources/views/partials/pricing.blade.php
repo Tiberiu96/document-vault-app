@@ -7,7 +7,7 @@
             <h3>{{ __('site.pricing.'.($plan === 'free' ? 'proposed' : 'soon')) }}</h3>
             <p class="plan-price">{{ __('site.pricing.tba') }}</p>
             <ul>@foreach($plan === 'free' ? ['pages','size','quotas'] : ($plan === 'business' ? ['team','more'] : ['more','quotas']) as $benefit)<li><x-icon name="check" :size="16"/>{{ __('site.pricing.'.$benefit) }}</li>@endforeach</ul>
-            <x-button :href="route('demo')" :variant="$plan === 'personal' ? 'primary' : 'outline'" icon="arrow">{{ __('site.nav.demo') }}</x-button>
+            <x-button :href="(auth()->check() ? route('dashboard') : route('register'))" :variant="$plan === 'personal' ? 'primary' : 'outline'" icon="arrow">{{ (auth()->check() ? __('site.nav.account') : __('registration.create')) }}</x-button>
         </article>
         @endforeach
     </div>

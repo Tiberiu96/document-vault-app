@@ -14,7 +14,7 @@
             <x-turnstile action="login"/>
             <x-button type="submit" icon="arrow">{{ __('site.nav.login') }}</x-button>
         </form>
-        <p class="auth-help">{{ __('registration.no_account') }} <a class="action-button" href="{{ route('register') }}">{{ __('registration.create') }}</a></p><a class="action-button" href="{{ route('demo') }}">{{ __('site.nav.demo') }} <x-icon name="arrow" :size="16"/></a>
+        <p class="auth-help">{{ __('registration.no_account') }} <a class="action-button" href="{{ route('register') }}">{{ __('registration.create') }}</a></p>
     </div>
 </section>
 @endsection

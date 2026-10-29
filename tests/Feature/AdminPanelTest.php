@@ -411,4 +411,54 @@ class AdminPanelTest extends TestCase
         $this->assertGuest('web');
         $this->assertGuest('admin');
     }
+
+    public function test_workspace_filters_keep_pagination_and_long_names(): void
+    {
+        $admin = $this->administrator();
+        $owner = User::factory()->create();
+        for ($i = 0; $i < 26; $i++) {
+            Workspace::forceCreate(['owner_id' => $owner->id, 'type' => 'business', 'name' => 'Potrivire '.str_repeat('contracte importante ', 5).$i]);
+        }
+        Workspace::forceCreate(['owner_id' => $owner->id, 'type' => 'business', 'name' => 'Exclus', 'plan_code' => 'pro']);
+        $this->enter($admin);
+        $query = '/admin/spatii?q=Potrivire&type=business&plan=free';
+        $response = $this->get($query)->assertOk()->assertViewHas('workspaces', fn ($rows) => $rows->total() === 26 && $rows->count() === 25);
+        $rows = $response->viewData('workspaces');
+        $this->assertStringContainsString('type=business', $rows->nextPageUrl());
+        $this->assertStringContainsString('plan=free', $rows->nextPageUrl());
+        $this->get($query.'&page=2')->assertOk()->assertViewHas('workspaces', fn ($rows) => $rows->count() === 1);
+        $this->get('/admin/spatii?type=invalid')->assertSessionHasErrors('type');
+    }
+
+    public function test_user_filters_and_pagination_exclude_other_roles_and_verified_accounts(): void
+    {
+        User::factory()->count(26)->create(['name' => 'Client cautat', 'email_verified_at' => null]);
+        User::factory()->create(['name' => 'Client cautat', 'email_verified_at' => now()]);
+        $this->enter($this->administrator());
+        $response = $this->get('/admin/utilizatori?q=cautat&verified=no&role=client')->assertOk()->assertViewHas('users', fn ($rows) => $rows->total() === 26 && $rows->count() === 25);
+        $this->assertStringContainsString('verified=no', $response->viewData('users')->nextPageUrl());
+        $this->get('/admin/utilizatori?q=cautat&verified=no&role=client&page=2')->assertViewHas('users', fn ($rows) => $rows->count() === 1);
+    }
+
+    public function test_dashboard_tables_have_independent_pagination_and_filters(): void
+    {
+        $admin = $this->administrator();
+        $document = $this->document(User::factory()->create());
+        for ($i = 0; $i < 16; $i++) {
+            ProcessingRun::forceCreate(['workspace_id' => $document->workspace_id, 'document_id' => $document->id, 'requested_by' => $document->uploaded_by, 'kind' => 'ai', 'provider' => 'fake', 'status' => 'failed', 'units' => 1, 'period' => now('UTC')->startOfMonth()->toDateString(), 'base_version' => 0, 'locale' => 'ro']);
+            DB::table('admin_audit_events')->insert(['actor_id' => $admin->id, 'action' => 'plan.limits_updated', 'created_at' => now()]);
+        }
+        $this->enter($admin);
+        $this->get('/admin?failed_kind=ai&audit_actor='.$admin->id)->assertOk()->assertViewHas('runs', fn ($rows) => $rows->count() === 15)->assertViewHas('events', fn ($rows) => $rows->count() === 15);
+        $this->get('/admin?failed_kind=ai&audit_actor='.$admin->id.'&failed_page=2&audit_page=2')->assertOk()->assertViewHas('runs', fn ($rows) => $rows->count() === 1)->assertViewHas('events', fn ($rows) => $rows->count() === 1);
+        $this->get('/admin?failed_kind=ocr')->assertViewHas('runs', fn ($rows) => $rows->total() === 0);
+    }
+
+    public function test_delivery_filters_accept_standalone_end_date_and_reject_invalid_ranges(): void
+    {
+        $this->enter($this->administrator());
+        $this->get('/admin/notificari?status=uncertain&workspace_id=1&to=2026-12-31')->assertOk();
+        $this->get('/admin/notificari?status=invalid')->assertSessionHasErrors('status');
+        $this->get('/admin/notificari?from=2026-12-31&to=2026-01-01')->assertSessionHasErrors('to');
+    }
 }

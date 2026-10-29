@@ -4,9 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Language;
 use Database\Seeders\LanguageSeeder;
-use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\RateLimiter;
 use Tests\TestCase;
 
 class PublicPagesTest extends TestCase
@@ -52,11 +50,10 @@ class PublicPagesTest extends TestCase
             ->assertSee('application/ld+json', false)->assertSee('og:image', false)->assertSee('twitter:card', false);
     }
 
-    public function test_production_public_page_is_indexable_but_demo_and_health_are_not(): void
+    public function test_production_public_page_is_indexable_but_health_is_not(): void
     {
         $this->app->detectEnvironment(fn () => 'production');
         $this->get('/ro')->assertOk()->assertHeaderMissing('X-Robots-Tag')->assertSee('content="index, follow"', false);
-        $this->get('/ro/demo')->assertOk()->assertHeader('X-Robots-Tag', 'noindex, nofollow')->assertSee('content="noindex, nofollow"', false);
         $this->get('/up')->assertHeader('X-Robots-Tag', 'noindex, nofollow');
     }
 
@@ -89,19 +86,14 @@ class PublicPagesTest extends TestCase
         $this->get('/llms.txt')->assertOk()->assertSee('Currently in development')->assertDontSee('/admin')->assertDontSee('DB_PASSWORD');
     }
 
-    public function test_demo_search_and_category_filters_use_only_demo_data(): void
+    public function test_demo_routes_and_links_are_removed_in_every_language(): void
     {
-        $this->get('/ro/demo?q=energie')->assertOk()->assertViewHas('documents', fn ($documents) => $documents->count() === 1 && $documents->first()['key'] === 'energy');
-        $this->get('/en/demo?category=contracts')->assertOk()->assertViewHas('documents', fn ($documents) => $documents->count() === 1 && $documents->first()['key'] === 'rent');
-        $this->get('/hu/bemutato?q=nonexistent')->assertOk()->assertSee('Nem található bemutatódokumentum.');
-        $this->assertDatabaseCount('users', 0);
-        $this->assertDatabaseCount('workspaces', 0);
-    }
-
-    public function test_demo_input_is_validated_and_html_is_escaped(): void
-    {
-        $this->from('/ro/demo')->get('/ro/demo?q='.str_repeat('x', 101))->assertRedirect('/ro/demo')->assertSessionHasErrors('q');
-        $this->get('/ro/demo?q='.urlencode('<script>alert(1)</script>'))->assertOk()->assertDontSee('<script>alert(1)</script>', false);
+        foreach (['ro/demo', 'en/demo', 'hu/bemutato', 'bg/demo'] as $path) {
+            $this->get('/'.$path)->assertNotFound();
+        }
+        foreach (['ro', 'en', 'hu', 'bg'] as $locale) {
+            $this->get('/'.$locale)->assertOk()->assertDontSee('/demo')->assertDontSee('/bemutato')->assertDontSee('site.preview_ui');
+        }
     }
 
     public function test_language_switcher_keeps_current_translated_page(): void
@@ -117,12 +109,5 @@ class PublicPagesTest extends TestCase
         $this->seed(LanguageSeeder::class);
         $this->assertDatabaseCount('languages', 4);
         $this->assertFalse(Language::where('locale', 'hu')->first()->is_active);
-    }
-
-    public function test_demo_search_returns_429_when_the_limit_is_reached(): void
-    {
-        RateLimiter::for('demo', fn () => Limit::perMinute(1)->by('demo-test'));
-        $this->get('/ro/demo')->assertOk();
-        $this->get('/ro/demo?q=energie')->assertStatus(429)->assertHeader('Retry-After');
     }
 }

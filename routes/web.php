@@ -40,7 +40,6 @@ Route::translate(function () {
             Route::post(Localizer::url('ai.test'), [LocalAiController::class, 'store'])->middleware('throttle:local.ai')->name('ai.run');
             Route::get(Localizer::url('ai.test').'/{run}', [LocalAiController::class, 'status'])->whereUuid('run')->middleware('throttle:local.ai.status')->name('ai.status');
         });
-        Route::get(Localizer::url('demo'), [PublicPageController::class, 'demo'])->middleware('throttle:demo')->name('demo');
         Route::get(Localizer::url('verification.verify').'/{id}/{hash}', [AccountSecurityController::class, 'verify'])->whereNumber('id')->where('hash', '[a-f0-9]{40}')->middleware(['signed:relative', 'throttle:verification.verify'])->name('verification.verify');
         Route::get(Localizer::url('invitations').'/{invitation}/{token}', [WorkspaceInvitationController::class, 'link'])->whereUuid('invitation')->where('token', '[A-Za-z0-9]{64}')->middleware('throttle:30,1')->name('invitations.link');
         Route::middleware('guest')->group(function () {

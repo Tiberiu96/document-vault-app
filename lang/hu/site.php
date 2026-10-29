@@ -1,11 +1,16 @@
 <?php
 
 return [
+    'preview_ui' => [
+        'title' => 'A dokumentumaid',
+        'subtitle' => 'Egy hely a fontos dolgoknak.',
+        'greeting' => 'RENDEZETT MUNKATERÜLET',
+        'example' => 'Felületi példa',
+    ],
     'nav' => [
         'features' => 'Funkciók',
         'pricing' => 'Csomagok',
         'faq' => 'Gyakori kérdések',
-        'demo' => 'Bemutató',
         'home' => 'Kezdőlap',
         'language' => 'Felület nyelve',
         'menu' => 'Menü',
@@ -22,10 +27,9 @@ return [
         'description' => 'Egy hely az iratoknak, számláknak és mindannak, ami fontos. A magánélet és a vállalkozás egyszerűbbé tételére tervezve.',
         'cta' => 'Fedezd fel a Vaultyt',
         'secondary' => 'Ismerd meg az ötletet',
-        'note' => 'Fejlesztés alatt. A szemléltető felület már felfedezhető.',
+        'note' => 'Privát dokumentumok, OCR és emlékeztetők egy helyen.',
     ],
     'common' => [
-        'demo' => 'INTERAKTÍV BEMUTATÓ',
         'preview' => 'Termékelőnézet',
         'personal' => 'Személyes',
         'workspace' => 'Személyes munkaterület',
@@ -70,7 +74,7 @@ return [
             'title' => 'Idő arra, ami fontos',
             'text' => 'Emlékeztetők határidőkre és lejáratokra, egy helyen.',
         ],
-        'status' => 'Tervezett funkciók. A bemutató a termék tervezett irányát szemlélteti.',
+        'status' => 'Rendszerezés, OCR és emlékeztetők a dokumentumaidhoz.',
     ],
     'life' => [
         'kicker' => 'AZ ÉLETEDHEZ. A VÁLLALKOZÁSODHOZ.',
@@ -102,27 +106,13 @@ mindig kéznél.',
     'faq' => [
         'title' => 'Néhány dolog, röviden.',
         'q1' => 'Már feltölthetek dokumentumokat?',
-        'a1' => 'A regisztráció és a bejelentkezés már elérhető. A dokumentumfeltöltés későbbi szakaszban érkezik; a bemutató csak fiktív adatokat használ.',
+        'a1' => 'Igen. Hozz létre fiókot privát dokumentumok feltöltéséhez. Az OCR kinyeri a szöveget, az AI-elemzés opcionális. Mentés előtt ellenőrizd a javaslatokat.',
         'q2' => 'Kötelező lesz az AI használata?',
         'a2' => 'Nem. Az AI-elemzés választható lesz. A javasolt információk kézzel ellenőrizhetők és javíthatók lesznek.',
         'q3' => 'Lesz mobilalkalmazás?',
-        'a3' => 'Android- és iOS-alkalmazásokat tervezünk. Addig a reszponzív webes bemutatót telefonon is felfedezheted.',
+        'a3' => 'A webalkalmazás telefonon is használható, a szkennerrel együtt. Natív Android- és iOS-alkalmazásokat tervezünk.',
         'q4' => 'Milyen nyelvek érhetők el?',
         'a4' => 'A felület románul, angolul, magyarul és bolgárul érhető el. A dokumentumok nyelve független a felület nyelvétől.',
-    ],
-    'demo' => [
-        'title' => 'A dokumentumaid',
-        'subtitle' => 'Egy hely a fontos dolgoknak.',
-        'notice' => 'Bemutató fiktív adatokkal. Ne tölts fel személyes dokumentumokat. A szkennelés és feldolgozás még nem érhető el.',
-        'scan' => 'Szkennelés',
-        'upload' => 'Fájl feltöltése',
-        'unavailable' => 'Egy későbbi szakaszban lesz elérhető',
-        'search' => 'Keresés',
-        'reset' => 'Alaphelyzet',
-        'allcategories' => 'Összes kategória',
-        'empty' => 'Nem található bemutatódokumentum.',
-        'greeting' => 'ÜDVÖZLÜNK A BEMUTATÓBAN',
-        'storage' => 'Szemléltető adatok',
     ],
     'documents' => [
         'energy' => 'Villanyszámla',
@@ -141,7 +131,7 @@ mindig kéznél.',
     'seo' => [
         'home' => [
             'title' => 'Fontos dokumentumok, a helyükön',
-            'description' => 'Ismerd meg a Vaultyt, a személyes és üzleti dokumentumok rendszerezésére készülő terméket. Fedezd fel a bemutatót és a tervezett funkciókat.',
+            'description' => 'Személyes és céges dokumentumok rendszerezése a Vaultyval: privát tárhely, szkennelés, OCR, opcionális AI és emlékeztetők.',
         ],
         'features' => [
             'title' => 'Funkciók egy rendezettebb élethez',
@@ -154,10 +144,6 @@ mindig kéznél.',
         'faq' => [
             'title' => 'Gyakori kérdések',
             'description' => 'Válaszok a Vaulty fejlesztéséről, a feltöltésről, AI-elemzésről, nyelvekről és mobilalkalmazásokról.',
-        ],
-        'demo' => [
-            'title' => 'Dokumentumbemutató',
-            'description' => 'Fedezd fel a Vaulty szemléltető felületét fiktív dokumentumokkal.',
         ],
         'login' => [
             'title' => 'Bejelentkezés',

@@ -5,7 +5,7 @@ Platforma pentru documente personale si business, dezvoltata incremental cu Lara
 ## Disponibil acum
 
 - Pagina publica, functionalitati, planuri si FAQ in romana fara diacritice, engleza, maghiara si bulgara.
-- Demo cu date fictive, cautare si filtre; nu incarca sau proceseaza fisiere reale.
+- Interfata publica si biblioteca privata, cu upload, OCR, AI optional si remindere.
 - Inregistrare PF/PJ cu creare atomica user/workspaces/company, login/logout, sesiuni regenerate si rate limiting.
 - Panou privat si selectare de workspace, autorizate prin membership si WorkspacePolicy.
 - Structura limbilor, activare/dezactivare si schimbare sigura a defaultului prin serviciu intern autorizat.
@@ -28,7 +28,7 @@ php artisan serve --host=127.0.0.1 --port=8000
 
 Binarul Tailwind trebuie instalat local in `.tools/` conform [docs/web-foundation.md](docs/web-foundation.md), inainte de build. Fara Node/Vite.
 
-Pe serverul de dezvoltare: [pagina publica](http://vaulty.test:8000/ro), [autentificare](http://vaulty.test:8000/ro/autentificare), [inregistrare](http://vaulty.test:8000/ro/inregistrare), [demo](http://vaulty.test:8000/ro/demo). Nginx/hosts pentru `http://vaulty.test` sunt documentate separat in [docs/local-hosting.md](docs/local-hosting.md).
+Pe serverul de dezvoltare: [pagina publica](http://vaulty.test/ro), [autentificare](http://vaulty.test/ro/autentificare), [inregistrare](http://vaulty.test/ro/inregistrare). Nginx/hosts pentru `http://vaulty.test` sunt documentate separat in [docs/local-hosting.md](docs/local-hosting.md).
 
 Primul administrator se creeaza in terminal, cu parola ascunsa:
 
@@ -60,7 +60,7 @@ Reguli permanente: [AGENTS.md](AGENTS.md). Arhitectura: [docs/architecture.md](d
 
 Inregistrare si izolarea spatiilor: [docs/registration.md](docs/registration.md). Autentificare GitHub/push: [docs/github.md](docs/github.md). Pentru documentele private nu executa storage:link.
 
-Bulgara: [pagina publica](http://vaulty.test:8000/bg), [inregistrare](http://vaulty.test:8000/bg/registratsiya), [autentificare](http://vaulty.test:8000/bg/vhod). Textul functional are minimum 16px; antetul mobil are meniu compact si icon de profil. Vizualizarea directa prin instrumentul browser ramane blocata, chiar daca interfata setarilor arata Always allow.
+Bulgara: [pagina publica](http://vaulty.test/bg), [inregistrare](http://vaulty.test/bg/registratsiya), [autentificare](http://vaulty.test/bg/vhod). Textul functional are minimum 16px; antetul mobil are meniu compact si icon de profil. Vizualizarea directa prin instrumentul browser ramane blocata, chiar daca interfata setarilor arata Always allow.
 
 Emailuri de cont: [confirmare/resetare si securitate](docs/account-email.md), [Mailpit si servicii locale](docs/integrations.md). Notificarile folosesc Redis/high si Horizon.
 

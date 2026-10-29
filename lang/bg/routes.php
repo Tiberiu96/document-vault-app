@@ -15,7 +15,6 @@ return [
     'features' => 'funktsii',
     'pricing' => 'tseni',
     'faq' => 'chesto-zadavani-vaprosi',
-    'demo' => 'demo',
     'login' => 'vhod',
     'dashboard' => 'tablo',
     'logout' => 'izhod',

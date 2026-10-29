@@ -44,10 +44,9 @@
     <script type="application/ld+json">{!! json_encode(['@context' => 'https://schema.org', '@type' => 'WebPage', 'name' => $title, 'description' => $description, 'url' => $canonical, 'inLanguage' => app()->getLocale()], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}</script>
     @endif
 </head>
-<body id="top" class="{{ $page === 'demo' ? 'demo-body' : '' }}">
+<body id="top">
 @include('admin.partials.impersonation-banner')
     <a href="#main" class="skip-link">{{ __('site.a11y.skip') }}</a>
-    @if($page !== 'demo')
     <header class="site-header wrap">
         <x-brand/>
         <nav class="desktop-nav" aria-label="{{ __('site.nav.menu') }}">
@@ -57,11 +56,9 @@
         </nav>
         <div class="header-actions">
             <x-language-switcher :languages="$languages"/>
-            @auth
-                <a class="auth-link" href="{{ route('demo') }}">{{ __('site.nav.demo') }}</a>
-            @else
+            @guest
                 <a class="auth-link" href="{{ route('login') }}">{{ __('site.nav.login') }}</a>
-            @endauth
+            @endguest
             @auth
                 <x-account-link :active="$page === 'dashboard'"/>
             @else
@@ -73,15 +70,12 @@
             <x-mobile-menu :languages="$languages" :page="$page"/>
         </div>
     </header>
-    @endif
     <main id="main" tabindex="-1">@yield('content')</main>
-    @if($page !== 'demo')
     <footer class="site-footer wrap">
         <div><x-brand/><p>{{ __('site.footer.line') }}</p></div>
         <div class="footer-links"><a href="{{ route('faq') }}">{{ __('site.nav.faq') }}</a><a href="#top">{{ __('site.footer.top') }} ↑</a><span class="status-note"><i></i>{{ __('site.footer.status') }}</span></div>
         <div class="footer-bottom"><span>© {{ date('Y') }} {{ $brand }}</span><span>{{ $languages->pluck('locale')->map(fn ($code) => strtoupper($code))->implode(' · ') }}</span></div>
     </footer>
-    @endif
 @stack('scripts')
 </body>
 </html>

@@ -19,8 +19,8 @@ class WorkspaceMemberController extends Controller
 
         return view('team.members', [...app(WebsiteContext::class)->forPage($request, 'team'), 'section' => 'team', 'workspace' => $workspace,
             'workspaces' => $request->user()->workspaces()->get()->filter(fn ($w) => Gate::allows('view', $w)),
-            'members' => $workspace->members()->orderBy('name')->get(),
-            'invitations' => Gate::allows('manageMembers', $workspace) ? $workspace->invitations()->whereNull('accepted_at')->whereNull('revoked_at')->latest()->paginate(15) : collect()]);
+            'members' => $workspace->members()->orderBy('name')->orderBy('users.id')->paginate(20, ['users.*'], 'members_page')->withQueryString(),
+            'invitations' => Gate::allows('manageMembers', $workspace) ? $workspace->invitations()->whereNull('accepted_at')->whereNull('revoked_at')->latest()->orderByDesc('id')->paginate(15, ['*'], 'invitations_page')->withQueryString() : collect()]);
     }
 
     public function store(WorkspaceInvitationRequest $request, WorkspaceInvitations $service)

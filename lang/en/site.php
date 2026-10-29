@@ -1,11 +1,16 @@
 <?php
 
 return [
+    'preview_ui' => [
+        'title' => 'Your documents',
+        'subtitle' => 'A place for the things that matter.',
+        'greeting' => 'YOUR SPACE, ORGANIZED',
+        'example' => 'Interface example',
+    ],
     'nav' => [
         'features' => 'Features',
         'pricing' => 'Plans',
         'faq' => 'FAQ',
-        'demo' => 'Explore demo',
         'home' => 'Home',
         'language' => 'Interface language',
         'menu' => 'Menu',
@@ -22,10 +27,9 @@ return [
         'description' => 'A space for your paperwork, invoices and the things that matter. Designed to bring simplicity to your personal life and your business.',
         'cta' => 'Explore Vaulty',
         'secondary' => 'Discover the idea',
-        'note' => 'In development. Explore the illustrative interface today.',
+        'note' => 'Private documents, OCR and reminders in one place.',
     ],
     'common' => [
-        'demo' => 'INTERACTIVE DEMO',
         'preview' => 'Product preview',
         'personal' => 'Personal',
         'workspace' => 'Personal workspace',
@@ -70,7 +74,7 @@ return [
             'title' => 'Time for what matters',
             'text' => 'Reminders for due dates and expirations, together in one place.',
         ],
-        'status' => 'Planned features. The demo illustrates the product direction.',
+        'status' => 'Organization, OCR and reminders for your documents.',
     ],
     'life' => [
         'kicker' => 'FOR YOUR LIFE. FOR YOUR BUSINESS.',
@@ -102,27 +106,13 @@ always within reach.',
     'faq' => [
         'title' => 'A few things, explained.',
         'q1' => 'Can I upload documents already?',
-        'a1' => 'Registration and login are available. Document uploads will arrive in a subsequent stage; the demo uses only fictional data.',
+        'a1' => 'Yes. Create an account to upload private documents. OCR extracts the text, and AI analysis is optional. Review suggested details before saving.',
         'q2' => 'Will AI be required?',
         'a2' => 'No. AI analysis will be optional. Suggested information will be available for manual review and correction.',
         'q3' => 'Will there be a mobile app?',
-        'a3' => 'Android and iOS apps are planned. For now, explore the responsive web demo, including on your phone.',
+        'a3' => 'You can use the web app on your phone, including the scanner. Native Android and iOS apps are planned.',
         'q4' => 'Which languages are available?',
         'a4' => 'The interface is available in Romanian, English, Hungarian and Bulgarian. Document language remains independent of interface language.',
-    ],
-    'demo' => [
-        'title' => 'Your documents',
-        'subtitle' => 'A place for the things that matter.',
-        'notice' => 'Demo with fictional data. Do not upload personal documents. Scanning and processing are not available yet.',
-        'scan' => 'Scan',
-        'upload' => 'Upload file',
-        'unavailable' => 'Available in a future stage',
-        'search' => 'Search',
-        'reset' => 'Reset',
-        'allcategories' => 'All categories',
-        'empty' => 'No demo documents found.',
-        'greeting' => 'WELCOME TO THE DEMO',
-        'storage' => 'Illustrative data',
     ],
     'documents' => [
         'energy' => 'Electricity invoice',
@@ -141,7 +131,7 @@ always within reach.',
     'seo' => [
         'home' => [
             'title' => 'Important documents, in their place',
-            'description' => 'Discover Vaulty, a project for personal and business document organisation. Explore the demo and plans for scanning, OCR and reminders.',
+            'description' => 'Organize personal and business documents in Vaulty with private storage, scanning, OCR, optional AI analysis and reminders.',
         ],
         'features' => [
             'title' => 'Features for a more organised life',
@@ -154,10 +144,6 @@ always within reach.',
         'faq' => [
             'title' => 'Frequently asked questions',
             'description' => 'Answers about Vaulty development, uploads, optional AI analysis, languages and mobile apps.',
-        ],
-        'demo' => [
-            'title' => 'Document demo',
-            'description' => 'Explore the illustrative Vaulty interface with fictional documents.',
         ],
         'login' => [
             'title' => 'Log in',

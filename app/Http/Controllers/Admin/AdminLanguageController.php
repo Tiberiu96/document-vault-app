@@ -15,9 +15,19 @@ use Illuminate\Validation\ValidationException;
 
 class AdminLanguageController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        return view('admin.languages', ['languages' => Language::orderBy('id')->get()]);
+        $filters = $request->validate(['q' => ['nullable', 'string', 'max:80'], 'status' => ['nullable', 'in:active,inactive']]);
+        $query = Language::query();
+        if ($request->filled('q')) {
+            $term = '%'.addcslashes($filters['q'], '%_\\').'%';
+            $query->where(fn ($q) => $q->where('locale', 'like', $term)->orWhere('display_name', 'like', $term)->orWhere('native_name', 'like', $term));
+        }
+        if (! empty($filters['status'])) {
+            $query->where('is_active', $filters['status'] === 'active');
+        }
+
+        return view('admin.languages', ['languages' => $query->orderBy('id')->paginate(20)->withQueryString(), 'filters' => $filters]);
     }
 
     public function save(AdminLanguageRequest $request, LanguageManager $manager, ?string $language = null)

@@ -65,3 +65,5 @@ Invitatii numai business: acceptare explicita cu email verificat exact, fara acc
 Backup: numai productie, oprit implicit, single-host confirmat. Snapshotul DB/fisiere cere bariera partajata HTTP/joburi si drenare inainte de copia locala; uploadul se face dupa reluarea aplicatiei. Fara rulari R2 reale pana la configurare confirmata. Retentie numai prin Restic, ultimele doua copii verificate; niciun TTL R2 arbitrar. Vezi docs/backups.md.
 
 Turnstile: oprit implicit; cand este activat, login/inregistrare/cerere reset necesita Siteverify server-side, hostname de incredere si action exact. Fara fallback automat la erori, fara tokenuri in old input/loguri, fara chei dummy in productie. Vezi docs/turnstile.md.
+
+Listele operationale se pagineaza server-side, cu ordine stabila si filtre validate pastrate in URL. Listele multiple pe aceeasi pagina folosesc nume distincte pentru parametrii de paginare. Textul tabelelor admin se incadreaza in celula; butoanele scurte nu rup cuvintele. Pagina demo a fost eliminata, nu reintroduce linkuri catre ea.

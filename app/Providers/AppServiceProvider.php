@@ -93,7 +93,6 @@ class AppServiceProvider extends ServiceProvider
         RateLimiter::for('invitations', fn (Request $request) => Limit::perMinute(10)->by('invitations:'.$request->user()->id));
         RateLimiter::for('taxonomy', fn (Request $request) => Limit::perMinute(30)->by($request->user()->id));
         RateLimiter::for('admin', fn (Request $request) => Limit::perMinute(30)->by($request->ip()));
-        RateLimiter::for('demo', fn (Request $request) => Limit::perMinute(60)->by($request->ip()));
         RateLimiter::for('registration', fn (Request $request) => Limit::perHour(config('vault.rate_limits.registration_per_hour'))
             ->by(hash('sha256', (string) $request->ip()))
             ->response(fn (Request $request, array $headers) => response()->view('auth.register', [

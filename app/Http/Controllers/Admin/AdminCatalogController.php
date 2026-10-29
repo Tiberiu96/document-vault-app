@@ -22,7 +22,18 @@ class AdminCatalogController extends Controller
 
     public function index(Request $request)
     {
-        return view('admin.catalog', ['catalog' => ($request->routeIs('admin.categories*') ? 'categories' : 'tags'), 'items' => $this->model($request)::whereNull('workspace_id')->whereNotNull('system_key')->orderBy('system_key')->get()]);
+        $catalog = $request->routeIs('admin.categories*') ? 'categories' : 'tags';
+        $filters = $request->validate(['q' => ['nullable', 'string', 'max:100'], 'scope' => ['nullable', 'in:personal,business']]);
+        $query = $this->model($request)::whereNull('workspace_id')->whereNotNull('system_key');
+        if ($request->filled('q')) {
+            $term = '%'.addcslashes($filters['q'], '%_\\').'%';
+            $query->where(fn ($q) => $q->where('name', 'like', $term)->orWhere('system_key', 'like', $term));
+        }
+        if ($catalog === 'categories' && ! empty($filters['scope'])) {
+            $query->where('scope', $filters['scope']);
+        }
+
+        return view('admin.catalog', ['catalog' => $catalog, 'items' => $query->orderBy('system_key')->orderBy('id')->paginate(20)->withQueryString(), 'filters' => $filters]);
     }
 
     public function save(AdminCatalogRequest $request, ?string $item = null)
