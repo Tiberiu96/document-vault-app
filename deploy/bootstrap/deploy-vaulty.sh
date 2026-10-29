@@ -71,12 +71,17 @@ in_maintenance=true
 php_app down --no-interaction
 systemctl stop vaulty-scheduler.service vaulty-horizon.service php8.3-fpm.service
 [[ ! -e storage/app/backup-control/restore/request.json && ! -e storage/app/backup-control/restore/incomplete ]]
+# Curata cache-urile cu vechiul cod functional, folosind proprietarul runtime.
+php_app config:clear --no-interaction
+php_app route:clear --no-interaction
+php_app clear-compiled --no-interaction
+php_app view:clear --no-interaction
 as_operator git merge --ff-only "$sha"
-# Composer si scripturile proiectului nu se executa ca root.
-as_operator composer install --no-dev --prefer-dist --optimize-autoloader --no-interaction --no-progress
+# Composer instaleaza codul ca operator; operatiile Laravel ruleaza numai ca vaulty.
+as_operator composer install --no-dev --prefer-dist --optimize-autoloader --no-interaction --no-progress --no-scripts
 as_operator composer check-platform-reqs --no-dev
 cat "$temporary/app.css" | as_operator /bin/sh -c 'umask 022; cat > public/css/app.css; chmod 644 public/css/app.css'
-php_app config:clear --no-interaction
+php_app package:discover --no-interaction
 php_app migrate --force --no-interaction
 php_app config:cache --no-interaction
 php_app route:cache --no-interaction

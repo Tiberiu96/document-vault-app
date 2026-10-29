@@ -35,6 +35,10 @@ Dupa pull, instaleaza root-owned 0700 in /usr/local/libexec/vaulty-deploy.
 Actualizarea din Git nu reinstaleaza helperul privilegiat automat; necesita
 revizuire si sudo. Git/Composer ruleaza ca operator cu umask 022; PHP ca vaulty.
 Se pastreaza ACL-urile existente pentru .env si storage/cache.
+Cache-urile vechi se curata ca vaulty inainte de schimbarea codului. Composer
+foloseste --no-scripts; package:discover este executat apoi separat ca vaulty.
+Astfel, deploy-urile repetate nu cer operatorului sa citeasca cache-uri private
+create de runtime. Nu largi permisiunile cache-ului pentru a ocoli aceasta regula.
 
 Cheia SSH dedicata trebuie adaugata la authorized_keys pe o singura linie:
 
