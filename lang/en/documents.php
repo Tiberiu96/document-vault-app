@@ -31,7 +31,7 @@ return [
     'invalid_amount' => 'Enter the amount with a decimal point and up to two decimal places.',
     'invalid_tags' => 'Use up to 10 tags, each at most 40 characters long.',
     'invalid_category' => 'This category is not available in this workspace.',
-    'storage_full' => 'Storage is full. Documents in the trash still use storage.',
+    'storage_full' => 'Storage limit reached. Remove files or check your plan and usage.',
     'storage_error' => 'The file could not be saved. Please try again.',
     'duplicate' => 'This file already exists in the workspace.',
     'uploaded' => 'Your document was uploaded securely.',

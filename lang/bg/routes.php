@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'usage' => 'plan-i-potreblenie',
     'members' => 'chlenove',
     'invitations' => 'pokani',
     'notifications' => 'izvestiya',

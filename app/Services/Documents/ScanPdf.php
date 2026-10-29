@@ -2,6 +2,7 @@
 
 namespace App\Services\Documents;
 
+use App\Models\Workspace;
 use App\Services\PlanLimitsService;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\UploadedFile;
@@ -9,10 +10,10 @@ use Illuminate\Validation\ValidationException;
 
 class ScanPdf
 {
-    public function withPdf(array $pages, callable $callback): mixed
+    public function withPdf(array $pages, callable $callback, ?Workspace $workspace = null): mixed
     {
         $limits = app(PlanLimitsService::class);
-        $limits->validateDocument(0, count($pages));
+        $limits->validateDocument(0, count($pages), $workspace);
         $directory = sys_get_temp_dir().'/vaulty-scan-'.bin2hex(random_bytes(12));
         if (! mkdir($directory, 0700)) {
             throw ValidationException::withMessages(['pages' => __('scanner.failed')]);
@@ -22,12 +23,12 @@ class ScanPdf
             $pdf->SetAutoPageBreak(false);
             $bytes = 0;
             foreach ($pages as $index => $page) {
-                $inspection = app(FileInspector::class)->inspect($page);
+                $inspection = app(FileInspector::class)->inspect($page, $workspace);
                 if (! in_array($inspection['mime_type'], ['image/jpeg', 'image/png'], true)) {
                     throw ValidationException::withMessages(['pages' => __('scanner.invalid')]);
                 }
                 $bytes += $inspection['size_bytes'];
-                $limits->validateDocument($bytes, count($pages));
+                $limits->validateDocument($bytes, count($pages), $workspace);
                 $image = @imagecreatefromstring(file_get_contents($page->getPathname()));
                 if (! $image) {
                     throw ValidationException::withMessages(['pages' => __('scanner.invalid')]);
@@ -48,7 +49,7 @@ class ScanPdf
             }
             $output = $directory.'/scan.pdf';
             $pdf->Output('F', $output);
-            $limits->validateDocument(filesize($output), count($pages));
+            $limits->validateDocument(filesize($output), count($pages), $workspace);
 
             return $callback(new UploadedFile($output, 'scan.pdf', 'application/pdf', null, true));
         } catch (ValidationException|AuthorizationException $exception) {

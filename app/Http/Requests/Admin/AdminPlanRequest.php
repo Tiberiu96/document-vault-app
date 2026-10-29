@@ -14,7 +14,7 @@ class AdminPlanRequest extends FormRequest
 
     public function rules(): array
     {
-        return ['version' => ['required', 'integer', 'min:0'], 'max_pages' => ['required', 'integer', 'min:1', 'max:50'],
+        return ['plan' => ['sometimes', 'in:free,pro'], 'enabled' => ['sometimes', 'boolean'], 'version' => ['required', 'integer', 'min:0'], 'max_pages' => ['required', 'integer', 'min:1', 'max:50'],
             'max_file_bytes' => ['required', 'integer', 'min:1024', 'max:5242880'], 'storage_bytes' => ['required', 'integer', 'min:1048576', 'max:1099511627776'],
             'monthly_ocr_pages' => ['required', 'integer', 'min:'.(app()->environment('local') ? -1 : 0), 'max:1000000'],
             'monthly_ai_calls' => ['required', 'integer', 'min:'.(app()->environment('local') ? -1 : 0), 'max:1000000']];

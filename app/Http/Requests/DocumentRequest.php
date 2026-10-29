@@ -32,7 +32,7 @@ class DocumentRequest extends FormRequest
             'ai_run_id' => ['nullable', 'uuid'],
             'metadata_version' => ['nullable', 'integer', 'min:0'],
             'analyze_with_ai' => ['nullable', 'boolean', Rule::prohibitedIf(! config('ai.enabled'))],
-            'file' => [$this->isMethod('POST') ? 'required' : 'nullable', 'file', 'max:'.intdiv(app(PlanLimitsService::class)->free()['max_file_bytes'], 1024)],
+            'file' => [$this->isMethod('POST') ? 'required' : 'nullable', 'file', 'max:'.intdiv(app(PlanLimitsService::class)->forWorkspace($this->attributes->get('workspace'))['max_file_bytes'], 1024)],
             'title' => ['required', 'string', 'max:160'],
             'category_id' => ['nullable', 'integer'],
             'tag_ids' => ['nullable', 'array', 'max:10'],

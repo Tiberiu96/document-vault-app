@@ -1,7 +1,7 @@
 @extends('layouts.workspace')
 @section('content')
 <a class="action-button" href="{{ $document ? route('documents.show', ['document' => $document->id]) : route('documents.index') }}" data-action="back"><x-icon name="back" :size="18"/>{{ __('documents.back') }}</a>
-<div class="library-heading"><div><span class="eyebrow">{{ $workspace->name }}</span><h1>{{ isset($suggestionRunId) ? __('processing.review') : ($document ? __('documents.edit') : __('documents.upload')) }}</h1><p>{{ app(\App\Services\PlanLimitsService::class)->message() }}</p></div></div>
+<div class="library-heading"><div><span class="eyebrow">{{ $workspace->name }}</span><h1>{{ isset($suggestionRunId) ? __('processing.review') : ($document ? __('documents.edit') : __('documents.upload')) }}</h1><p>{{ app(\App\Services\PlanLimitsService::class)->message($workspace) }}</p></div></div>
 <form class="library-panel library-form auth-form" method="POST" enctype="multipart/form-data" action="{{ $document ? route('documents.update', ['document' => $document->id]) : route('documents.store') }}" data-document-confirm data-document-id="{{ $document->id }}" @if($document->isDraft())data-source-available="{{ $document->source_released_at ? '0' : '1' }}" data-upload-state="{{ base64_encode(json_encode((new \App\Http\Resources\DraftUploadResource($document))->resolve(request()), JSON_THROW_ON_ERROR)) }}"@endif>
     @if($document->isDraft())
     <div data-source-upload><label for="confirm-source">{{ __('processing.source_label') }}</label><input type="file" id="confirm-source" name="file" accept="application/pdf,image/jpeg,image/png" required><p class="field-help">{{ __('processing.source_reselect') }}</p></div>

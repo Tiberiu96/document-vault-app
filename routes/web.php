@@ -16,6 +16,7 @@ use App\Http\Controllers\SwitchWorkspaceController;
 use App\Http\Controllers\TaxonomyController;
 use App\Http\Controllers\WorkspaceInvitationController;
 use App\Http\Controllers\WorkspaceMemberController;
+use App\Http\Controllers\WorkspaceUsageController;
 use App\Http\Middleware\EnsureActiveWorkspace;
 use App\Http\Middleware\EnsureAvailableLanguage;
 use App\Http\Middleware\EnsureLocalEnvironment;
@@ -61,6 +62,7 @@ Route::translate(function () {
                 Route::post(Localizer::url('invitations').'/{invitation}', [WorkspaceInvitationController::class, 'accept'])->whereUuid('invitation')->middleware('throttle:invitations')->name('invitations.accept');
             });
             Route::middleware(['verified', EnsureActiveWorkspace::class])->group(function () {
+                Route::get(Localizer::url('usage'), WorkspaceUsageController::class)->name('usage');
                 Route::get(Localizer::url('members'), [WorkspaceMemberController::class, 'index'])->name('members.index');
                 Route::post(Localizer::url('members'), [WorkspaceMemberController::class, 'store'])->middleware('throttle:invitations')->name('members.invite');
                 Route::post(Localizer::url('members').'/invitations/{invitation}/{action}', [WorkspaceMemberController::class, 'invitation'])->whereUuid('invitation')->where('action', 'resend|revoke')->middleware('throttle:invitations')->name('members.invitation');

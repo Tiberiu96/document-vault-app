@@ -17,7 +17,7 @@ class DocumentScanRequest extends FormRequest
 
     public function rules(): array
     {
-        $limits = app(PlanLimitsService::class)->free();
+        $limits = app(PlanLimitsService::class)->forWorkspace($this->attributes->get('workspace'));
 
         return [
             'retain_file' => ['nullable', 'boolean'],

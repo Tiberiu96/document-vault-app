@@ -34,6 +34,8 @@ Route::prefix('admin')->name('admin.')->middleware([AdminSecurity::class, 'throt
             Route::delete('utilizatori/{client}', [AdminClientController::class, 'destroy'])->whereNumber('client')->name('users.destroy');
             Route::post('utilizatori/{client}/acceseaza', [AdminImpersonationController::class, 'start'])->whereNumber('client')->name('users.impersonate');
             Route::get('spatii', [AdminDashboardController::class, 'workspaces'])->name('workspaces');
+            Route::get('spatii/{workspace}/plan', [AdminPlanController::class, 'workspace'])->whereNumber('workspace')->name('workspace.plan');
+            Route::patch('spatii/{workspace}/plan', [AdminPlanController::class, 'assign'])->whereNumber('workspace')->name('workspace.plan.update');
             Route::get('securitate', [AdminAuthController::class, 'security'])->name('security');
             Route::get('mfa/coduri-recuperare', [AdminAuthController::class, 'recovery'])->name('mfa.recovery');
             Route::post('mfa/coduri-recuperare', [AdminAuthController::class, 'regenerate'])->middleware('throttle:admin.mfa')->name('mfa.regenerate');

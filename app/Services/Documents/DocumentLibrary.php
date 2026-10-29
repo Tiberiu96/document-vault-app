@@ -28,7 +28,7 @@ class DocumentLibrary
     public function upload(User $user, Workspace $workspace, UploadedFile $file, array $data, bool $draft = false): Document
     {
         Gate::forUser($user)->authorize('create', [Document::class, $workspace]);
-        $inspection = app(FileInspector::class)->inspect($file);
+        $inspection = app(FileInspector::class)->inspect($file, $workspace);
         $id = (string) Str::uuid();
         $path = 'workspaces/'.$workspace->id.'/documents/'.$id.'/original.'.$inspection['extension'];
         try {
@@ -42,6 +42,7 @@ class DocumentLibrary
                 if ($duplicate) {
                     throw ValidationException::withMessages(['file' => __('documents.duplicate')]);
                 }
+                app(PlanLimitsService::class)->validateDocument($inspection['size_bytes'], $inspection['page_count'], $locked);
                 app(PlanLimitsService::class)->reserveStorage($locked, $inspection['size_bytes']);
                 $document = new Document;
                 $metadata = $this->metadata($locked, $data);
@@ -86,7 +87,7 @@ class DocumentLibrary
     public function update(User $user, Document $document, array $data, ?UploadedFile $source = null): void
     {
         Gate::forUser($user)->authorize('update', $document);
-        $inspection = $source ? app(FileInspector::class)->inspect($source) : null;
+        $inspection = $source ? app(FileInspector::class)->inspect($source, $document->workspace) : null;
         $previewRevision = null;
         try {
             DB::transaction(function () use ($user, $document, $data, $source, $inspection, &$previewRevision) {
@@ -108,6 +109,7 @@ class DocumentLibrary
                 // Validarea etichetelor precede scrierea fisierului; rollback la orice eroare.
                 $this->syncTags($fresh, $workspace, $data['tags'] ?? [], $data['tag_ids'] ?? []);
                 if ($fresh->isDraft()) {
+                    app(PlanLimitsService::class)->validateDocument($fresh->size_bytes, $fresh->page_count, $workspace);
                     if (! $source || ! $inspection) {
                         throw ValidationException::withMessages(['file' => __('processing.source_reselect')]);
                     }

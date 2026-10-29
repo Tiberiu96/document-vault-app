@@ -52,6 +52,8 @@ Remindere: programul aprobat este cu 10, 3 si 1 zi inainte, la 09:00 Europe/Buch
 
 Preferinta utilizatorului pentru ritmul de lucru: ruleaza testele doar la cererea explicita sau in etapa finala dinaintea commit/push; grupeaza verificarile relevante, fara repetare dupa fiecare editare.
 
+Planuri: PlanLimitsService rezolva planul workspace-ului pentru orice upload, scanare si rezervare. Free implicit; Pro manual numai din admin/MFA/confirmare/audit, sablon dezactivat initial. Expirarea/dezactivarea revine la Free fara stergeri sau resetari de consum. Cote OCR/AI pe luna UTC, comune tuturor membrilor; include rezervarile. Platile comerciale raman TODO dupa productie si alegerea procesatorului. Vezi docs/plans-and-usage.md.
+
 Administrarea platformei: guard admin separat, MFA TOTP obligatoriu inclusiv local, QR generat local, secrete criptate si coduri de recuperare de unica folosinta. Nu inspecta/captura secrete MFA reale prin browser tools. Productia cere HTTPS si cookie securizat. Dashboardul operational este sanitizat; Horizon brut ramane inchis. Reprocesarea nu ocoleste permisiunile workspace-ului. Vezi docs/admin.md.
 
 Actiunile secundare din UI se afiseaza ca butoane, nu linkuri subliniate: Inapoi cu sageata stanga si ton neutru cald, Renunta/stergere rosu. Accesul administrativ la contul clientului este numai consultare, cu MFA, parola admin, banner si audit; nu reutiliza sesiunea sau parola clientului.

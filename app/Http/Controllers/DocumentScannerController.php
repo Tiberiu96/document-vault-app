@@ -27,7 +27,7 @@ class DocumentScannerController extends Controller
         return view('documents.scanner', [
             ...app(WebsiteContext::class)->forPage($request, 'documents'), 'section' => 'scan', 'workspace' => $workspace,
             'workspaces' => $request->user()->workspaces()->get()->filter(fn ($w) => Gate::allows('view', $w)),
-            'limits' => app(PlanLimitsService::class)->free(),
+            'limits' => app(PlanLimitsService::class)->forWorkspace($workspace),
         ]);
     }
 
@@ -53,7 +53,7 @@ class DocumentScannerController extends Controller
             }
 
             return $document;
-        });
+        }, $workspace);
 
         if ($record instanceof Response) {
             return $record;

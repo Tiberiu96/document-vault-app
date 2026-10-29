@@ -17,6 +17,7 @@ class AdminAudit
             'catalog.created' => 'Element de catalog creat', 'catalog.updated' => 'Element de catalog actualizat', 'catalog.deleted' => 'Element de catalog sters',
             'language.created' => 'Limba creata', 'language.updated' => 'Limba actualizata', 'language.deleted' => 'Limba stearsa', 'language.default_changed' => 'Limba implicita schimbata',
             'plan.limits_updated' => 'Limite actualizate', 'processing.retry_requested' => 'Reprocesare solicitata',
+            'plan.assigned_free' => 'Plan Free atribuit manual', 'plan.assigned_pro' => 'Plan Pro atribuit manual',
             'client.created' => 'Client creat', 'client.updated' => 'Client actualizat', 'client.deleted' => 'Client sters',
             'impersonation.started' => 'Consultare cont client inceputa', 'impersonation.stopped' => 'Consultare cont client oprita', 'impersonation.expired' => 'Consultare cont client expirata',
             default => 'Operatie administrativa',

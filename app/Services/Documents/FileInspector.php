@@ -2,6 +2,7 @@
 
 namespace App\Services\Documents;
 
+use App\Models\Workspace;
 use App\Services\PlanLimitsService;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Validation\ValidationException;
@@ -9,14 +10,14 @@ use Symfony\Component\Process\Process;
 
 class FileInspector
 {
-    public function inspect(UploadedFile $file): array
+    public function inspect(UploadedFile $file, ?Workspace $workspace = null): array
     {
         $invalid = fn () => throw ValidationException::withMessages(['file' => __('documents.invalid_file')]);
         if (! $file->isValid()) {
             $invalid();
         }
         $bytes = filesize($file->getPathname());
-        app(PlanLimitsService::class)->validateDocument($bytes, 1);
+        app(PlanLimitsService::class)->validateDocument($bytes, 1, $workspace);
         $mime = (new \finfo(FILEINFO_MIME_TYPE))->file($file->getPathname());
         $extensions = ['application/pdf' => 'pdf', 'image/jpeg' => 'jpg', 'image/png' => 'png'];
         if (! isset($extensions[$mime])) {
@@ -73,7 +74,7 @@ class FileInspector
             unset($image);
             $pages = 1;
         }
-        app(PlanLimitsService::class)->validateDocument($bytes, $pages);
+        app(PlanLimitsService::class)->validateDocument($bytes, $pages, $workspace);
 
         return ['mime_type' => $mime, 'size_bytes' => $bytes, 'page_count' => $pages, 'sha256' => hash_file('sha256', $file->getPathname()), 'extension' => $extensions[$mime]];
     }

@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'usage' => 'csomag-es-hasznalat',
     'members' => 'tagok',
     'invitations' => 'meghivasok',
     'notifications' => 'ertesitesek',

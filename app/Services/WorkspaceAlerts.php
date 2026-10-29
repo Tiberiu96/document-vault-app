@@ -26,7 +26,7 @@ class WorkspaceAlerts
 
     public function storage(Workspace $workspace, User $actor): void
     {
-        $limit = app(PlanLimitsService::class)->free()['storage_bytes'];
+        $limit = app(PlanLimitsService::class)->forWorkspace($workspace)['storage_bytes'];
         if ($limit < 1 || $workspace->storage_used_bytes < (int) ceil($limit * .9) || ! Gate::forUser($actor)->allows('view', $workspace) || ! app(NotificationPreferences::class)->forUser($actor)['usage_in_app']) {
             return;
         }

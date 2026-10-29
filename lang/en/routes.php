@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'usage' => 'plan-and-usage',
     'members' => 'members',
     'invitations' => 'invitations',
     'notifications' => 'notifications',

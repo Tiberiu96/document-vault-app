@@ -31,7 +31,7 @@ return [
     'invalid_amount' => 'Introdu suma cu punct si maximum doua zecimale.',
     'invalid_tags' => 'Foloseste maximum 10 etichete, fiecare de cel mult 40 de caractere.',
     'invalid_category' => 'Categoria nu este disponibila in acest spatiu.',
-    'storage_full' => 'Spatiul de stocare este plin. Documentele din cos ocupa in continuare spatiu.',
+    'storage_full' => 'Limita de stocare a fost atinsa. Elimina fisiere sau verifica planul si consumul.',
     'storage_error' => 'Fisierul nu a putut fi salvat. Incearca din nou.',
     'duplicate' => 'Acest fisier exista deja in spatiu.',
     'uploaded' => 'Documentul a fost incarcat in siguranta.',

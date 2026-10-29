@@ -31,7 +31,7 @@ return [
     'invalid_amount' => 'Az összeget tizedesponttal és legfeljebb két tizedesjeggyel add meg.',
     'invalid_tags' => 'Legfeljebb 10 címkét használj, egyenként legfeljebb 40 karakterrel.',
     'invalid_category' => 'Ez a kategória nem érhető el ebben a munkatérben.',
-    'storage_full' => 'A tárhely megtelt. A kukában lévő dokumentumok is foglalnak helyet.',
+    'storage_full' => 'Elérted a tárhelykeretet. Törölj fájlokat, vagy ellenőrizd a csomagot és a használatot.',
     'storage_error' => 'A fájl mentése nem sikerült. Próbáld újra.',
     'duplicate' => 'Ez a fájl már létezik a munkatérben.',
     'uploaded' => 'A dokumentum biztonságosan feltöltve.',

@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'usage' => 'plan-si-consum',
     'members' => 'membri',
     'invitations' => 'invitatii',
     'notifications' => 'notificari',

@@ -85,3 +85,8 @@ Checkpoint backup productie: runner Restic/R2, bariera filesystem single-host pe
 Checkpoint colaborare: migrarea 000016, invitatii business cu token hash, email verificat,
 acceptare atomica, roluri si revocare. Notificari email high si inbox pentru primire si
 acceptare; vezi workspace-invitations.md.
+
+Checkpoint cote: migrarea 000017, plan efectiv per workspace, sablon Pro dezactivat,
+atribuire manuala auditata si pagina de consum ro/en/hu/bg. Upload/scanner/confirmare
+si rezervarile OCR/AI folosesc acelasi plan. Vezi plans-and-usage.md; integrarea platilor
+este amanata pana dupa mutarea pe productie, conform TODO.md.
