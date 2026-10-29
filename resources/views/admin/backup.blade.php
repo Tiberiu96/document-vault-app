@@ -35,12 +35,12 @@ $mb = fn($value) => number_format($value / 1048576, 2, '.', ' ');
     @else<p>Actualizeaza detaliile pentru a vedea spatiul ocupat si lista copiilor.</p>@endif
 </section>
 <section class="library-panel admin-panel backup-section backup-danger" @if(in_array($restoreState['phase'] ?? '', ['queued', 'downloading', 'safety_copy', 'applying', 'reconciling', 'restored']))data-restore-pending data-status-url="{{ route('admin.backup.restore.status') }}" data-login-url="{{ route('admin.login') }}"@endif>
-    <h2>Aplica un backup</h2>
+    <h2>Restaureaza backup</h2>
     <p>Restaurarea inlocuieste datele selectate. Aplicatia intra temporar in mentenanta; reporneste automat numai dupa succes.</p>
     <p>Sesiunile si tokenurile sunt invalidate. Joburile vechi sunt eliminate, iar reminderele existente sunt oprite pentru verificare, ca sa nu retrimitem notificari deja livrate.</p>
     @if(!empty($restoreState['phase']))<p role="status">Ultima restaurare: <strong>{{ $labels[$restoreState['phase']] ?? 'De verificat' }}</strong>@if(!empty($restoreState['error_code'])) · {{ $restoreState['error_code'] }}@endif</p>@endif
     <p role="status" data-restore-progress></p>
-    <button type="button" class="danger-button backup-restore-button" data-open-restore @disabled(!$enabled || !$restoreEnabled || empty($inspection['snapshots']))>Aplica backup</button>
+    <button type="button" class="danger-button backup-restore-button" data-open-restore @disabled(!$enabled || !$restoreEnabled || empty($inspection['snapshots']))>Restaureaza backup</button>
     @if(!$restoreEnabled)<p class="field-help">Restaurarea este oprita pana la instalarea runnerului systemd si confirmarea bazelor Redis dedicate.</p>@endif
 </section>
 <dialog id="backup-restore-dialog" class="backup-dialog" aria-labelledby="restore-title">
@@ -55,7 +55,7 @@ $mb = fn($value) => number_format($value / 1048576, 2, '.', ' ');
         <label>Scrie RESTAUREAZA<input name="confirmation" autocomplete="off" pattern="RESTAUREAZA" required></label>
         <label class="backup-confirm"><input type="checkbox" name="confirm" value="1" required> Confirm inlocuirea datelor si invalidarea sesiunilor, joburilor si notificarilor in asteptare.</label>
         <p class="field-help">Se pastreaza o copie locala privata a starii actuale. La esec, serviciile raman oprite pentru verificare; nu se reincearca automat.</p>
-        <div class="backup-dialog-actions"><button type="button" class="action-button" data-close-restore>Renunta</button><button type="submit" class="danger-button backup-restore-button">Da, aplica backup</button></div>
+        <div class="backup-dialog-actions"><button type="button" class="action-button" data-close-restore>Renunta</button><button type="submit" class="danger-button backup-restore-button">Da, restaureaza backup</button></div>
     </form>
 </dialog>
 <script src="{{ asset('js/backup-admin.js') }}" defer></script>
