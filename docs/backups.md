@@ -237,8 +237,11 @@ nu comenzi pentru aplicare manuala in timp ce aplicatia serveste trafic.
 
 ### Volum R2
 
-Adminul afiseaza bytes_processed si data_added raportate de Restic in MB (MiB),
-cu explicatia diferentei fata de traficul de retea. Actiunea manuala de detalii
+Adminul afiseaza bytes_processed drept "Volum total al ultimului backup" si
+data_added drept "Date noi identificate", in MB (MiB). A doua valoare este dupa
+deduplicare, inainte de compresie, nu traficul exact de retea. "Spatiu total ocupat
+in Cloudflare" masoara ocuparea tuturor obiectelor pastrate, nu ultima copie.
+Actiunea manuala de detalii
 listeaza obiectele din bucket prin S3 ListObjectsV2 semnat SigV4 cu credentialele
 existente, fara token Cloudflare suplimentar. Se insumeaza Size, fara a expune chei
 sau nume de obiecte. Maximum 10 pagini/30s (o cerere in curs poate adauga maximum

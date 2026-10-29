@@ -12,10 +12,10 @@ $mb = fn($value) => number_format($value / 1048576, 2, '.', ' ');
         @foreach(['status'=>'Stare','phase'=>'Etapa','started_at'=>'Pornit','finished_at'=>'Terminat','last_success_at'=>'Ultima reusita','duration_seconds'=>'Durata (secunde)','error_code'=>'Cod diagnostic','alert_reason'=>'Alerta','alert_at'=>'Data alertei','monitor_error'=>'Monitorizare'] as $key=>$label)
         <div><dt>{{ $label }}</dt><dd>@if(isset($state[$key])){{ str_ends_with($key,'_at') ? \Carbon\Carbon::createFromTimestamp($state[$key])->timezone('Europe/Bucharest')->format('d.m.Y H:i:s') : ($labels[$state[$key]] ?? $state[$key]) }}@else — @endif</dd></div>
         @endforeach
-        <div><dt>Date procesate</dt><dd>{{ isset($state['bytes_processed']) ? $mb($state['bytes_processed']).' MB' : '—' }}</dd></div>
-        <div><dt>Date adaugate in repository</dt><dd>{{ isset($state['bytes_added']) ? $mb($state['bytes_added']).' MB' : '—' }}</dd></div>
+        <div><dt>Volum total al ultimului backup</dt><dd>{{ isset($state['bytes_processed']) ? $mb($state['bytes_processed']).' MB' : '—' }}</dd></div>
+        <div><dt>Date noi identificate</dt><dd>{{ isset($state['bytes_added']) ? $mb($state['bytes_added']).' MB' : '—' }}</dd></div>
     </dl>
-    <p class="field-help">MB sunt afisati in unitati de 1.048.576 bytes (MiB). Datele procesate reprezinta volumul logic; datele adaugate sunt raportate de Restic dupa deduplicare, nu traficul HTTP exact.</p>
+    <p class="field-help">Volumul total include toate datele din ultima copie. Datele noi reprezinta doar ce s-a adaugat dupa eliminarea duplicatelor, inainte de compresie; nu este cantitatea exacta trimisa prin internet. Valorile MB sunt afisate in MiB (1.048.576 bytes).</p>
     <p class="field-help">Programul prevazut este zilnic la 23:30, cu avertizare dupa 15 minute si ultimele doua copii verificate. Programarea necesita activarea timerelor pe server.</p>
 </section>
 <section class="library-panel admin-panel backup-section">
@@ -24,10 +24,10 @@ $mb = fn($value) => number_format($value / 1048576, 2, '.', ' ');
     @if(!empty($inspection['at']))
     <p class="field-help">Masurat la {{ \Carbon\Carbon::createFromTimestamp($inspection['at'])->timezone('Europe/Bucharest')->format('d.m.Y H:i:s') }}. Actualizarea citeste obiectele prin API si consuma operatii R2.</p>
     <dl class="admin-queue-list">
-        <div><dt>Spatiu ocupat in bucket{{ !($inspection['bucket']['complete'] ?? false) ? ' (partial)' : '' }}</dt><dd>{{ $mb($inspection['bucket']['bytes'] ?? 0) }} MB</dd></div>
-        <div><dt>Obiecte masurate</dt><dd>{{ $inspection['bucket']['objects'] ?? 0 }}</dd></div>
+        <div><dt>Spatiu total ocupat in Cloudflare{{ !($inspection['bucket']['complete'] ?? false) ? ' (masurare partiala)' : '' }}</dt><dd>{{ $mb($inspection['bucket']['bytes'] ?? 0) }} MB</dd></div>
+        <div><dt>Obiecte numarate</dt><dd>{{ $inspection['bucket']['objects'] ?? 0 }}</dd></div>
     </dl>
-    <p class="field-help">Suma marimilor obiectelor din bucket la momentul citirii. Nu este costul facturat si nu reprezinta media GB-luna. Include metadatele si blocurile comune; nu aduna marimile snapshoturilor.</p>
+    <p class="field-help">Tot spatiul ocupat acum de backupuri in Cloudflare, dupa compresie, inclusiv informatiile necesare restaurarii. Datele comune mai multor copii ocupa spatiu o singura data. Aceasta este ocuparea totala, nu dimensiunea ultimei copii si nici costul facturat.</p>
     @if(!($inspection['bucket']['complete'] ?? false))<p role="status">Lista a atins bugetul de timp sau paginare. Valoarea afisata este numai un minim, nu totalul bucketului.</p>@endif
     <div class="library-table-scroll"><table class="library-table"><thead><tr><th>Copie verificata</th><th>Identificator</th></tr></thead><tbody>
     @forelse($inspection['snapshots'] ?? [] as $snapshot)<tr><td>{{ \Carbon\Carbon::createFromTimestamp($snapshot['at'])->timezone('Europe/Bucharest')->format('d.m.Y H:i:s') }}</td><td>{{ substr($snapshot['id'], 0, 12) }}</td></tr>@empty<tr><td colspan="2">Nu sunt copii verificate disponibile.</td></tr>@endforelse

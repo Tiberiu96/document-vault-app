@@ -503,7 +503,7 @@ class AdminPanelTest extends TestCase
     {
         $this->mock(BackupRestoreControl::class)->shouldReceive('read')->andReturn([]);
         $this->enter($this->administrator())->get('/admin/backup')->assertOk()
-            ->assertSee('Date adaugate in repository')->assertSee('Actualizeaza detaliile')
+            ->assertSee('Date noi identificate')->assertSee('Actualizeaza detaliile')
             ->assertSee('backup-restore-dialog', false)->assertSee('Cod MFA nou');
     }
 }
