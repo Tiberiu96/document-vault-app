@@ -13,6 +13,9 @@ class BackupRunner
     {
         $repository = app(ResticRepository::class);
         $repository->configured();
+        if (is_file(app(BackupState::class)->directory().'/restore/incomplete')) {
+            throw new \RuntimeException('BACKUP_RESTORE_INCOMPLETE');
+        }
         $state = app(BackupState::class);
         $lock = $state->runLock();
         if (! $lock) {

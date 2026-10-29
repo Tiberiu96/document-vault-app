@@ -15,6 +15,9 @@ class BackupBarrier
 
     public function shared(bool $blocking = false)
     {
+        if (is_file(app(BackupState::class)->directory().'/restore/incomplete')) {
+            return null;
+        }
         $handle = fopen(app(BackupState::class)->directory().'/data.lock', 'c');
         if (! $handle || ! flock($handle, LOCK_SH | ($blocking ? 0 : LOCK_NB))) {
             if (is_resource($handle)) {

@@ -1049,3 +1049,27 @@
 /* Tabele admin: textul nu depaseste celula; pe ecrane inguste se deruleaza tabelul. */
 .admin-table th,.admin-table td{white-space:normal;overflow-wrap:anywhere;word-break:normal}.admin-workspace-table{table-layout:fixed;min-width:1050px}.admin-workspace-table th,.admin-workspace-table td{min-width:0;max-width:none}.admin-workspace-table .action-button{max-width:100%;white-space:normal;text-align:center}.admin-filters{padding:20px;display:flex;gap:16px;flex-wrap:wrap;align-items:end;margin-bottom:24px}.admin-filters label{display:grid;gap:8px;flex:1 1 170px;min-width:0;font-size:16px}.admin-filters input,.admin-filters select{width:100%;min-width:0;min-height:46px;padding:10px 12px;border:1px solid var(--color-line);border-radius:5px;background:white;font-size:16px}.admin-filter-actions{display:flex;gap:10px;flex-wrap:wrap}.library-pagination{flex-wrap:wrap}
 .taxonomy-create>div,.taxonomy-row>form:first-child{align-items:center}.taxonomy-create input,.taxonomy-row input{flex:1 1 0;min-width:0;width:auto;min-height:48px}.taxonomy-create button,.taxonomy-row button{flex:0 0 auto;white-space:nowrap;word-break:normal;min-height:48px;align-self:center}@media(max-width:480px){.taxonomy-create>div{align-items:stretch}.taxonomy-create input{flex-basis:100%;width:100%}.taxonomy-create button{width:100%}}
+
+/* Fundalul antetului si hoverul acopera intreaga latime scrollabila. */
+.document-desktop-list { background:#fff; }
+.document-desktop-list .library-table { min-width:1100px; width:100%; }
+.document-desktop-list .library-table thead,
+.document-desktop-list .library-table thead tr,
+.document-desktop-list .library-table th { background:#faf9f6; }
+.document-desktop-list .library-table tbody td { background:#fff; }
+.document-desktop-list .library-table tbody tr:hover > td { background:#fbf9f4; }
+.backup-section { margin-top:24px; }
+.backup-section > form { margin:20px 0; }
+.backup-danger { border-color:#ddc6bf; }
+.backup-restore-button { background:#a44034; border-color:#a44034; color:#fff; min-height:48px; }
+.backup-restore-button:disabled { opacity:.5; cursor:not-allowed; }
+.backup-dialog { margin:auto; width:min(640px,calc(100vw - 32px)); max-height:calc(100dvh - 40px); overflow:auto; border:1px solid #e6e2da; border-radius:12px; padding:28px; background:#fff; color:#242724; }
+.backup-dialog::backdrop { background:#24272488; }
+.backup-dialog h2 { font-family:var(--font-editorial); font-size:30px; }
+.backup-restore-form { display:grid; gap:18px; font-size:16px; }
+.backup-restore-form label { display:grid; gap:8px; }
+.backup-restore-form input:not([type=checkbox]),.backup-restore-form select { width:100%; min-height:48px; padding:10px 12px; border:1px solid #d8d1c4; border-radius:6px; font:inherit; background:#fff; }
+.backup-restore-form .backup-confirm { display:flex; align-items:flex-start; gap:12px; }
+.backup-confirm input { margin-top:4px; width:20px; height:20px; flex-shrink:0; }
+.backup-dialog-actions { display:flex; justify-content:flex-end; flex-wrap:wrap; gap:12px; }
+@media(max-width:600px){.backup-dialog{padding:20px}.backup-dialog-actions>*{width:100%}}

@@ -139,3 +139,114 @@ Surse primare:
 - https://restic.readthedocs.io/en/stable/
 - https://developers.cloudflare.com/r2/api/tokens/
 - https://developers.cloudflare.com/r2/reference/data-location/
+
+## Restaurare automatizata din admin sau terminal
+
+Implementare pentru acelasi server Ubuntu 24.04, aceeasi schema si aceeasi APP_KEY.
+Runnerul privilegiat are cai/unitati fixe pentru `/var/www/document-vault-app`,
+utilizatorul `vaulty`, PHP 8.3, Horizon si Scheduler systemd. Nu adapta nume de
+servicii din input HTTP. PHP nu ruleaza ca root si nu exista sudoers pentru FPM.
+
+Din admin: Actualizeaza detaliile, apoi Aplica backup (buton rosu la final), alege
+snapshotul verificat si all/mysql/documents. Dialogul cere parola admin, cod TOTP
+nou (nu recovery), RESTAUREAZA si checkbox explicit. Se aplica CSRF, gate global,
+MFA de sesiune si rate limit; codul consumat nu poate fi reutilizat. Cererea este
+criptata pe disc, expira in 10 minute si este consumata o singura data. Nu porni
+restaurarea ca job Horizon: Horizon trebuie oprit in timpul importului.
+
+Runnerul root opreste timerele active, refuza o copie in curs, pune down si opreste
+FPM/Horizon/Scheduler. PHP ca vaulty verifica toate unitatile inactive, ia run.lock
+si bariera exclusiva, revalideaza ID-ul exact, descarca intr-un director privat,
+refuza symlinkuri, verifica APP_KEY si spatiul liber. Face intai un export SQL si o
+copie a originalelor curente in `storage/app/backup-control/restore/run-ID/safety`.
+Abia apoi importa SQL cu utilizatorul DB dedicat (niciodata root) si schimba arborele
+de documente. Lista tabelelor si migrarilor trebuie sa corespunda; migrarile intre
+versiuni de aplicatie necesita o procedura separata. Originalele sunt verificate
+prin SHA-256/marime, iar campurile criptate sunt decriptate fara afisare.
+
+Scope all readuce baza si originalele impreuna; este optiunea pentru documente
+sterse din UI. mysql singur este refuzat daca fisierele referentiate lipsesc sau
+nu corespund. documents singur nu reface randuri sterse din baza si este refuzat
+daca snapshotul nu poate satisface toate documentele confirmate curente. Nu este
+un restore selectiv per client si nu modifica APP_KEY/env/configuratia SMTP.
+
+Restaurarea invalideaza tokenurile, remember_token, codurile de recuperare MFA
+si ambele baze Redis dedicate Vaulty (sesiuni/cache/cozi/Horizon). Codurile MFA de
+recuperare se regenereaza dupa login; TOTP trebuie sa fie dintr-un interval nou.
+BACKUP_RESTORE_DEDICATED_REDIS=true confirma explicit ca aceste baze Redis NU sunt
+folosite de alte aplicatii. Orice livrare reminder pending/processing devine
+uncertain/RESTORED_REQUIRES_REVIEW, iar procesarile queued/running devin failed.
+Rezervarile se elibereaza. Nu se retrimit automat emailuri istorice; dupa restore
+revizuieste reminderele si reactiveaza explicit printr-un ciclu nou unde este cazul.
+
+La esec dupa import se incearca rollback SQL si fisiere. Chiar dupa rollback
+reusit se pastreaza down, serviciile oprite si markerul restore/incomplete. Acesta
+blocheaza HTTP/joburi si backupuri noi chiar daca cineva reporneste serviciile din
+greseala. Nici monitorul nu curata acest marker. Statusul sanitizat este in
+restore/status.json. Inspectia si reluarea dupa esec se fac de operator; nu elimina
+markerul si nu da up orb. Pentru rollback SQL de siguranta se permite schema
+partial deteriorata, fara validarea comparativa cu starea avariata.
+
+Dupa succes se sterge descarcarea temporara, dar copia locala de siguranta si
+arborele `.before-restore-ID` se pastreaza privat pentru verificare/rollback.
+Aceste copii sunt plaintext, 0700/0600, pe acelasi server; nu sunt un inlocuitor
+pentru R2. Dupa confirmarea recuperarii operatorul le poate elimina explicit.
+Un nou restore este refuzat daca o restaurare precedenta necesita interventie.
+La succes runnerul da up si porneste FPM/Horizon/Scheduler; timerele revin numai
+daca erau active. La esec nu reporneste aplicatia si nu incearca automat din nou.
+
+### Instalare runner (dupa pull, cu utilizatorul de deploy)
+
+Verifica intai ca nu exista operatii backup/restore in curs. Configuratia este
+pentru caile si numele serviciilor de mai sus, nu pentru orice server arbitrar.
+
+```bash
+cd /var/www/document-vault-app
+sudo install -d -m 0755 /usr/local/libexec
+sudo install -o root -g root -m 0700 deploy/bootstrap/restore-vaulty.sh /usr/local/libexec/vaulty-restore
+sudo install -o root -g root -m 0644 deploy/systemd/vaulty-restore.service deploy/systemd/vaulty-restore.path /etc/systemd/system/
+```
+
+Configureaza privat in .env, dupa confirmarea topologiei:
+
+```dotenv
+BACKUP_RESTORE_ENABLED=true
+BACKUP_RESTORE_DEDICATED_REDIS=true
+BACKUP_MYSQL_BINARY=mysql
+```
+
+```bash
+sudo setfacl -m u:vaulty:r-- .env
+php artisan config:clear
+sudo systemctl daemon-reload
+sudo systemctl enable --now vaulty-restore.path
+```
+
+Interfata admin necesita apoi aplicatia pornita. Runnerul poate fi folosit si
+cand aplicatia este deja down, prin comanda interactiva (fara Tinker):
+
+```bash
+sudo -u vaulty php artisan vault:backup restore
+```
+
+Aceasta listeaza copiile, cere scope si confirmare, apoi trimite aceeasi cerere
+catre runner. Daca runnerul nu este instalat/activ, o cerere queued nu inseamna
+restaurare efectuata. Verifica `systemctl status vaulty-restore.service` si starea
+sanitizata. Operatiile interne restore-validate/restore-apply sunt pentru runner,
+nu comenzi pentru aplicare manuala in timp ce aplicatia serveste trafic.
+
+### Volum R2
+
+Adminul afiseaza bytes_processed si data_added raportate de Restic in MB (MiB),
+cu explicatia diferentei fata de traficul de retea. Actiunea manuala de detalii
+listeaza obiectele din bucket prin S3 ListObjectsV2 semnat SigV4 cu credentialele
+existente, fara token Cloudflare suplimentar. Se insumeaza Size, fara a expune chei
+sau nume de obiecte. Maximum 10 pagini/30s (o cerere in curs poate adauga maximum
+10s); daca lista e incompleta, afiseaza explicit un minim partial. Valorile sunt
+memorate cu timestamp, nu se pretinde actualizare live sau cost de factura. Un
+esec pastreaza masuratoarea anterioara. Citirile consuma operatii R2; nu exista
+plafon automat de facturare. Nu se aplica TTL pe obiectele Restic.
+
+Validarea automata foloseste servicii externe mockuite, teste de autorizare/MFA,
+replay, expirare, hashuri, rollback si scope-uri. Nu substituie un restore real pe
+VM. Prima aplicare productie trebuie urmarita de operator, cu acces SSH disponibil.

@@ -14,6 +14,9 @@ class BackupMonitor
             return;
         }
         $store = app(BackupState::class);
+        if (is_file($store->directory().'/restore/incomplete')) {
+            return;
+        }
         $state = $store->read();
         $now = now()->timestamp;
         $lock = $store->runLock();

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AdminAuthController;
+use App\Http\Controllers\Admin\AdminBackupController;
 use App\Http\Controllers\Admin\AdminCatalogController;
 use App\Http\Controllers\Admin\AdminClientController;
 use App\Http\Controllers\Admin\AdminDashboardController;
@@ -24,6 +25,9 @@ Route::prefix('admin')->name('admin.')->middleware([AdminSecurity::class, 'throt
         Route::post('mfa/verificare', [AdminAuthController::class, 'verify'])->middleware('throttle:admin.mfa')->name('mfa.verify');
         Route::middleware(RequireAdminMfa::class)->group(function () {
             Route::get('/', [AdminDashboardController::class, 'index'])->name('dashboard');
+            Route::get('backup/stare-restaurare', [AdminBackupController::class, 'status'])->name('backup.restore.status');
+            Route::post('backup/detalii', [AdminBackupController::class, 'inspect'])->middleware('throttle:3,1')->name('backup.inspect');
+            Route::post('backup/restaureaza', [AdminBackupController::class, 'restore'])->middleware('throttle:admin.mfa')->name('backup.restore');
             Route::get('backup', [AdminDashboardController::class, 'backup'])->name('backup');
             Route::get('notificari', [AdminDashboardController::class, 'notifications'])->name('notifications');
             Route::get('utilizatori', [AdminDashboardController::class, 'users'])->name('users');

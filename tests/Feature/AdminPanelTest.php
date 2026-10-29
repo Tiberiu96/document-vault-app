@@ -14,6 +14,7 @@ use App\Models\Workspace;
 use App\Notifications\AccountMail;
 use App\Services\Admin\AdminMfa;
 use App\Services\Admin\OperationalSummary;
+use App\Services\Backup\BackupRestoreControl;
 use App\Services\PlanLimitsService;
 use Database\Seeders\CategorySeeder;
 use Database\Seeders\LanguageSeeder;
@@ -460,5 +461,47 @@ class AdminPanelTest extends TestCase
         $this->get('/admin/notificari?status=uncertain&workspace_id=1&to=2026-12-31')->assertOk();
         $this->get('/admin/notificari?status=invalid')->assertSessionHasErrors('status');
         $this->get('/admin/notificari?from=2026-12-31&to=2026-01-01')->assertSessionHasErrors('to');
+    }
+
+    public function test_restore_requires_global_admin_mfa_and_production(): void
+    {
+        $this->post('/admin/backup/restaureaza')->assertRedirect('/admin/autentificare');
+        $user = $this->administrator();
+        $this->enter($user, false)->post('/admin/backup/restaureaza')->assertRedirect();
+        $this->enter($user)->post('/admin/backup/restaureaza')->assertForbidden();
+    }
+
+    public function test_restore_rejects_wrong_password_and_never_enqueues(): void
+    {
+        $this->app['env'] = 'production';
+        config(['backup.enabled' => true, 'backup.restore_enabled' => true, 'session.secure' => true]);
+        $this->withoutMiddleware(PreventRequestForgery::class);
+        $user = $this->administrator();
+        $this->mock(BackupRestoreControl::class)->shouldNotReceive('request');
+        $this->enter($user)->post('https://localhost/admin/backup/restaureaza', [
+            'snapshot' => str_repeat('a', 64), 'scope' => 'all', 'password' => 'wrong',
+            'code' => $this->otp($user), 'confirmation' => 'RESTAUREAZA', 'confirm' => '1',
+        ])->assertSessionHasErrors('code');
+    }
+
+    public function test_restore_requires_fresh_code_and_queues_only_validated_scope(): void
+    {
+        $this->app['env'] = 'production';
+        config(['backup.enabled' => true, 'backup.restore_enabled' => true, 'session.secure' => true]);
+        $this->withoutMiddleware(PreventRequestForgery::class);
+        $user = $this->administrator();
+        $this->mock(BackupRestoreControl::class)->shouldReceive('request')->once()->with(str_repeat('a', 64), 'all', $user->id);
+        $data = ['snapshot' => str_repeat('a', 64), 'scope' => 'all', 'password' => self::PASSWORD,
+            'code' => $this->otp($user), 'confirmation' => 'RESTAUREAZA', 'confirm' => '1'];
+        $this->enter($user)->post('https://localhost/admin/backup/restaureaza', $data)->assertSessionHasNoErrors();
+        $this->enter($user->fresh())->post('https://localhost/admin/backup/restaureaza', $data)->assertSessionHasErrors('code');
+    }
+
+    public function test_backup_view_has_readable_volumes_and_restore_dialog(): void
+    {
+        $this->mock(BackupRestoreControl::class)->shouldReceive('read')->andReturn([]);
+        $this->enter($this->administrator())->get('/admin/backup')->assertOk()
+            ->assertSee('Date adaugate in repository')->assertSee('Actualizeaza detaliile')
+            ->assertSee('backup-restore-dialog', false)->assertSee('Cod MFA nou');
     }
 }

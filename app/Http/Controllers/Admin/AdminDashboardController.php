@@ -11,6 +11,7 @@ use App\Models\User;
 use App\Models\Workspace;
 use App\Services\Admin\AdminAudit;
 use App\Services\Admin\OperationalSummary;
+use App\Services\Backup\BackupRestoreControl;
 use App\Services\Backup\BackupState;
 use App\Services\Documents\DocumentProcessingService;
 use Carbon\CarbonImmutable;
@@ -46,7 +47,7 @@ class AdminDashboardController extends Controller
     {
         $allowed = ['status', 'phase', 'started_at', 'finished_at', 'last_success_at', 'duration_seconds', 'error_code', 'alert_reason', 'alert_at', 'monitor_error', 'bytes_processed', 'bytes_added'];
 
-        return view('admin.backup', ['enabled' => app()->environment('production') && config('backup.enabled'), 'state' => array_intersect_key(app(BackupState::class)->read(), array_flip($allowed))]);
+        return view('admin.backup', ['enabled' => app()->environment('production') && config('backup.enabled'), 'state' => array_intersect_key(app(BackupState::class)->read(), array_flip($allowed)), 'inspection' => app(BackupRestoreControl::class)->read('inspection'), 'restoreState' => app(BackupRestoreControl::class)->read('status'), 'restoreEnabled' => config('backup.restore_enabled') && config('backup.restore_dedicated_redis')]);
     }
 
     public function notifications(Request $request)

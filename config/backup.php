@@ -1,6 +1,9 @@
 <?php
 
 return [
+    'restore_enabled' => (bool) env('BACKUP_RESTORE_ENABLED', false),
+    'restore_dedicated_redis' => (bool) env('BACKUP_RESTORE_DEDICATED_REDIS', false),
+    'mysql' => env('BACKUP_MYSQL_BINARY', 'mysql'),
     'enabled' => (bool) env('BACKUP_ENABLED', false),
     'single_host' => (bool) env('BACKUP_SINGLE_HOST_CONFIRMED', false),
     'account_id' => env('BACKUP_R2_ACCOUNT_ID', ''),

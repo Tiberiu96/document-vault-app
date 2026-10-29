@@ -1,0 +1,9 @@
+[Unit]
+Description=Watch approved Vaulty restore requests
+
+[Path]
+PathExists=/var/www/document-vault-app/storage/app/backup-control/restore/request.json
+Unit=vaulty-restore.service
+
+[Install]
+WantedBy=multi-user.target
