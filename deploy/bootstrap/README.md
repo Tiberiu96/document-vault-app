@@ -1,5 +1,10 @@
 # Installer runtime pentru VM beta
 
+Pentru fluxul complet nou foloseste **migrare_finala_vaulty_24.04.sh**, standalone
+interactiv, cu export criptat/import, runtime, TLS, workeri, backup si CD optional.
+Instructiuni: [docs/migration.md](../../docs/migration.md). Scriptul de mai jos ramane
+componenta de instalare runtime reutilizata de installerul final.
+
 `install-ubuntu-24.04.sh` este un installer permanent cerut explicit de utilizator,
 nu un script temporar cu credentiale. Tinta: VM noua Ubuntu 24.04 LTS x86_64,
 cu systemd. Nu se ruleaza pe laptop sau peste aplicatia deja instalata.

@@ -83,6 +83,9 @@ jobs:
       - name: Ruleaza testele
         run: php artisan test --compact
 
+      - name: Verifica scriptul de migrare fara modificari de sistem
+        run: python3 -m unittest discover -s tests/Infrastructure -p 'test_migration.py' -v
+
       - name: Verifica instalarea fara dependinte de dezvoltare
         run: |
           composer install --no-dev --prefer-dist --no-interaction --no-progress --optimize-autoloader
