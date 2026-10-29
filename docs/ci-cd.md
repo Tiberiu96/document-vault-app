@@ -85,6 +85,8 @@ In Actions, verifica succesul joburilor CI si Deploy productie, inclusiv mesajul
 Pe VM, `git rev-parse HEAD` trebuie sa corespunda commitului testat; verifica apoi
 HTTPS /up si starea FPM, Horizon si scheduler. Nu executa git pull manual in timpul
 acestui test: actualizarea trebuie facuta de CD.
+Repeta verificarea dupa reinstalarea helperului: deploy-ul trebuie sa reuseasca
+si cand config/route/view cache exista deja, create de utilizatorul vaulty.
 
 ## Esecuri
 
@@ -98,7 +100,8 @@ completa a vendor/DB. Backupul Restic contine DB/documente; restaurarea este un
 flux separat. Nu reporni cod vechi peste o schema incompatibila. Retentia Restic
 ramane ultimele doua copii verificate, inclusiv cele facute inainte de deploy.
 Verificarea /up si DB/Redis nu inlocuieste testarea uploadului/emailului dupa
-primul deploy real. Activarea si prima livrare pe VM nu sunt inca verificate.
+primul deploy real. Prima livrare pe VM a fost confirmata pentru 39d86a0;
+corectia separarii Composer/Artisan necesita verificarea unui nou deploy complet.
 
 Referinte: [concurrency](https://docs.github.com/en/actions/how-tos/write-workflows/choose-when-workflows-run/control-workflow-concurrency),
 [artifacts](https://docs.github.com/en/actions/how-tos/manage-workflow-runs/download-workflow-artifacts).
