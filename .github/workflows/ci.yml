@@ -68,9 +68,6 @@ jobs:
       - name: Verifica stilul PHP
         run: vendor/bin/pint --test
 
-      - name: Ruleaza testele
-        run: php artisan test --compact
-
       - name: Instaleaza Tailwind standalone
         run: |
           mkdir -p .tools
@@ -83,6 +80,9 @@ jobs:
 
       - name: Construieste CSS
         run: composer css:build
+
+      - name: Ruleaza testele
+        run: php artisan test --compact
 
       - name: Verifica instalarea fara dependinte de dezvoltare
         run: |

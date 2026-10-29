@@ -1,10 +1,12 @@
-# CI/CD - propunere pentru beta
+# CI/CD pentru beta
 
-Status: nu exista inca workflow-uri .github/workflows. Testele au fost rulate local
-inainte de commit/push; GitHub nu face inca automat aceste verificari sau deploy.
+Status: CI este activ prin `.github/workflows/ci.yml`, la push pe main, pull request
+si pornire manuala. CSS-ul se construieste inainte de testele care randeaza pagini.
+Mediul CI foloseste SQLite in memorie si provideri externi dezactivati/mockuiti.
+CD nu este inca activ; productia nu se modifica la push.
 Nu exista acces SSH de deploy sau credentiale de productie configurate prin acest document.
 
-Flux recomandat dupa configurarea serverului:
+Flux de verificare si livrare:
 
 1. Push pe main / pull request porneste GitHub Actions pentru validare Composer,
    stil PHP, teste cu servicii externe mockuite, build CSS si verificare route cache.
