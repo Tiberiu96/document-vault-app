@@ -22,6 +22,8 @@
         <env name="VAULT_FREE_OCR_PAGES" value="50" force="true"/>
         <env name="VAULT_FREE_STORAGE_BYTES" value="104857600" force="true"/>
         <env name="TURNSTILE_ENABLED" value="false" force="true"/>
+        <env name="OLLAMA_BASE_URL" value="http://127.0.0.1:11434" force="true"/>
+        <env name="OLLAMA_MODEL" value="qwen3.5:4b" force="true"/>
         <env name="AI_PROVIDER" value="ollama" force="true"/>
         <env name="GROQ_API_KEY" value="" force="true"/>
         <env name="GEMINI_API_KEY" value="" force="true"/>
@@ -34,6 +36,8 @@
         <env name="DB_CONNECTION" value="sqlite" force="true"/>
         <env name="DB_DATABASE" value=":memory:" force="true"/>
         <env name="DB_URL" value="" force="true"/>
+        <env name="MAIL_FROM_ADDRESS" value="test@example.test" force="true"/>
+        <env name="MAIL_FROM_NAME" value="Vaulty Test" force="true"/>
         <env name="MAIL_MAILER" value="array" force="true"/>
         <env name="QUEUE_CONNECTION" value="sync" force="true"/>
         <env name="SESSION_DRIVER" value="array" force="true"/>
