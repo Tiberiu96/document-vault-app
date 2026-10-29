@@ -10,15 +10,14 @@ on:
 permissions:
   contents: read
 
-concurrency:
-  group: ci-${{ github.ref }}
-  cancel-in-progress: true
-
 jobs:
   tests:
     name: Teste Laravel si build CSS
     runs-on: ubuntu-24.04
     timeout-minutes: 15
+    concurrency:
+      group: ci-${{ github.ref }}
+      cancel-in-progress: true
 
     env:
       APP_ENV: testing
@@ -94,3 +93,57 @@ jobs:
           APP_ENV=production php artisan config:cache
           APP_ENV=production php artisan route:cache
           APP_ENV=production php artisan view:cache
+
+      - name: Pastreaza CSS-ul verificat
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: css-${{ github.sha }}
+          path: public/css/app.css
+          if-no-files-found: error
+          retention-days: 7
+
+  deploy:
+    name: Deploy productie
+    needs: tests
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.AUTO_DEPLOY_ENABLED == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    environment: production
+    concurrency:
+      group: vaulty-production-deploy
+      cancel-in-progress: false
+    steps:
+      - name: Descarca CSS-ul aceluiasi commit
+        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5
+        with:
+          name: css-${{ github.sha }}
+          path: compiled-css
+
+      - name: Livreaza prin conexiunea SSH restrictionata
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          DEPLOY_KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+          COMMIT_SHA: ${{ github.sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "$DEPLOY_HOST" =~ ^[a-zA-Z0-9.-]+$ ]]
+          [[ "$DEPLOY_USER" =~ ^[a-z_][a-z0-9_-]*$ ]]
+          [[ "$COMMIT_SHA" =~ ^[a-f0-9]{40}$ ]]
+          test -n "$DEPLOY_SSH_KEY"
+          test -n "$DEPLOY_KNOWN_HOSTS"
+          umask 077
+          mkdir -p "$HOME/.ssh"
+          printf '%s\n' "$DEPLOY_SSH_KEY" > "$HOME/.ssh/vaulty-deploy"
+          printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > "$HOME/.ssh/known_hosts"
+          {
+            printf '%s\n' "$COMMIT_SHA"
+            sha256sum compiled-css/app.css | cut -d ' ' -f 1
+            base64 -w 0 compiled-css/app.css
+            printf '\n'
+          } | ssh -T -i "$HOME/.ssh/vaulty-deploy" \
+            -o BatchMode=yes -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes \
+            -o ConnectTimeout=15 -o ServerAliveInterval=15 -o ServerAliveCountMax=4 \
+            "$DEPLOY_USER@$DEPLOY_HOST" deploy
