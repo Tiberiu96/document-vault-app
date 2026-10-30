@@ -3,7 +3,6 @@
 @php($scanUrl = route('documents.scan'))
 <section class="hero home-hero wrap" aria-labelledby="hero-title">
     <div class="hero-copy">
-        <a class="hero-kicker" href="{{ route('features') }}"><x-icon name="sparkle" :size="20"/><span>{{ __('site.hero.kicker') }}</span><x-icon name="arrow" :size="18"/></a>
         <h1 id="hero-title">{{ __('site.hero.line1') }}<br>{{ __('site.hero.line2') }}<br><em>{{ __('site.hero.line3') }}</em></h1>
         <p class="hero-description">{{ __('site.hero.description') }}</p>
         <div class="hero-actions">

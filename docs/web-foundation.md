@@ -54,7 +54,7 @@ Inregistrarea PF/PJ si actiunile tranzactionale sunt acum livrate (registration.
 ## Home - referinta vizuala actualizata (30 octombrie 2026)
 
 Hero-ul din `resources/views/pages/home.blade.php` reproduce compozitia din
-fotografia furnizata: titlu pe trei randuri, badge introductiv, actiuni de
+fotografia furnizata: titlu pe trei randuri, actiuni de
 scanare/prezentare, nota de autentificare, beneficii si card de scanare suprapus
 peste miniatura produsului. Telefonul si documentul sunt ilustratii HTML/CSS,
 fara date personale. Butoanele de scanare trimit la ruta protejata existenta;
@@ -68,3 +68,9 @@ Buildul CSS a reusit. Nu au fost rulate teste, conform preferintei de lucru.
 Verificarea vizuala desktop/mobil ramane necesara: browserul local este dezactivat
 in setarile Work. Nu se afirma potrivire pixel cu pixel fara aceasta verificare.
 Nu este necesara configurarea unui serviciu extern.
+
+Ajustare dupa captura de pe laptop: badge-ul introductiv a fost eliminat,
+titlul este limitat la 72px (64px pe desktop cu inaltime de maximum 800px),
+iar spatierea de sus, descrierea si butoanele sunt mai compacte pentru a aduce
+actiunile de scanare/prezentare in primul ecran. Antetul desktop are minimum
+96px. CSS recompilat; fara teste locale, verificarile sunt lasate in GitHub CI.
