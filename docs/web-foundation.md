@@ -74,3 +74,6 @@ titlul este limitat la 72px (64px pe desktop cu inaltime de maximum 800px),
 iar spatierea de sus, descrierea si butoanele sunt mai compacte pentru a aduce
 actiunile de scanare/prezentare in primul ecran. Antetul desktop are minimum
 96px. CSS recompilat; fara teste locale, verificarile sunt lasate in GitHub CI.
+
+Mesajul de sub butoanele hero despre autentificare/creare cont este afisat numai
+vizitatorilor neautentificati, prin `@guest`; utilizatorii conectati nu il vad.

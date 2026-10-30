@@ -1053,12 +1053,14 @@
 /* Fundalul antetului si hoverul acopera intreaga latime scrollabila. */
 .document-desktop-list { background:#fff; }
 .document-desktop-list .document-table { min-width:1100px; width:100%; table-layout:fixed; }
-.document-col-title { width:28%; }
-.document-col-category,.document-col-status,.document-col-date { width:12%; }
+.document-col-title { width:26%; }
+.document-col-category { width:18%; }
+.document-col-status,.document-col-date { width:12%; }
 .document-col-amount { width:14%; }
-.document-col-summary { width:22%; }
+.document-col-summary { width:18%; }
 .document-desktop-list .document-table td { white-space:normal; overflow-wrap:anywhere; vertical-align:top; }
 .document-desktop-list .document-summary { min-width:0; max-width:none; white-space:normal; }
+.document-desktop-list .document-chip { max-width:100%; margin-inline:0; white-space:normal; word-break:normal; overflow-wrap:break-word; }
 .document-desktop-list .document-title-link { min-width:0; }
 .document-desktop-list .document-title-link > span:last-child { min-width:0; flex:1; }
 .document-desktop-list .library-table thead,

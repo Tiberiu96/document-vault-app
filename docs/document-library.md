@@ -80,3 +80,7 @@ Copia de analiza a draftului este eliminata dupa procesare, iar browserul pastre
 originalul in memorie pentru retrimiterea la confirmare. Drafturile nu genereaza
 preview pe server. Originalele confirmate raman private; reselectarea trebuie sa
 aiba acelasi SHA-256, MIME si numar de pagini.
+
+Coloana Categorie din lista desktop ocupa 18% din tabel (anterior 12%).
+Etichetele se incadreaza in celula si se rup la spatii; cuvintele sunt separate
+numai daca un singur cuvant depaseste intreaga latime disponibila.

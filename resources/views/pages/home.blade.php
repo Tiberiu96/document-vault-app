@@ -9,7 +9,9 @@
             <x-button :href="$scanUrl" icon="arrow"><x-icon name="camera" :size="22"/>{{ __('site.hero.cta') }}</x-button>
             <x-button href="#features" variant="outline"><x-icon name="play" :size="28"/>{{ __('site.hero.secondary') }}</x-button>
         </div>
+        @guest
         <p class="hero-note"><x-icon name="lock" :size="20"/>{{ __('site.hero.note') }}</p>
+        @endguest
         <ul class="hero-trust" role="list">@foreach(['private', 'intelligent', 'together'] as $benefit)<li><x-icon name="circle-check" :size="18"/>{{ __('site.hero.'.$benefit) }}</li>@endforeach</ul>
     </div>
     <div class="hero-visual">
