@@ -35,6 +35,7 @@ class WorkspaceInvitations
             if ($workspace->invitations()->where('email', $email)->whereNull('accepted_at')->whereNull('revoked_at')->where('expires_at', '>', now())->exists()) {
                 throw ValidationException::withMessages(['email' => __('team.already_invited')]);
             }
+            app(PlanLimitsService::class)->ensureMemberSeat($workspace);
             $invitation = new WorkspaceInvitation;
             $invitation->forceFill(['workspace_id' => $workspace->id, 'email' => $email, 'role' => $role, 'invited_by' => $actor->id, 'locale' => app()->getLocale()]);
             $this->send($invitation, $workspace);
@@ -71,6 +72,7 @@ class WorkspaceInvitations
             if ($invitation->last_sent_at->gt(now()->subMinute())) {
                 throw ValidationException::withMessages(['invitation' => __('team.resend_wait')]);
             }
+            app(PlanLimitsService::class)->ensureMemberSeat($workspace, $invitation->id);
             $invitation->invited_by = $actor->id;
             $this->send($invitation, $workspace);
         }, 3);
@@ -105,6 +107,7 @@ class WorkspaceInvitations
             abort_unless($inviter && Gate::forUser($inviter)->allows('manageMembers', $workspace), 410);
             $this->role($inviter, $workspace, $invitation->role);
             abort_if($workspace->members()->whereKey($user->id)->exists(), 409);
+            app(PlanLimitsService::class)->ensureMemberSeat($workspace, $invitation->id);
             $workspace->members()->attach($user->id, ['role' => $invitation->role]);
             $invitation->forceFill(['accepted_at' => now(), 'accepted_by' => $user->id])->save();
             $user->notifications()->where('data->event', 'invitation_received')->where('data->invitation_id', $invitation->id)->whereNull('read_at')->update(['read_at' => now()]);

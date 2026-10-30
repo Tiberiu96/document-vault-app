@@ -1,6 +1,12 @@
 <?php
 
 return [
+    'seats_title' => 'Business helyek',
+    'seats_summary' => 'Tagok: :members. Aktív meghívások: :pending. Teljes kapacitás: :limit.',
+    'seats_included' => 'Benne foglalt: :included, a tulajdonossal együtt. Aktív további helyek: :additional.',
+    'seats_help' => 'Az aktív meghívások helyet foglalnak. További helyekért fordulj a platform adminisztrátorához. Nincs automatikus terhelés.',
+    'seat_limit' => 'Elérted a :limit fős korlátot a tulajdonossal és az aktív meghívásokkal együtt. Vonj vissza egy meghívást, vagy kérj további helyeket.',
+
     'invite_help' => 'A munkatárs csak a meghívás elfogadása után kap hozzáférést.',
     'title' => 'Tagok és meghívások',
     'intro' => 'Közös munkaterület, szerepkörhöz igazított hozzáféréssel.',

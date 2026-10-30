@@ -58,3 +58,9 @@ Verificarea vizuala locala foloseste conturi fictive si un workspace fara docume
 Limite ale etapei: fara transfer de proprietate, invitatii in masa sau notificari push
 FCM. Nu exista notificari suplimentare pentru fiecare editare de rol; primirea invitatiei
 si acceptarea au email si inbox. Invitatia poate fi ignorata sau anulata de manager.
+
+Capacitate: cinci utilizatori inclusi, cu proprietarul numarat. Invitatiile valide
+rezerva locuri; create/resend/accept verifica PlanLimitsService sub lock comun
+pe workspace. Acceptarea exclude propria rezervare din calcul si ramane
+idempotenta. Locurile suplimentare se acorda numai din admin, pentru Pro activ
+pe business, dupa configurarea pretului. Vezi plans-and-usage.md.

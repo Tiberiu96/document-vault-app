@@ -10,3 +10,7 @@
 </article>
 @endforeach
 </div>
+
+@if($workspace->type === 'business')
+<section class="library-panel usage-details"><h2>{{ __('team.seats_title') }}</h2><p>{{ __('team.seats_summary', ['members' => $usage['seats']['members'], 'pending' => $usage['seats']['pending'], 'limit' => $usage['seats']['limit']]) }}</p><p>{{ __('team.seats_included', ['included' => $usage['seats']['included'], 'additional' => $usage['seats']['additional']]) }}</p><p>{{ __('team.seats_help') }}</p></section>
+@endif

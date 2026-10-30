@@ -1,6 +1,12 @@
 <?php
 
 return [
+    'seats_title' => 'Business seats',
+    'seats_summary' => 'Members: :members. Active invitations: :pending. Total capacity: :limit.',
+    'seats_included' => 'Included: :included, including the owner. Active additional seats: :additional.',
+    'seats_help' => 'Active invitations reserve seats. Contact the platform administrator for additional seats. No automatic charges are made.',
+    'seat_limit' => 'The limit of :limit users, including the owner and active invitations, has been reached. Revoke an invitation or request additional seats.',
+
     'invite_help' => 'Your colleague receives access only after accepting the invitation.',
     'title' => 'Members and invitations',
     'intro' => 'Collaborate in one workspace with access suited to each role.',

@@ -1,6 +1,12 @@
 <?php
 
 return [
+    'seats_title' => 'Locuri Business',
+    'seats_summary' => 'Membri: :members. Invitatii active: :pending. Capacitate totala: :limit.',
+    'seats_included' => 'Incluse: :included, inclusiv proprietarul. Suplimentare active: :additional.',
+    'seats_help' => 'Invitatiile active rezerva locuri. Pentru locuri suplimentare contacteaza administratorul platformei. Nu se efectueaza plati automate.',
+    'seat_limit' => 'Limita de :limit utilizatori, inclusiv proprietarul si invitatiile active, a fost atinsa. Revoca o invitatie sau solicita locuri suplimentare.',
+
     'invite_help' => 'Colegul primeste acces numai dupa acceptarea invitatiei.',
     'title' => 'Membri si invitatii',
     'intro' => 'Colaborati in acelasi spatiu, cu acces potrivit fiecarui rol.',

@@ -28,7 +28,7 @@ class PlanLimitsService
             }
         }
 
-        return ['code' => $code, 'enabled' => $code === 'free' || ($row && (bool) $row->enabled), 'version' => (int) ($row->version ?? 0), 'limits' => $defaults];
+        return ['code' => $code, 'enabled' => $code === 'free' || ($row && (bool) $row->enabled), 'version' => (int) ($row->version ?? 0), 'extra_member_price_bani' => ($row->extra_member_price_bani ?? null) === null ? null : (int) $row->extra_member_price_bani, 'limits' => $defaults];
     }
 
     public function free(): array
@@ -93,6 +93,33 @@ class PlanLimitsService
         $lockedWorkspace->forceFill(['storage_used_bytes' => $lockedWorkspace->storage_used_bytes + $bytes])->save();
     }
 
+    public function memberSeats(Workspace $workspace): array
+    {
+        $included = $workspace->type === 'business' ? 5 : 1;
+        $plan = $this->resolve($workspace);
+        $extra = $workspace->type === 'business' && $plan['code'] === 'pro' ? (int) $workspace->additional_member_seats : 0;
+        // Proprietarul consuma intotdeauna un loc, chiar daca un membership este reparat ulterior.
+        $members = 1 + $workspace->members()->where('users.id', '!=', $workspace->owner_id)->count();
+        $pending = $workspace->invitations()->whereNull('accepted_at')->whereNull('revoked_at')->where('expires_at', '>', now())->count();
+
+        return ['included' => $included, 'additional' => $extra, 'limit' => $included + $extra,
+            'members' => $members, 'pending' => $pending, 'remaining' => max(0, $included + $extra - $members - $pending),
+            'extra_member_price_bani' => $plan['code'] === 'pro' ? $plan['extra_member_price_bani'] : null];
+    }
+
+    public function ensureMemberSeat(Workspace $lockedWorkspace, ?string $invitationId = null): void
+    {
+        if (DB::transactionLevel() < 1) {
+            throw new \LogicException('Workspace lock required for member capacity.');
+        }
+        $seats = $this->memberSeats($lockedWorkspace);
+        $pending = $lockedWorkspace->invitations()->whereNull('accepted_at')->whereNull('revoked_at')->where('expires_at', '>', now())
+            ->when($invitationId, fn ($query) => $query->where('id', '!=', $invitationId))->count();
+        if ($lockedWorkspace->type !== 'business' || $seats['limit'] <= $seats['members'] + $pending) {
+            throw ValidationException::withMessages(['email' => __('team.seat_limit', ['limit' => $seats['limit']])]);
+        }
+    }
+
     public function usage(Workspace $workspace): array
     {
         $plan = $this->resolve($workspace);
@@ -108,6 +135,6 @@ class PlanLimitsService
             $metrics[$kind] = ['used' => $used, 'reserved' => $reserved, 'limit' => $limit, 'remaining' => $limit < 0 ? null : max(0, $limit - $used - $reserved), 'exceeded' => $limit >= 0 && $used + $reserved > $limit];
         }
 
-        return ['plan' => $plan['code'], 'limits' => $plan['limits'], 'metrics' => $metrics, 'period' => $month->format('Y-m'), 'resets_at' => $month->addMonth()->format('d.m.Y'), 'expires_at' => $plan['code'] === 'pro' ? $workspace->plan_expires_at : null];
+        return ['seats' => $this->memberSeats($workspace), 'plan' => $plan['code'], 'limits' => $plan['limits'], 'metrics' => $metrics, 'period' => $month->format('Y-m'), 'resets_at' => $month->addMonth()->format('d.m.Y'), 'expires_at' => $plan['code'] === 'pro' ? $workspace->plan_expires_at : null];
     }
 }

@@ -65,3 +65,82 @@ Lockurile folosesc mecanismul MySQL din fluxurile existente. Verificare locala s
 doua procese au cerut simultan 70 si 40 bytes din 100 bytes disponibili; o rezervare a
 fost acceptata si una respinsa, fara depasire. Workspace-ul fictiv a fost eliminat.
 Acest control nu inlocuieste testarea de incarcare pe infrastructura de productie.
+
+## Locuri Business - 30 octombrie 2026
+
+Fiecare workspace business include maximum cinci utilizatori, inclusiv proprietarul.
+Toate rolurile consuma un loc. Invitatiile active, neacceptate si nerevocate,
+rezerva un loc pana la acceptare, expirare sau revocare. PlanLimitsService
+centralizeaza capacitatea. Crearea, retrimiterea si acceptarea invitatiilor se
+verifica sub acelasi lock pe workspace, fara suprarezervare concurenta.
+Acceptarea transforma rezervarea in membership; repetarea acceptarii nu consuma
+un loc nou. Rolurile si verificarile de email/expeditor raman neschimbate.
+
+Compatibilitate cu beta existenta: limita de cinci se aplica tuturor spatiilor
+business, inclusiv celor care folosesc momentan Free. Nu se creeaza un abonament
+comercial nou. Sablonul platit intern ramane Pro; pentru firme, administrarea il
+prezinta ca Pro / Business. Numai Pro activ poate adauga capacitate suplimentara.
+Spatiile personale raman limitate la proprietar, fara invitatii.
+
+In /admin/limite?plan=pro se configureaza pretul lunar al unui loc suplimentar,
+in bani RON intregi, fara FLOAT (100 bani = 1 RON). Valoare initiala NULL,
+fara pret inventat; gol blocheaza acordarea locurilor suplimentare. Zero este
+permis numai ca gratuitate configurata explicit. Campul foloseste versiunea
+optimista si auditul planului. Nu se modifica facturi istorice si nu se incaseaza bani.
+
+In /admin/spatii/{workspace}/plan, adminul global cu MFA/parola verificata,
+confirmare explicita si versiune curenta poate acorda 0-1000 locuri suplimentare.
+Clientii si administratorii workspace-ului nu le pot modifica. Pretul trebuie
+configurat inaintea acordarii; planul Pro trebuie activat explicit. Schimbarea
+locurilor este auditata si nu reseteaza consumul. Nu se activeaza automat Pro.
+
+La expirarea/dezactivarea Pro, locurile suplimentare devin inactive. Numarul
+atribuit este pastrat, fara eliminarea membrilor, invitatiilor sau documentelor.
+Daca ocuparea depaseste noul plafon, se blocheaza invitatiile/acceptarile noi pana
+la eliberarea sau acordarea capacitatii necesare. Membrii existenti isi pastreaza
+permisiunile. Invitatia expirata necesita o rezervare noua la retrimitere.
+Cotele OCR/AI/stocare raman comune workspace-ului, indiferent de numarul locurilor.
+
+Migrarea 000019 adauga platform_plan_limits.extra_member_price_bani si
+workspaces.additional_member_seats (implicit 0). Pagina Membri si Plan si consum
+arata membri, invitatii rezervate, locuri incluse si suplimentare active.
+BusinessMemberSeatsTest acopera plafonul, rezervarile, acceptarea idempotenta,
+expirarea/revocarea, izolarea, fallback-ul si acordarea administrativa.
+Migrarea locala, compilarea Blade/CSS si route:cache sunt verificate separat;
+testele automate nu au fost rulate local, conform preferintei utilizatorului.
+
+## Decizii pentru integrarea ulterioara Stripe
+
+Stripe este numai planificat; nu este instalat/configurat si nu exista apeluri,
+checkout, incasari, facturi comerciale sau credentiale Stripe folosite aici.
+Utilizatorul are deja un cont. Va fi confirmat sandbox-ul separat al proiectului
+si configuratia privata inaintea integrarii. Abonamente recurente, cu planul de
+baza si locuri suplimentare ca pozitii ale aceluiasi abonament.
+
+Cerinta aprobata pentru etapa de plati inlocuieste plata numai in RON: moneda
+implicita este ro=RON, en=EUR, hu=HUF, bg=EUR. Clientul poate alege explicit RON,
+EUR sau HUF inainte de checkout. Pretul final afisat si suma/moneda trimise catre
+Stripe trebuie sa coincida, inclusiv pentru locuri suplimentare. Abonamentul
+pastreaza moneda confirmata; schimbarea limbii nu schimba renovarile existente.
+Preturile comerciale pe monede vor fi configurate explicit si versionate, fara
+rate inventate sau conversii aproximative facturate. Actualul camp RON este
+configurare manuala pregatitoare; nu reprezinta implementare multicurrency.
+
+Webhook: validarea semnaturii pe body brut, persistenta durabila in MySQL inainte
+de raspuns 2xx, deduplicare pe eveniment/cont/mediu si payload minim criptat.
+Procesarea efectiva pe joburi, cu reluare din inbox/outbox durabil daca Redis sau
+workerul cade. Tranzitii idempotente, protectie la evenimente neordonate, retry
+limitat/backoff, monitorizare sanitizata si reconciliere periodica cu Stripe.
+Niciun acces platit acordat exclusiv pe baza redirectului de succes din browser.
+Sandbox si credentiale live separate; local se vor testa plata initiala,
+reinnoirea cu ceas simulat, esecul, autentificarea suplimentara, anularea,
+modificarile de locuri si evenimentele duplicate/dezordonate. Fara plati reale.
+
+Referinte oficiale pentru etapa viitoare:
+- https://docs.stripe.com/sandboxes
+- https://docs.stripe.com/currencies
+- https://docs.stripe.com/products-prices/manage-prices
+- https://docs.stripe.com/billing/subscriptions/quantities
+- https://docs.stripe.com/billing/subscriptions/overview
+- https://docs.stripe.com/webhooks
+- https://docs.stripe.com/billing/testing

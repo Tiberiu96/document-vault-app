@@ -14,7 +14,7 @@ class Workspace extends Model
 {
     protected function casts(): array
     {
-        return ['plan_expires_at' => 'immutable_datetime', 'plan_version' => 'integer', 'storage_used_bytes' => 'integer'];
+        return ['plan_expires_at' => 'immutable_datetime', 'additional_member_seats' => 'integer', 'plan_version' => 'integer', 'storage_used_bytes' => 'integer'];
     }
 
     public function owner(): BelongsTo

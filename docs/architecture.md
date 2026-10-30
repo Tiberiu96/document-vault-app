@@ -94,3 +94,11 @@ este amanata pana dupa mutarea pe productie, conform TODO.md.
 Checkpoint cont: sectiunea privata Contul meu, nume editabil, email blocat,
 schimbare parola cu parola actuala si avatar unic privat de maximum 5 MiB.
 Migrarea 000018, GD pentru reencodare si cleanup low; vezi account-profile.md.
+
+Checkpoint Business: cinci locuri incluse cu proprietarul si invitatiile active
+rezervate; capacitate suplimentara manuala Pro / Business din admin, cu pret
+lunar in bani RON configurabil, MFA/confirmare/audit. Migrarea 000019.
+Stripe ramane o etapa separata, numai planificata. Pentru ea s-a aprobat plata
+in RON/EUR/HUF, preselectie dupa limba si alegere explicita a altei monede
+acceptate, pret final egal cu suma facturata si inbox durabil pentru webhookuri.
+Detalii si restrictii: plans-and-usage.md.

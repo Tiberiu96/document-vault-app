@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\WorkspaceInvitationRequest;
 use App\Models\User;
 use App\Models\WorkspaceInvitation;
+use App\Services\PlanLimitsService;
 use App\Services\WebsiteContext;
 use App\Services\WorkspaceInvitations;
 use Illuminate\Http\Request;
@@ -17,7 +18,7 @@ class WorkspaceMemberController extends Controller
         $workspace = $request->attributes->get('workspace');
         abort_unless($workspace->type === 'business', 404);
 
-        return view('team.members', [...app(WebsiteContext::class)->forPage($request, 'team'), 'section' => 'team', 'workspace' => $workspace,
+        return view('team.members', [...app(WebsiteContext::class)->forPage($request, 'team'), 'seats' => app(PlanLimitsService::class)->memberSeats($workspace), 'section' => 'team', 'workspace' => $workspace,
             'workspaces' => $request->user()->workspaces()->get()->filter(fn ($w) => Gate::allows('view', $w)),
             'members' => $workspace->members()->orderBy('name')->orderBy('users.id')->paginate(20, ['users.*'], 'members_page')->withQueryString(),
             'invitations' => Gate::allows('manageMembers', $workspace) ? $workspace->invitations()->whereNull('accepted_at')->whereNull('revoked_at')->latest()->orderByDesc('id')->paginate(15, ['*'], 'invitations_page')->withQueryString() : collect()]);
