@@ -77,3 +77,7 @@ actiunile de scanare/prezentare in primul ecran. Antetul desktop are minimum
 
 Mesajul de sub butoanele hero despre autentificare/creare cont este afisat numai
 vizitatorilor neautentificati, prin `@guest`; utilizatorii conectati nu il vad.
+
+Logo-ul din antetul mobil autentificat foloseste ruta home localizata, la fel ca
+logo-ul din sidebar. Suprascrierea catre dashboard a fost eliminata pentru a
+permite revenirea la pagina publica fara modificarea manuala a URL-ului.
