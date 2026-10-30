@@ -1,6 +1,10 @@
 <?php
 
 return [
+    'profile' => 'fiokom',
+    'profile.avatar' => 'fiokom/avatar',
+    'profile.password' => 'fiokom/jelszo',
+
     'usage' => 'csomag-es-hasznalat',
     'members' => 'tagok',
     'invitations' => 'meghivasok',

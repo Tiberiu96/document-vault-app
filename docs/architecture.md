@@ -90,3 +90,7 @@ Checkpoint cote: migrarea 000017, plan efectiv per workspace, sablon Pro dezacti
 atribuire manuala auditata si pagina de consum ro/en/hu/bg. Upload/scanner/confirmare
 si rezervarile OCR/AI folosesc acelasi plan. Vezi plans-and-usage.md; integrarea platilor
 este amanata pana dupa mutarea pe productie, conform TODO.md.
+
+Checkpoint cont: sectiunea privata Contul meu, nume editabil, email blocat,
+schimbare parola cu parola actuala si avatar unic privat de maximum 5 MiB.
+Migrarea 000018, GD pentru reencodare si cleanup low; vezi account-profile.md.

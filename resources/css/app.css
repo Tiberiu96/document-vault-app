@@ -1309,3 +1309,28 @@
  .processing-footer-actions { width:100%; flex-wrap:wrap; justify-content:space-between; gap:12px; }.processing-loading-details { flex:1; }.processing-loading-details summary { justify-content:center; }.processing-cancel { min-height:46px; padding-inline:16px; }.processing-loading-details p { right:auto; left:0; }
 }
 @media(prefers-reduced-motion:reduce) { .processing-meter>[role=progressbar]>span { animation:none; width:100%; opacity:.55; } }
+
+/* Contul propriu: avatar privat unic si formulare lizibile. */
+.user-avatar { display:inline-grid; place-items:center; flex:none; width:42px; height:42px; border-radius:50%; background:#e8dfd0; color:#715a3e; font-size:18px; font-weight:600; overflow:hidden; }
+.user-avatar img { width:100%; height:100%; object-fit:cover; display:block; }
+.account-control .user-avatar { width:100%; height:100%; font-size:18px; }
+.profile-nav-link { display:flex; align-items:center; gap:12px; padding:10px 12px; border-radius:8px; font-size:16px; }
+.profile-nav-link .user-avatar { width:32px; height:32px; font-size:16px; }
+.profile-nav-link:hover,.profile-nav-link[aria-current] { background:#ece5da; color:#715a3e; }
+.profile-grid { display:grid; grid-template-columns:minmax(0,1.15fr) minmax(0,1fr); gap:24px; align-items:start; }
+.profile-panel { padding:28px; min-width:0; }
+.profile-panel h2 { font-family:var(--font-editorial); font-size:30px; margin-bottom:18px; }
+.profile-panel>.field-help { margin-bottom:20px; }
+.profile-form { gap:22px; }
+.profile-form label { display:block; font-size:16px; margin-bottom:8px; }
+.profile-form input:not([type=checkbox]) { width:100%; min-width:0; min-height:48px; font-size:16px; }
+.profile-form input[readonly] { background:#f5f2eb; color:#77766f; }
+.profile-form .field-help { font-size:16px; line-height:1.6; margin-top:8px; color:#77766f; }
+.profile-avatar-row { display:flex; align-items:center; gap:22px; }
+.profile-avatar-row>div { min-width:0; flex:1; }
+.profile-avatar.user-avatar { width:96px; height:96px; font-size:36px; }
+.profile-form input[type=file] { padding:10px; border:1px solid #e6e2da; border-radius:6px; background:white; }
+.profile-form .profile-remove { display:flex; align-items:center; gap:10px; margin:0; color:#a34035; }
+.profile-remove input { width:20px; height:20px; accent-color:#a34035; }
+@media(max-width:1000px) { .profile-grid { grid-template-columns:minmax(0,1fr); } }
+@media(max-width:600px) { .profile-panel { padding:22px 16px; }.profile-avatar-row { align-items:flex-start; flex-direction:column; gap:16px; }.profile-avatar-row>div { width:100%; } }

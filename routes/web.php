@@ -8,6 +8,7 @@ use App\Http\Controllers\DocumentProcessingController;
 use App\Http\Controllers\DocumentScannerController;
 use App\Http\Controllers\LocalAiController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PublicDiscoveryController;
 use App\Http\Controllers\PublicPageController;
 use App\Http\Controllers\RegisteredUserController;
@@ -53,6 +54,10 @@ Route::translate(function () {
             Route::post(Localizer::url('register'), [RegisteredUserController::class, 'store'])->middleware(['throttle:registration', 'throttle:turnstile.forms', VerifyTurnstile::class.':register'])->name('register.store');
         });
         Route::middleware(['auth', 'auth.session'])->group(function () {
+            Route::get(Localizer::url('profile'), [ProfileController::class, 'edit'])->name('profile.edit');
+            Route::patch(Localizer::url('profile'), [ProfileController::class, 'update'])->middleware('throttle:profile.update')->name('profile.update');
+            Route::get(Localizer::url('profile.avatar'), [ProfileController::class, 'avatar'])->middleware('throttle:profile.avatar')->name('profile.avatar');
+            Route::put(Localizer::url('profile.password'), [ProfileController::class, 'password'])->middleware('throttle:profile.password')->name('profile.password');
             Route::get(Localizer::url('verification.notice'), [AccountSecurityController::class, 'notice'])->name('verification.notice');
             Route::post(Localizer::url('verification.send'), [AccountSecurityController::class, 'resend'])->name('verification.send');
             Route::middleware('verified')->group(function () {

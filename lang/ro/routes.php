@@ -1,6 +1,10 @@
 <?php
 
 return [
+    'profile' => 'contul-meu',
+    'profile.avatar' => 'contul-meu/avatar',
+    'profile.password' => 'contul-meu/parola',
+
     'usage' => 'plan-si-consum',
     'members' => 'membri',
     'invitations' => 'invitatii',

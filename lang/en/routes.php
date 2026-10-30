@@ -1,6 +1,10 @@
 <?php
 
 return [
+    'profile' => 'my-account',
+    'profile.avatar' => 'my-account/avatar',
+    'profile.password' => 'my-account/password',
+
     'usage' => 'plan-and-usage',
     'members' => 'members',
     'invitations' => 'invitations',

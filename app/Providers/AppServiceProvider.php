@@ -81,6 +81,9 @@ class AppServiceProvider extends ServiceProvider
 
             return [Limit::perHour(3)->by('reset-account:'.hash('sha256', $email)), Limit::perHour(20)->by('reset-ip:'.hash('sha256', (string) $request->ip()))];
         });
+        RateLimiter::for('profile.update', fn (Request $request) => Limit::perMinute(config('vault.rate_limits.profile_updates_per_minute'))->by('profile:'.$request->user()->id));
+        RateLimiter::for('profile.password', fn (Request $request) => Limit::perMinute(config('vault.rate_limits.profile_password_per_minute'))->by('profile-password:'.$request->user()->id));
+        RateLimiter::for('profile.avatar', fn (Request $request) => Limit::perMinute(config('vault.rate_limits.profile_avatar_per_minute'))->by('profile-avatar:'.$request->user()->id));
         RateLimiter::for('password.reset', fn (Request $request) => Limit::perMinute(10)->by($request->ip()));
         RateLimiter::for('verification.verify', fn (Request $request) => Limit::perMinute(20)->by($request->ip()));
         RateLimiter::for('local.ai', fn (Request $request) => Limit::perMinute(3)->by($request->user()->id));

@@ -1,6 +1,10 @@
 <?php
 
 return [
+    'profile' => 'moyat-profil',
+    'profile.avatar' => 'moyat-profil/avatar',
+    'profile.password' => 'moyat-profil/parola',
+
     'usage' => 'plan-i-potreblenie',
     'members' => 'chlenove',
     'invitations' => 'pokani',
