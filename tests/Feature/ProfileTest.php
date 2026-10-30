@@ -64,6 +64,7 @@ class ProfileTest extends TestCase
         $this->assertSame(512, imagesy($image));
         imagedestroy($image);
         $this->get('/ro/contul-meu/avatar')->assertOk()->assertHeader('Content-Type', 'image/jpeg')->assertHeader('Cache-Control', 'no-store, private');
+        $this->assertSame(Storage::disk('local')->get($old), $this->get('/ro/contul-meu/avatar')->streamedContent());
         $this->patch('/ro/contul-meu', ['name' => $user->name, 'avatar' => UploadedFile::fake()->image('new.jpg')])->assertRedirect();
         Storage::disk('local')->assertMissing($old);
         Storage::disk('local')->assertExists($user->fresh()->avatar_path);

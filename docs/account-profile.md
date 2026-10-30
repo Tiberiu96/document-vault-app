@@ -64,3 +64,6 @@ sau rezervari active. Nu s-au modificat documentele, planul sau istoricul joburi
 Aceasta operatiune punctuala nu introduce un bypass disponibil utilizatorilor.
 
 Migrarea avatar a fost aplicata local; compilarea Blade si route:cache au reusit.
+
+Corectie CI: endpointul avatarului citeste calea din inregistrarea curenta a
+utilizatorului, inclusiv cand guardul pastreaza o instanta anterioara uploadului.

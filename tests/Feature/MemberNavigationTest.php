@@ -48,7 +48,10 @@ class MemberNavigationTest extends TestCase
         $this->actingAs($user)->withSession(['active_workspace_id' => $workspace->id]);
         $expected = null;
         foreach (['/ro', '/ro/functionalitati', '/ro/contul-meu', '/ro/plan-si-consum', '/ro/documente'] as $url) {
-            $response = $this->get($url)->assertOk()->assertHeader('Cache-Control', 'no-store, private');
+            $response = $this->get($url)->assertOk();
+            $this->assertTrue($response->headers->hasCacheControlDirective('no-store'));
+            $this->assertTrue($response->headers->hasCacheControlDirective('private'));
+            $this->assertFalse($response->headers->hasCacheControlDirective('public'));
             $links = $this->links($response->getContent());
             $expected ??= $links;
             $this->assertSame($expected, $links);

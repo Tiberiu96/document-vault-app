@@ -40,7 +40,7 @@ class ProfileController extends Controller
     public function avatar(Request $request)
     {
         // Fara ID controlat de client: avatarul propriu, privat, pe identitate.
-        $path = $request->user()->avatar_path;
+        $path = $request->user()->fresh()?->avatar_path;
         abort_unless($path && Storage::disk('local')->exists($path), 404);
 
         return Storage::disk('local')->response($path, 'avatar.jpg', [

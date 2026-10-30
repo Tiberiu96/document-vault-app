@@ -114,3 +114,6 @@ izolarea contextului, sesiunile invalidate si conturile cu email neconfirmat.
 Nu au fost rulate teste locale. CSS/Blade si route:cache sunt recompilate.
 Verificarea vizuala desktop/mobil ramane limitata de browserul dezactivat in
 setarile Work; nu este raportata ca efectuata.
+
+Testul de confidentialitate a meniului verifica directivele no-store/private si
+absenta public, permitand directive suplimentare restrictive adaugate de Livewire.
