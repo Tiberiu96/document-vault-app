@@ -14,7 +14,6 @@
         <x-brand/>
         <div class="member-header-actions">
             @if($workspace && $navigationUser->hasVerifiedEmail())<livewire:notification-bell :workspace-id="$workspace->id" :key="'bell-'.$workspace->id"/>@endif
-            <x-account-link :active="request()->routeIs('*.profile.edit')"/>
             <x-member-menu :languages="$languages" :workspace="$workspace" :workspaces="$workspaces"/>
         </div>
     </div>

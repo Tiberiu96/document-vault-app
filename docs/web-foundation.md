@@ -86,7 +86,9 @@ permite revenirea la pagina publica fara modificarea manuala a URL-ului.
 
 Home, paginile publice si aplicatia folosesc aceleasi componente member-header si
 member-menu pentru utilizatorii conectati. Acelasi logo spre home, clopotel,
-avatar spre profil si buton hamburger pe desktop/mobil. Meniul are aceleasi
+si avatarul circular care deschide meniul complet pe desktop/mobil. Nu exista
+un hamburger separat sau un acces duplicat Contul meu in sidebar. Meniul are
+aceleasi
 grupuri Aplicatie / Contul meu / Descopera, limbi si deconectare. Se modifica
 numai marcajul paginii curente si optiunile autorizate pentru identitate/spatiu.
 Vizitatorii neautentificati pastreaza meniul public.
@@ -104,16 +106,19 @@ vechi dupa schimbarea parolei. Livewire este incarcat pe paginile publice numai
 pentru utilizatorii autentificati; clopotelul foloseste aceeasi autorizare si
 polling existent la 30s numai in tab vizibil/online. Fara WebSocket.
 
-Meniul are inaltime limitata la viewport si scroll propriu. Selectorul de spatiu
+Avatarul pastreaza initiala utilizatorului cand nu exista o imagine si are
+etichete localizate aria-label/title. Meniul are inaltime limitata la viewport
+si scroll propriu. Selectorul de spatiu
 se extinde in fluxul meniului. Clickul exterior si Escape inchid meniul;
 Escape reda focusul butonului, iar clopotelul si meniul nu raman deschise simultan.
 Texte functionale minimum 16px, actiuni minimum 44px, etichete ro/en/hu/bg.
 
 MemberNavigationTest acopera aceleasi optiuni intre pagini, vizitatorii anonimi,
 izolarea contextului, sesiunile invalidate si conturile cu email neconfirmat.
-Nu au fost rulate teste locale. CSS/Blade si route:cache sunt recompilate.
-Verificarea vizuala desktop/mobil ramane limitata de browserul dezactivat in
-setarile Work; nu este raportata ca efectuata.
+Pentru VAU-5 au trecut local cele 5 teste si 99 de asertiuni din suita de
+navigatie; CSS standalone si route:cache au fost recompilate. Verificarea
+vizuala desktop/mobil, cu meniul inchis si deschis, foloseste numai date
+demonstrative, iar cele patru capturi sunt atasate issue-ului Linear.
 
 Testul de confidentialitate a meniului verifica directivele no-store/private si
 absenta public, permitand directive suplimentare restrictive adaugate de Livewire.
