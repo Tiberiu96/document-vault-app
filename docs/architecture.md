@@ -102,3 +102,8 @@ Stripe ramane o etapa separata, numai planificata. Pentru ea s-a aprobat plata
 in RON/EUR/HUF, preselectie dupa limba si alegere explicita a altei monede
 acceptate, pret final egal cu suma facturata si inbox durabil pentru webhookuri.
 Detalii si restrictii: plans-and-usage.md.
+
+Checkpoint upgrade: Plan si consum ofera solicitari private adaptate planului
+si tipului spatiului; numai proprietarul trimite, adminul aproba/refuza manual.
+Migrarea 000020, cerere pending deduplicata sub lock, fara activare/plata automata.
+Vezi plans-and-usage.md.

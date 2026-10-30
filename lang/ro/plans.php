@@ -1,6 +1,26 @@
 <?php
 
 return [
+    'upgrade_kicker' => 'Mai mult pentru spatiul tau',
+    'upgrade_to' => 'Treci la :plan',
+    'upgrade_seats' => 'Locuri suplimentare pentru Business',
+    'highest_plan' => 'Ai cel mai mare plan disponibil',
+    'upgrade_hint' => 'Poti solicita trecerea la :plan pentru acest spatiu. Iti vom confirma disponibilitatea si conditiile inainte de activare.',
+    'upgrade_seats_hint' => 'Solicita mai multe locuri pentru echipa, pastrand acelasi workspace.',
+    'upgrade_business' => 'Business include cinci utilizatori, inclusiv proprietarul. Locurile suplimentare se stabilesc separat.',
+    'request_upgrade' => 'Solicita upgrade',
+    'request_seats' => 'Solicita locuri suplimentare',
+    'additional_seats' => 'Locuri suplimentare dorite, in total',
+    'additional_seats_hint' => 'Numarul este peste cele cinci locuri incluse, nu numarul de locuri de adaugat.',
+    'upgrade_manual' => 'Cererea nu schimba planul si nu incaseaza bani. Activarea necesita confirmarea conditiilor si aprobarea echipei.',
+    'upgrade_owner' => 'Doar proprietarul spatiului poate solicita upgrade.',
+    'upgrade_pending' => 'Cerere trimisa',
+    'upgrade_pending_hint' => 'Echipa va verifica solicitarea. Planul si limitele curente raman active pana la aprobare.',
+    'requested_seats' => 'Locuri suplimentare solicitate: :count.',
+    'upgrade_requested' => 'Cererea a fost trimisa. Planul actual nu s-a schimbat.',
+    'no_upgrade' => 'Nu exista un upgrade disponibil pentru aceasta solicitare.',
+    'highest_plan_hint' => 'Planul tau actual este cel mai mare disponibil pentru acest tip de spatiu.',
+
     'title' => 'Plan si consum',
     'current' => 'Plan curent: :plan',
     'storage' => 'Stocare',

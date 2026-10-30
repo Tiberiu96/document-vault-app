@@ -67,6 +67,7 @@ Route::translate(function () {
             });
             Route::middleware(['verified', EnsureActiveWorkspace::class])->group(function () {
                 Route::get(Localizer::url('usage'), WorkspaceUsageController::class)->name('usage');
+                Route::post(Localizer::url('usage'), [WorkspaceUsageController::class, 'requestUpgrade'])->middleware('throttle:plan.requests')->name('usage.upgrade');
                 Route::get(Localizer::url('members'), [WorkspaceMemberController::class, 'index'])->name('members.index');
                 Route::post(Localizer::url('members'), [WorkspaceMemberController::class, 'store'])->middleware('throttle:invitations')->name('members.invite');
                 Route::post(Localizer::url('members').'/invitations/{invitation}/{action}', [WorkspaceMemberController::class, 'invitation'])->whereUuid('invitation')->where('action', 'resend|revoke')->middleware('throttle:invitations')->name('members.invitation');

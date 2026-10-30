@@ -7,6 +7,11 @@ use App\Models\Workspace;
 
 class WorkspacePolicy
 {
+    public function requestUpgrade(User $user, Workspace $workspace): bool
+    {
+        return $workspace->owner_id === $user->id && $this->view($user, $workspace);
+    }
+
     public function manageMembers(User $user, Workspace $workspace): bool
     {
         return $workspace->type === 'business' && $this->view($user, $workspace)

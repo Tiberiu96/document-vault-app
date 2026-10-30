@@ -8,5 +8,5 @@ return [
     'pdftoppm_binary' => env('PDFTOPPM_BINARY', 'pdftoppm'),
     'qpdf_binary' => env('QPDF_BINARY', 'qpdf'),
     'public_pages' => ['home', 'features', 'pricing', 'faq'],
-    'rate_limits' => ['registration_per_hour' => 3, 'profile_updates_per_minute' => 10, 'profile_password_per_minute' => 5, 'profile_avatar_per_minute' => 120],
+    'rate_limits' => ['registration_per_hour' => 3, 'plan_requests_per_minute' => 5, 'profile_updates_per_minute' => 10, 'profile_password_per_minute' => 5, 'profile_avatar_per_minute' => 120],
 ];

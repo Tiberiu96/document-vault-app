@@ -144,3 +144,38 @@ Referinte oficiale pentru etapa viitoare:
 - https://docs.stripe.com/billing/subscriptions/overview
 - https://docs.stripe.com/webhooks
 - https://docs.stripe.com/billing/testing
+
+
+## Solicitarea upgrade-ului din Plan si consum
+
+Zona de upgrade se adapteaza planului efectiv si tipului spatiului: Free personal
+propune Pro, Free business propune Business (cod intern Pro), Business activ
+propune locuri suplimentare; Pro personal indica planul maxim disponibil.
+Nu exista o trecere implicita de la workspace personal la business.
+
+Numai proprietarul poate trimite cererea. Formularul POST pe ruta localizata
+Plan si consum foloseste auth/auth.session/verified/membership/Policy/CSRF si
+limita configurabila plan_requests_per_minute (implicit 5). Workspace-ul vine
+din sesiunea verificata; campurile client pentru ID/plan/pret nu sunt folosite.
+Planul, locurile si consumul nu se schimba prin trimiterea cererii.
+
+Migrarea 000020 creeaza workspace_upgrade_requests. Sub lock pe workspace se
+pastreaza maximum o cerere pending, inclusiv la cereri simultane. Locurile
+solicitate sunt numarul total suplimentar peste cele cinci incluse, nu un delta.
+Pentru Business deja activ trebuie sa fie mai multe decat cele atribuite.
+Preturile si disponibilitatea se confirma manual, inclusiv pentru sablonul Pro
+inca dezactivat; cererea nu este rezervare de capacitate sau dovada de plata.
+
+Admin: /admin/spatii afiseaza marcajul Upgrade solicitat si un filtru pentru
+cereri pending, pe lista paginata existenta. Pagina planului arata cererea.
+Atribuirea manuala Pro, cu MFA/parola verificata/confirmare/versiune/audit, o
+marcheaza approved numai daca si locurile solicitate sunt acordate. Refuzul
+cere confirmare si este auditat. Istoricul approved/rejected ramane in baza.
+Nu se trimit emailuri si nu exista integrare Stripe in aceasta etapa.
+
+Textele sunt localizate in ro/en/hu/bg, cu romana fara diacritice. Interfata
+respecta minimum 16px si se adapteaza pe mobil. WorkspaceUpgradeTest acopera
+cererea fara activare, deduplicarea, proprietarul, izolarea si recomandarile.
+Migrarea locala, compilarea Blade/CSS si route:cache sunt efectuate; testele
+raman pentru CI, fara rulare locala. Verificarea vizuala in browser este inca
+indisponibila din setarile Work.

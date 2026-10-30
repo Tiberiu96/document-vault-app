@@ -85,8 +85,12 @@ class AdminDashboardController extends Controller
 
     public function workspaces(Request $request)
     {
-        $filters = $request->validate(['q' => ['nullable', 'string', 'max:100'], 'type' => ['nullable', 'in:personal,business'], 'plan' => ['nullable', 'in:free,pro']]);
-        $query = Workspace::with('owner:id,name,email')->withCount('members');
+        $filters = $request->validate(['q' => ['nullable', 'string', 'max:100'], 'type' => ['nullable', 'in:personal,business'], 'plan' => ['nullable', 'in:free,pro'], 'upgrade' => ['nullable', 'in:pending']]);
+        $query = Workspace::with('owner:id,name,email')->withCount('members')
+            ->selectSub(DB::table('workspace_upgrade_requests')->selectRaw('1')->whereColumn('workspace_id', 'workspaces.id')->where('status', 'pending')->limit(1), 'pending_upgrade');
+        if (($filters['upgrade'] ?? null) === 'pending') {
+            $query->whereExists(fn ($query) => $query->selectRaw('1')->from('workspace_upgrade_requests')->whereColumn('workspace_id', 'workspaces.id')->where('status', 'pending'));
+        }
         if (! empty($filters['q'])) {
             $term = '%'.addcslashes($filters['q'], '%_\\').'%';
             $query->where(fn ($q) => $q->where('name', 'like', $term)->orWhereHas('owner', fn ($owner) => $owner->where('name', 'like', $term)->orWhere('email', 'like', $term)));

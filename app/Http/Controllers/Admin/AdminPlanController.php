@@ -57,7 +57,7 @@ class AdminPlanController extends Controller
     {
         $filters = $request->validate(['kind' => ['nullable', 'in:ocr,ai'], 'status' => ['nullable', 'in:queued,running,succeeded,failed']]);
 
-        return view('admin.workspace-plan', ['workspace' => $workspace, 'usage' => $limits->usage($workspace), 'proEnabled' => $limits->definition('pro')['enabled'], 'extraMemberPriceBani' => $limits->definition('pro')['extra_member_price_bani'],
+        return view('admin.workspace-plan', ['upgradeRequest' => DB::table('workspace_upgrade_requests')->where('workspace_id', $workspace->id)->where('status', 'pending')->first(), 'workspace' => $workspace, 'usage' => $limits->usage($workspace), 'proEnabled' => $limits->definition('pro')['enabled'], 'extraMemberPriceBani' => $limits->definition('pro')['extra_member_price_bani'],
             'processing' => DB::table('processing_runs')->where('workspace_id', $workspace->id)->where('period', now('UTC')->startOfMonth()->toDateString())
                 ->when($filters['kind'] ?? null, fn ($q, $kind) => $q->where('kind', $kind))->when($filters['status'] ?? null, fn ($q, $status) => $q->where('status', $status))
                 ->selectRaw('kind, provider, status, SUM(units) as units, SUM(attempts) as attempts')->groupBy('kind', 'provider', 'status')->orderBy('kind')->orderBy('provider')->orderBy('status')->paginate(20)->withQueryString(), 'filters' => $filters]);
@@ -81,6 +81,13 @@ class AdminPlanController extends Controller
             $seatsChanged = $extra !== $workspace->additional_member_seats;
             $workspace->forceFill(['plan_code' => $data['plan'], 'additional_member_seats' => $extra, 'plan_version' => $workspace->plan_version + 1,
                 'plan_expires_at' => $data['plan'] === 'pro' && ! empty($data['expires_on']) ? CarbonImmutable::parse($data['expires_on'], 'UTC')->addDay()->startOfDay() : null])->save();
+            if ($data['plan'] === 'pro') {
+                $approved = DB::table('workspace_upgrade_requests')->where('workspace_id', $workspace->id)->where('status', 'pending')->where('additional_member_seats', '<=', $extra)
+                    ->update(['status' => 'approved', 'reviewed_by' => Auth::guard('admin')->id(), 'reviewed_at' => now(), 'updated_at' => now()]);
+                if ($approved) {
+                    AdminAudit::record(Auth::guard('admin')->user(), 'plan.upgrade_approved', 'workspace', $workspace->id);
+                }
+            }
             if ($seatsChanged) {
                 AdminAudit::record(Auth::guard('admin')->user(), 'plan.member_seats_updated', 'workspace', $workspace->id);
             }
@@ -88,5 +95,20 @@ class AdminPlanController extends Controller
         }, 3);
 
         return back()->with('admin_status', 'Plan atribuit manual. Consumul nu a fost resetat; nu s-a efectuat nicio plata.');
+    }
+
+    public function rejectUpgrade(Request $request, Workspace $workspace)
+    {
+        $data = $request->validate(['request_id' => ['required', 'integer'], 'confirm' => ['required', 'accepted']]);
+        DB::transaction(function () use ($workspace, $data): void {
+            Workspace::lockForUpdate()->findOrFail($workspace->id);
+            $updated = DB::table('workspace_upgrade_requests')->where('id', $data['request_id'])->where('workspace_id', $workspace->id)->where('status', 'pending')
+                ->update(['status' => 'rejected', 'reviewed_by' => Auth::guard('admin')->id(), 'reviewed_at' => now(), 'updated_at' => now()]);
+            if ($updated) {
+                AdminAudit::record(Auth::guard('admin')->user(), 'plan.upgrade_rejected', 'workspace', $workspace->id);
+            }
+        }, 3);
+
+        return back()->with('admin_status', 'Cererea a fost inchisa fara schimbarea planului.');
     }
 }

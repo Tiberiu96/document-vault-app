@@ -1,6 +1,26 @@
 <?php
 
 return [
+    'upgrade_kicker' => 'More for your workspace',
+    'upgrade_to' => 'Upgrade to :plan',
+    'upgrade_seats' => 'Additional Business seats',
+    'highest_plan' => 'You have the highest available plan',
+    'upgrade_hint' => 'You can request :plan for this workspace. We will confirm availability and terms before activation.',
+    'upgrade_seats_hint' => 'Request more seats for your team in the same workspace.',
+    'upgrade_business' => 'Business includes five users, including the owner. Additional seats are arranged separately.',
+    'request_upgrade' => 'Request upgrade',
+    'request_seats' => 'Request additional seats',
+    'additional_seats' => 'Total additional seats wanted',
+    'additional_seats_hint' => 'This is above the five included seats, not the number of seats to add.',
+    'upgrade_manual' => 'This request does not change your plan or charge you. Activation requires agreed terms and team approval.',
+    'upgrade_owner' => 'Only the workspace owner can request an upgrade.',
+    'upgrade_pending' => 'Request sent',
+    'upgrade_pending_hint' => 'Our team will review your request. Your current plan and limits remain active until approval.',
+    'requested_seats' => 'Additional seats requested: :count.',
+    'upgrade_requested' => 'Your request has been sent. Your current plan has not changed.',
+    'no_upgrade' => 'No upgrade is available for this request.',
+    'highest_plan_hint' => 'Your current plan is the highest available for this workspace type.',
+
     'title' => 'Plan and usage',
     'current' => 'Current plan: :plan',
     'storage' => 'Storage',

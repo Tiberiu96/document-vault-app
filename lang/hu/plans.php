@@ -1,6 +1,26 @@
 <?php
 
 return [
+    'upgrade_kicker' => 'Több lehetőség a munkatérhez',
+    'upgrade_to' => 'Váltás erre: :plan',
+    'upgrade_seats' => 'További Business helyek',
+    'highest_plan' => 'A legmagasabb elérhető csomagod van',
+    'upgrade_hint' => 'Ehhez a munkatérhez :plan csomagot kérhetsz. Aktiválás előtt megerősítjük az elérhetőséget és a feltételeket.',
+    'upgrade_seats_hint' => 'Kérj több helyet a csapatnak ugyanabban a munkatérben.',
+    'upgrade_business' => 'A Business öt felhasználót tartalmaz a tulajdonossal együtt. A további helyek külön egyeztethetők.',
+    'request_upgrade' => 'Csomagváltás kérése',
+    'request_seats' => 'További helyek kérése',
+    'additional_seats' => 'Összes igényelt további hely',
+    'additional_seats_hint' => 'Az öt benne foglalt helyen felüli teljes szám, nem a most hozzáadandó helyek száma.',
+    'upgrade_manual' => 'A kérés nem módosítja a csomagot és nem jár terheléssel. Az aktiváláshoz egyeztetés és jóváhagyás szükséges.',
+    'upgrade_owner' => 'Csak a munkatér tulajdonosa kérhet csomagváltást.',
+    'upgrade_pending' => 'Kérés elküldve',
+    'upgrade_pending_hint' => 'Csapatunk megvizsgálja a kérést. Jóváhagyásig a jelenlegi csomag és korlátok maradnak érvényben.',
+    'requested_seats' => 'Igényelt további helyek: :count.',
+    'upgrade_requested' => 'A kérést elküldtük. A jelenlegi csomagod nem változott.',
+    'no_upgrade' => 'Ehhez a kéréshez nem érhető el magasabb csomag.',
+    'highest_plan_hint' => 'A jelenlegi csomag a legmagasabb ehhez a munkatértípushoz.',
+
     'title' => 'Csomag és használat',
     'current' => 'Jelenlegi csomag: :plan',
     'storage' => 'Tárhely',
