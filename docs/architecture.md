@@ -109,7 +109,8 @@ Migrarea 000020, cerere pending deduplicata sub lock, fara activare/plata automa
 Vezi plans-and-usage.md.
 
 Checkpoint navigatie: antet si meniu autentificat comune pe public/home si in
-aplicatie, cu selector de workspace autorizat, clopotel, avatar si hamburger.
+aplicatie, cu selector de workspace autorizat, clopotel si avatar circular ca
+unic declansator al meniului pe desktop si mobil.
 Dropdown-urile independente au fost eliminate din layouturile autentificate;
 paginile publice personalizate folosesc auth.session si cache privat. Detalii
 si verificari in web-foundation.md.

@@ -19,6 +19,15 @@ class MemberNavigationTest extends TestCase
         $xpath = new \DOMXPath($dom);
         $this->assertSame(1, $xpath->query('//*[@data-member-header]')->length);
         $this->assertSame(1, $xpath->query('//*[@data-member-menu]')->length);
+        $this->assertSame(1, $xpath->query('//*[@data-member-menu]/summary//*[contains(concat(" ", normalize-space(@class), " "), " user-avatar ")]')->length);
+        $this->assertSame(0, $xpath->query('//*[@data-member-menu]/summary//*[contains(concat(" ", normalize-space(@class), " "), " icon ")]')->length);
+        $this->assertSame(0, $xpath->query('//*[@data-member-header]//*[contains(concat(" ", normalize-space(@class), " "), " account-control ")]')->length);
+        $this->assertSame(0, $xpath->query('//*[contains(concat(" ", normalize-space(@class), " "), " profile-nav-link ")]')->length);
+        $this->assertNotSame('', $xpath->query('//*[@data-member-menu]/summary')->item(0)->getAttribute('aria-label'));
+        $this->assertSame(
+            $xpath->query('//*[@data-member-menu]/summary')->item(0)->getAttribute('aria-label'),
+            $xpath->query('//*[@data-member-menu]/summary')->item(0)->getAttribute('title'),
+        );
         $links = [];
         foreach ($xpath->query('//*[@data-member-menu]//nav[contains(@class,"member-menu-group")]/a') as $link) {
             $links[] = $link->getAttribute('href');
@@ -56,6 +65,7 @@ class MemberNavigationTest extends TestCase
             $expected ??= $links;
             $this->assertSame($expected, $links);
             $this->assertStringNotContainsString('class="library-account"', $response->getContent());
+            $this->assertSame(1, count(array_filter($links, fn ($url) => $url === route('profile.edit'))));
         }
     }
 

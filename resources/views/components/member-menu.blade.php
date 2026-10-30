@@ -21,7 +21,7 @@
     }
 @endphp
 <details class="member-menu" data-member-menu>
-    <summary aria-label="{{ __('site.nav.menu') }}" title="{{ __('site.nav.menu') }}"><x-icon name="menu" :size="23"/></summary>
+    <summary aria-label="{{ __('site.nav.account') }}" title="{{ __('site.nav.account') }}" @if($isCurrent('profile.edit')) aria-current="page" @endif><x-user-avatar/></summary>
     <div class="member-menu-panel">
         @if($workspace)<div class="member-menu-workspace"><x-workspace-picker :workspace="$workspace" :workspaces="$workspaces"/></div>@endif
         <nav class="member-menu-group" aria-label="{{ __('site.nav.application') }}">

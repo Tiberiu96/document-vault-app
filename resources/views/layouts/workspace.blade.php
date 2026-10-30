@@ -27,7 +27,6 @@
             <a href="{{ route('invitations.index') }}" @if($section === 'invitations')aria-current="page"@endif><x-icon name="bell"/>{{ __('team.incoming_title') }}</a>
         @if(app()->environment('local') && config('ai.enabled') && $workspace && Gate::allows('manage', [App\Models\Document::class, $workspace]))<a href="{{ route('ai.playground') }}" @if($section === 'ai') aria-current="page" @endif><x-icon name="sparkle"/>{{ __('ai.title') }}</a>@endif
         </nav>
-        <a class="profile-nav-link" href="{{ route('profile.edit') }}" @if($section === 'profile') aria-current="page" @endif><x-user-avatar/>{{ __('profile.title') }}</a>
         <div class="library-botanical"><x-branch/><p>{{ __('site.life.quote') }}</p><span>{{ __('documents.private') }}</span></div>
         <a class="action-button library-public-link" href="{{ route('home') }}">{{ config('app.name') }} ↗</a>
     </aside>

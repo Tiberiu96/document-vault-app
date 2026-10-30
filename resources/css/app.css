@@ -1314,9 +1314,6 @@
 .user-avatar { display:inline-grid; place-items:center; flex:none; width:42px; height:42px; border-radius:50%; background:#e8dfd0; color:#715a3e; font-size:18px; font-weight:600; overflow:hidden; }
 .user-avatar img { width:100%; height:100%; object-fit:cover; display:block; }
 .account-control .user-avatar { width:100%; height:100%; font-size:18px; }
-.profile-nav-link { display:flex; align-items:center; gap:12px; padding:10px 12px; border-radius:8px; font-size:16px; }
-.profile-nav-link .user-avatar { width:32px; height:32px; font-size:16px; }
-.profile-nav-link:hover,.profile-nav-link[aria-current] { background:#ece5da; color:#715a3e; }
 .profile-grid { display:grid; grid-template-columns:minmax(0,1.15fr) minmax(0,1fr); gap:24px; align-items:start; }
 .profile-panel { padding:28px; min-width:0; }
 .profile-panel h2 { font-family:var(--font-editorial); font-size:30px; margin-bottom:18px; }
@@ -1361,9 +1358,12 @@
 .member-header .notification-bell { margin:0; }
 .member-header .notification-dropdown>summary { width:44px; height:44px; }
 .member-header .notification-popover { top:calc(100% + 22px); }
-.member-menu>summary { display:flex; align-items:center; justify-content:center; width:44px; height:44px; border:1px solid #d7cdbf; border-radius:7px; background:#fdfbf7; color:var(--color-action); cursor:pointer; list-style:none; }
+.member-menu>summary { display:flex; align-items:center; justify-content:center; width:44px; height:44px; padding:0; overflow:hidden; border:1px solid #cbbba5; border-radius:50%; background:#fdfbf7; color:var(--color-action); cursor:pointer; list-style:none; }
 .member-menu>summary::-webkit-details-marker { display:none; }
-.member-menu[open]>summary { background:#eae2d4; border-color:#a88f70; }
+.member-menu>summary .user-avatar { width:100%; height:100%; font-size:18px; }
+.member-menu>summary:hover,.member-menu>summary[aria-current=page],.member-menu[open]>summary { background:#eae2d4; border-color:#8b7355; }
+.member-menu>summary[aria-current=page],.member-menu[open]>summary { box-shadow:0 0 0 2px #eae2d4; }
+.member-menu>summary:focus-visible { outline:3px solid #987852; outline-offset:3px; }
 .member-menu-panel { position:absolute; z-index:50; right:0; top:calc(100% - 4px); width:390px; max-width:100%; max-height:calc(100dvh - 120px); overflow-y:auto; overscroll-behavior:contain; border:1px solid #e1dacf; border-radius:12px; padding:20px; background:#fff; box-shadow:0 12px 32px #302b1b14; color:var(--color-ink); font-size:16px; line-height:1.5; overflow-wrap:anywhere; }
 .member-menu-workspace { margin-bottom:20px; }
 .member-menu-workspace .workspace-picker summary { padding:12px 14px; }
