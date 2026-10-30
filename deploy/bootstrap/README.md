@@ -55,3 +55,13 @@ Nu copia .env sau baza de pe laptop fara un transfer privat aprobat.
 
 Validare locala a installerului: bash -n, --dry-run si identitatea copiei Desktop.
 Nu reprezinta o instalare verificata pe VM: rezultatul real se confirma dupa rulare.
+
+
+## Cheie de deploy persistenta pe Google Cloud
+
+`install-deploy-ssh-key.sh` este installer permanent, separat de installerul
+runtime. Refoloseste cheia publica ED25519 existenta, verifica amprenta asteptata
+si o instaleaza root-owned in `/etc/ssh/vaulty-authorized-keys/`, cu comanda
+fortata spre helperul de deploy. Pastreaza cheile Google si verifica sshd inainte
+de reload. Nu foloseste credentiale private si nu schimba secrete GitHub.
+Parametri, rollback si reluarea deploy-ului: `docs/ci-cd.md`.

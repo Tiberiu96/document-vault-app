@@ -40,11 +40,57 @@ foloseste --no-scripts; package:discover este executat apoi separat ca vaulty.
 Astfel, deploy-urile repetate nu cer operatorului sa citeasca cache-uri private
 create de runtime. Nu largi permisiunile cache-ului pentru a ocoli aceasta regula.
 
-Cheia SSH dedicata trebuie adaugata la authorized_keys pe o singura linie:
+Cheia SSH dedicata se instaleaza separat de fisierele gestionate de Google:
+`/etc/ssh/vaulty-authorized-keys/<operator>`, root-owned 0644, director 0755.
+Cheia este publica; sshd trebuie sa o poata citi in contextul utilizatorului.
+Numai root poate modifica fisierul. Nu se pastreaza cheia privata pe server si
+nu se adauga cheia de deploy in metadata Google fara restrictia comenzii fortate.
+
+Installer permanent: `deploy/bootstrap/install-deploy-ssh-key.sh`. Confirma
+amprenta publica dintr-un deploy cunoscut ca legitim, apoi ruleaza din consola:
+
+```bash
+sudo bash deploy/bootstrap/install-deploy-ssh-key.sh \
+  --user szabotiberiuandrei2020 \
+  --public-key "$HOME/.ssh/vaulty-github-actions.pub" \
+  --fingerprint 'SHA256:AMPRENTA_PUBLICA_VERIFICATA'
+```
+
+`--dry-run` face verificarile preliminare fara modificari. Installerul verifica
+amprenta, formatul ED25519, helperul root-owned si politica existenta. Nu
+suprascrie alte chei/configuratii. Instaleaza `00-vaulty-deploy-key.conf`, care
+pastreaza `.ssh/authorized_keys` si `.ssh/authorized_keys2` si adauga sursa
+root-owned `/etc/ssh/vaulty-authorized-keys/%u`. Numai fisierul operatorului este
+creat; nu se adauga utilizatori, parole sau acces pentru alte identitati.
+
+Cheia instalata are exact restrictia:
 
 ```text
 restrict,command="sudo -n /usr/local/libexec/vaulty-deploy" ssh-ed25519 CHEIA_PUBLICA vaulty-github-actions
 ```
+
+Se verifica `sshd -t` si configuratia efectiva pentru operator inainte de
+`systemctl reload ssh.service`. Nu se face restart, nu se inchide sesiunea
+curenta si nu se dezactiveaza agentul Google/StrictModes/validarea host key.
+La esec se elimina numai fisierele nou create si se restaureaza configuratia
+anterioara. Cheile existente din home si fisierele .env nu sunt modificate.
+
+Incident observat pe beta la 30 octombrie 2026: deploy-urile GitHub de la
+12:41/12:56/13:07/13:08 UTC coincid cu autentificarile ED25519 reusite. La
+16:57:58 UTC, guest agent a raportat expirarea cheilor temporare Google si
+eliminarea operatorului din google-sudoers; authorized_keys a fost gasit absent.
+Aceasta sustine curatarea automata ca explicatie, fara a reprezenta un audit
+complet al securitatii VM. Sursa separata root-owned evita dependenta cheii CI
+de ciclul de viata al cheilor temporare Google.
+
+Dupa instalarea pe server, reia numai jobul de deploy esuat al SHA-ului testat,
+cu acelasi artifact CSS. Nu relua testele reusite fara motiv si nu anula un
+deploy deja pornit. Validarea locala a installerului: bash -n; verificarea pe
+server si reconectarea CI se confirma separat, dupa executia operatorului.
+
+Surse Google:
+- https://docs.cloud.google.com/compute/docs/images/guest-agent-functions
+- https://docs.cloud.google.com/compute/docs/troubleshooting/troubleshooting-ssh-errors
 
 Regula sudoers root-owned 0440, validata inainte cu visudo -cf:
 
