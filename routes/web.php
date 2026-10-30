@@ -34,7 +34,7 @@ Route::get('/llms.txt', [PublicDiscoveryController::class, 'llms'])->name('llms'
 Route::translate(function () {
     Route::middleware(EnsureAvailableLanguage::class)->group(function () {
         foreach (config('vault.public_pages') as $page) {
-            Route::get(Localizer::url($page), [PublicPageController::class, 'index'])->name($page)->defaults('indexable', true);
+            Route::get(Localizer::url($page), [PublicPageController::class, 'index'])->middleware('auth.session')->name($page)->defaults('indexable', true);
         }
         Route::middleware([EnsureLocalEnvironment::class, 'auth', 'auth.session', 'verified', EnsureActiveWorkspace::class])->group(function () {
             Route::get(Localizer::url('ai.test'), [LocalAiController::class, 'index'])->name('ai.playground');

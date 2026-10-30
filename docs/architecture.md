@@ -107,3 +107,9 @@ Checkpoint upgrade: Plan si consum ofera solicitari private adaptate planului
 si tipului spatiului; numai proprietarul trimite, adminul aproba/refuza manual.
 Migrarea 000020, cerere pending deduplicata sub lock, fara activare/plata automata.
 Vezi plans-and-usage.md.
+
+Checkpoint navigatie: antet si meniu autentificat comune pe public/home si in
+aplicatie, cu selector de workspace autorizat, clopotel, avatar si hamburger.
+Dropdown-urile independente au fost eliminate din layouturile autentificate;
+paginile publice personalizate folosesc auth.session si cache privat. Detalii
+si verificari in web-foundation.md.

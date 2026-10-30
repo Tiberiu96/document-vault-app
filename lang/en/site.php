@@ -8,6 +8,10 @@ return [
         'example' => 'Interface example',
     ],
     'nav' => [
+        'application' => 'Application',
+        'discover' => 'Discover',
+        'public_home' => 'Home page',
+
         'features' => 'Features',
         'pricing' => 'Plans',
         'faq' => 'FAQ',

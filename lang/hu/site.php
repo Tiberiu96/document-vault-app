@@ -8,6 +8,10 @@ return [
         'example' => 'Felületi példa',
     ],
     'nav' => [
+        'application' => 'Alkalmazás',
+        'discover' => 'Felfedezés',
+        'public_home' => 'Kezdőlap',
+
         'features' => 'Funkciók',
         'pricing' => 'Csomagok',
         'faq' => 'Gyakori kérdések',

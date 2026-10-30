@@ -81,3 +81,36 @@ vizitatorilor neautentificati, prin `@guest`; utilizatorii conectati nu il vad.
 Logo-ul din antetul mobil autentificat foloseste ruta home localizata, la fel ca
 logo-ul din sidebar. Suprascrierea catre dashboard a fost eliminata pentru a
 permite revenirea la pagina publica fara modificarea manuala a URL-ului.
+
+## Antet autentificat comun - 30 octombrie 2026
+
+Home, paginile publice si aplicatia folosesc aceleasi componente member-header si
+member-menu pentru utilizatorii conectati. Acelasi logo spre home, clopotel,
+avatar spre profil si buton hamburger pe desktop/mobil. Meniul are aceleasi
+grupuri Aplicatie / Contul meu / Descopera, limbi si deconectare. Se modifica
+numai marcajul paginii curente si optiunile autorizate pentru identitate/spatiu.
+Vizitatorii neautentificati pastreaza meniul public.
+
+Selectorul de workspace este in meniul comun, inclusiv pe home. In aplicatie,
+sidebarul desktop si cautarea contextuala raman unelte separate; vechiul dropdown
+library-account si antetul library-topbar nu mai sunt randate. Logo-ul nu mai
+este dublat in sidebar. Cautarea nu este afisata in scanner/upload. Bara de
+navigare rapida de jos ramane disponibila in aplicatie pe mobil.
+
+Contextul public selecteaza exclusiv un workspace permis de membership/Policy;
+un ID strain din sesiune nu este folosit. Paginile publice personalizate au
+Cache-Control no-store/private si auth.session pentru invalidarea sesiunilor
+vechi dupa schimbarea parolei. Livewire este incarcat pe paginile publice numai
+pentru utilizatorii autentificati; clopotelul foloseste aceeasi autorizare si
+polling existent la 30s numai in tab vizibil/online. Fara WebSocket.
+
+Meniul are inaltime limitata la viewport si scroll propriu. Selectorul de spatiu
+se extinde in fluxul meniului. Clickul exterior si Escape inchid meniul;
+Escape reda focusul butonului, iar clopotelul si meniul nu raman deschise simultan.
+Texte functionale minimum 16px, actiuni minimum 44px, etichete ro/en/hu/bg.
+
+MemberNavigationTest acopera aceleasi optiuni intre pagini, vizitatorii anonimi,
+izolarea contextului, sesiunile invalidate si conturile cu email neconfirmat.
+Nu au fost rulate teste locale. CSS/Blade si route:cache sunt recompilate.
+Verificarea vizuala desktop/mobil ramane limitata de browserul dezactivat in
+setarile Work; nu este raportata ca efectuata.

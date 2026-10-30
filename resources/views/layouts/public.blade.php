@@ -37,6 +37,7 @@
     <meta name="twitter:title" content="{{ $title }}">
     <meta name="twitter:description" content="{{ $description }}">
     <meta name="twitter:image" content="{{ rtrim(config('app.url'), '/') }}/images/social-card.png">
+    @auth @livewireStyles @endauth
     <x-favicons/>
     <link rel="preload" href="{{ asset(app()->getLocale() === 'bg' ? 'fonts/noto-serif-bg.woff2' : 'fonts/dm-serif-display.ttf') }}" as="font" type="{{ app()->getLocale() === 'bg' ? 'font/woff2' : 'font/ttf' }}" crossorigin>
     <link rel="stylesheet" href="{{ asset('css/app.css') }}?v={{ filemtime(public_path('css/app.css')) }}">
@@ -47,6 +48,9 @@
 <body id="top" @class(['home-page' => $page === 'home'])>
 @include('admin.partials.impersonation-banner')
     <a href="#main" class="skip-link">{{ __('site.a11y.skip') }}</a>
+    @auth
+        <x-member-header :languages="$languages"/>
+    @else
     <header class="site-header wrap">
         <x-brand/>
         <nav class="desktop-nav" aria-label="{{ __('site.nav.menu') }}">
@@ -70,6 +74,7 @@
             <x-mobile-menu :languages="$languages" :page="$page"/>
         </div>
     </header>
+    @endauth
     <main id="main" tabindex="-1">@yield('content')</main>
     <footer class="site-footer wrap">
         <div><x-brand/><p>{{ __('site.footer.line') }}</p></div>
@@ -77,5 +82,6 @@
         <div class="footer-bottom"><span>© {{ date('Y') }} {{ $brand }}</span><span>{{ $languages->pluck('locale')->map(fn ($code) => strtoupper($code))->implode(' · ') }}</span></div>
     </footer>
 @stack('scripts')
+@auth @livewireScripts @endauth
 </body>
 </html>

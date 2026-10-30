@@ -8,6 +8,10 @@ return [
         'example' => 'Exemplu de interfata',
     ],
     'nav' => [
+        'application' => 'Aplicatie',
+        'discover' => 'Descopera',
+        'public_home' => 'Pagina principala',
+
         'features' => 'Functionalitati',
         'pricing' => 'Planuri',
         'faq' => 'Intrebari frecvente',

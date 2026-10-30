@@ -8,6 +8,10 @@ return [
         'example' => 'Примерен интерфейс',
     ],
     'nav' => [
+        'application' => 'Приложение',
+        'discover' => 'Открий',
+        'public_home' => 'Начална страница',
+
         'features' => 'Функции',
         'pricing' => 'Планове',
         'faq' => 'Въпроси',

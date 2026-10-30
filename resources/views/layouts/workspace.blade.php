@@ -11,9 +11,9 @@
 <body @class(['library-body', 'scanner-body' => ($section ?? '') === 'scan', 'upload-body' => ($section ?? '') === 'upload'])>
 @include('admin.partials.impersonation-banner')
 <a href="#main" class="skip-link">{{ __('site.a11y.skip') }}</a>
+<x-member-header :languages="$languages" :workspace="$workspace" :workspaces="$workspaces"/>
 <div class="library-shell">
     <aside class="library-sidebar">
-        <x-brand/>
         @if($workspace)
         <x-workspace-picker :workspace="$workspace" :workspaces="$workspaces"/>
         @endif
@@ -32,13 +32,9 @@
         <a class="action-button library-public-link" href="{{ route('home') }}">{{ config('app.name') }} ↗</a>
     </aside>
     <div class="library-main">
-        <header class="library-topbar">
-            @if($workspace)<x-workspace-picker :workspace="$workspace" :workspaces="$workspaces" class="library-mobile-workspace"/>@endif
-            <x-brand class="library-mobile-brand"/>
-            <form action="{{ route('documents.index') }}" class="library-search" role="search"><x-icon name="search"/><input type="search" name="q" maxlength="100" placeholder="{{ __('documents.search') }}" aria-label="{{ __('documents.search') }}" value="{{ is_string(request('q')) ? request('q') : '' }}"><button type="submit" aria-label="{{ __('documents.search') }}"><x-icon name="arrow"/></button></form>
-            @if($workspace && auth()->user()->hasVerifiedEmail())<livewire:notification-bell :workspace-id="$workspace->id" :key="'bell-'.$workspace->id"/>@endif
-            <details class="library-account"><summary><x-user-avatar class="library-avatar"/><span>{{ auth()->user()->name }}</span><x-icon name="chevron" :size="16"/></summary><div class="library-account-menu"><a href="{{ route('profile.edit') }}">{{ __('profile.title') }}</a><a href="{{ route('usage') }}">{{ __('plans.title') }}</a><a href="{{ route('invitations.index') }}">{{ __('team.incoming_title') }}</a>@if($workspace?->type === 'business')<a href="{{ route('members.index') }}">{{ __('team.title') }}</a>@endif@if(auth()->user()->hasVerifiedEmail())<a href="{{ route('notifications.index') }}">{{ __('notifications.title') }}</a>@endif<a href="{{ route('reminders.index') }}">{{ __('reminders.title') }}</a><x-language-switcher :languages="$languages"/><a href="{{ route('verification.notice') }}">{{ __('account_mail.status') }}</a><form action="{{ route('logout') }}" method="POST">@csrf<button type="submit">{{ __('site.nav.logout') }}</button></form></div></details>
-        </header>
+        @if($workspace && auth()->user()->hasVerifiedEmail() && !in_array($section, ['scan', 'upload']))
+        <div class="workspace-tools"><form action="{{ route('documents.index') }}" class="library-search" role="search"><x-icon name="search"/><input type="search" name="q" maxlength="100" placeholder="{{ __('documents.search') }}" aria-label="{{ __('documents.search') }}" value="{{ is_string(request('q')) ? request('q') : '' }}"><button type="submit" aria-label="{{ __('documents.search') }}"><x-icon name="arrow"/></button></form></div>
+        @endif
         <main id="main" class="library-content" tabindex="-1">
             @if(session('library_status'))<div class="security-notice" role="status">{{ session('library_status') }}</div>@endif
             @if(session('security_status'))<div class="security-notice" role="status">{{ session('security_status') }}</div>@endif

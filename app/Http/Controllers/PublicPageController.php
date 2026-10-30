@@ -12,7 +12,12 @@ class PublicPageController extends Controller
     {
         $page = Route::currentBaseName();
 
-        return view('pages.'.$page, $this->data($request, $page));
+        $response = response()->view('pages.'.$page, $this->data($request, $page));
+        if ($request->user()) {
+            $response->headers->set('Cache-Control', 'no-store, private');
+        }
+
+        return $response;
     }
 
     private function data(Request $request, string $page): array

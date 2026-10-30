@@ -14,7 +14,7 @@
         </form>
     </section>
     <section class="library-panel profile-panel">
-        <h2>{{ __('profile.password') }}</h2><p class="field-help">{{ __('profile.password_hint') }}</p>
+        <h2 id="profile-password">{{ __('profile.password') }}</h2><p class="field-help">{{ __('profile.password_hint') }}</p>
         <form method="POST" action="{{ route('profile.password') }}" class="auth-form profile-form">
             @csrf @method('PUT')
             <div><label for="current-password">{{ __('profile.current_password') }}</label><input id="current-password" name="current_password" type="password" required autocomplete="current-password"></div>
