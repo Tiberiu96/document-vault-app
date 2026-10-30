@@ -99,3 +99,6 @@ Tabelul agregat de consum are filtru tip/stare si paginare. Listele pastreaza qu
 filtrelor, folosesc ordine stabila si nu schimba permisiunile sau datele afisate.
 Tabelele admin impun incadrarea textului in celula; cel de spatii are coloane
 proportionale si derulare orizontala pe ecrane inguste.
+
+Logo-ul Vaulty din antetul admin deschide pagina publica home in romana intr-un
+tab nou (target=_blank, rel=noopener noreferrer). Panoul ramane deschis.
