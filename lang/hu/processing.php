@@ -1,6 +1,17 @@
 <?php
 
 return [
+    'loading_title' => 'Feldolgozzuk a dokumentumot',
+    'loading_intro' => 'Kinyerjük a szöveget, elemezzük a tartalmat és rendszerezzük az információkat.',
+    'upload_step' => 'Feltöltés',
+    'upload_complete' => 'A dokumentum feltöltése sikerült',
+    'ocr_step_hint' => 'Kinyerjük a dokumentum szövegét',
+    'ai_step_hint' => 'Elemezzük és rendszerezzük az információkat',
+    'loading_hint' => 'OCR-rel kinyerjük a szöveget. Ha AI-elemzést választottál, ellenőrizhető javaslatokat is készítünk.',
+    'upload_complete_short' => 'Feltöltés kész',
+    'elapsed' => 'Eltelt idő:',
+    'view_details' => 'Részletek',
+
     'ai_failed_title' => 'Az AI-elemzés sikertelen',
     'ai_failed_hint' => 'Nem sikerült javaslatokat kérni az AI-szolgáltatástól. Az adatokat kézzel is megadhatod. Ez a hiba nem jelenti azt, hogy a dokumentummal probléma van.',
     'upload_failed' => 'A fájl feltöltése nem sikerült. Ellenőrizd a korlátot és a kapcsolatot, majd próbáld újra.',

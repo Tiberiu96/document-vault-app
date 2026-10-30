@@ -4,7 +4,8 @@
     const stage = box.querySelector('[data-processing-stage]');
     const message = box.querySelector('[data-processing-message]');
     const elapsed = box.querySelector('[data-processing-elapsed]');
-    const active = status => ['queued', 'running'].includes(status);
+    const retry=box.querySelector('[data-flow-retry]');
+    retry?.addEventListener('click',()=>location.reload());
     let elapsedSeconds = 0;
     let polls = 0;
     let finished = false;
@@ -22,7 +23,8 @@
             const data = await response.json();
             box.querySelector('[data-ocr-state]').textContent = data.ocr_label;
             box.querySelector('[data-ai-state]').textContent = data.ai_label;
-            if (!active(data.ocr_status) && !active(data.ai_status)) {
+            window.VaultUploadFlow?.updateProcessing(box,data);
+            if (!data.pending) {
                 finished = true;
                 clearInterval(clock);
                 if (data.ready_for_review && box.dataset.reviewUrl) location.replace(box.dataset.reviewUrl);
@@ -42,6 +44,7 @@
             clearInterval(clock);
             if (message) message.textContent = box.dataset.offline;
             box.querySelector('.processing-spinner')?.classList.add('is-paused');
+            if(retry)retry.hidden=false;
         }
     };
     poll();

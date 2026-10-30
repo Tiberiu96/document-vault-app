@@ -52,6 +52,7 @@
     @if($workspace && Gate::allows('create', [App\Models\Document::class, $workspace]))<a class="mobile-upload mobile-scan" href="{{ route('documents.scan') }}"><x-icon name="scan"/><span>{{ __('scanner.short_title') }}</span></a>@endif
     <a href="{{ route('documents.index') }}"><x-icon name="document"/><span>{{ __('documents.title') }}</span></a>
 </nav>
+<template id="processing-loading-template">@include('documents.processing-loading', ['loadingDocument' => null])</template>
 <script src="{{ asset('js/document-upload-flow.js') }}?v={{ filemtime(public_path('js/document-upload-flow.js')) }}" defer></script>
 @stack('scripts')
 @livewireScripts

@@ -1,6 +1,17 @@
 <?php
 
 return [
+    'loading_title' => 'Procesam documentul',
+    'loading_intro' => 'Extragem textul, analizam continutul si organizam informatiile pentru tine.',
+    'upload_step' => 'Incarcare',
+    'upload_complete' => 'Documentul a fost incarcat cu succes',
+    'ocr_step_hint' => 'Extragem textul din document',
+    'ai_step_hint' => 'Analizam si organizam informatiile',
+    'loading_hint' => 'Extragem textul prin OCR. Daca ai ales analiza AI, pregatim si sugestiile pentru verificare.',
+    'upload_complete_short' => 'Incarcare finalizata',
+    'elapsed' => 'Timp scurs:',
+    'view_details' => 'Vezi detalii',
+
     'ai_failed_title' => 'Analiza AI nu a reusit',
     'ai_failed_hint' => 'Nu am putut obtine sugestii de la serviciul AI. Poti completa campurile manual. Aceasta eroare nu indica o problema cu documentul.',
     'upload_failed' => 'Nu am putut incarca fisierul. Verifica limita si conexiunea, apoi incearca din nou.',

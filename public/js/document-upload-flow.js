@@ -73,19 +73,43 @@
         if (!response.ok) throw new Error('cancel');
         const destination = state.meta.index_url; clear(); location.assign(sameOrigin(destination));
     };
+    const updateProcessing = (panel,data) => {
+        panel.querySelector('[data-ocr-state]').textContent=data.ocr_label;
+        panel.querySelector('[data-ai-state]').textContent=data.ai_label;
+        const ocrDone=data.ocr_status==='ready';
+        const aiDone=['ready','needs_review','accepted','rejected'].includes(data.ai_status);
+        const ocr=panel.querySelector('[data-step-ocr]'),ai=panel.querySelector('[data-step-ai]');
+        ocr?.classList.toggle('is-complete',ocrDone);
+        ocr?.classList.toggle('is-current',!ocrDone && ['queued','running'].includes(data.ocr_status));
+        ai?.classList.toggle('is-complete',aiDone);
+        ai?.classList.toggle('is-current',ocrDone && !aiDone && data.pending);
+        panel.classList.toggle('is-ai-stage',ocrDone);
+        panel.querySelector('[data-badge-ocr]')?.classList.toggle('is-complete',ocrDone);
+        panel.querySelector('[data-badge-ai]')?.classList.toggle('is-complete',aiDone);
+        const stage=panel.querySelector('[data-processing-stage]');
+        if(stage) stage.textContent=data.ocr_status==='running'?(panel.dataset.loadingOcr || data.ocr_label):(data.ai_status==='running'?(panel.dataset.loadingAi || data.ai_label):(panel.dataset.loadingWait || data.ocr_label));
+        if(data.source_released && panel.hasAttribute('data-document-processing')) {
+            panel.querySelector('[data-server-preview]')?.remove();
+            const preview=panel.querySelector('[data-local-preview]');if(preview){preview.hidden=true;preview.removeAttribute('href');}
+        }
+    };
     const start = async (file, meta, csrf) => {
         clear(); stopped = false; current = {file,meta,csrf};
         const main = document.querySelector('#main');
-        const panel = document.createElement('section'); panel.className='library-panel processing-panel';
-        const title=document.createElement('h1'); title.textContent=meta.messages.title;
-        const notice=document.createElement('p'); notice.textContent=meta.messages.progress; notice.setAttribute('role','status');
-        const spinner=document.createElement('span'); spinner.className='processing-spinner'; spinner.setAttribute('aria-hidden','true');
-        const status=document.createElement('p'); status.setAttribute('aria-live','polite');
-        const elapsed=document.createElement('p'); elapsed.className='field-help';
-        const retry=document.createElement('button'); retry.type='button'; retry.className='button button-outline'; retry.textContent=meta.messages.retry; retry.hidden=true;
-        const discard=document.createElement('button'); discard.type='button'; discard.className='button button-danger'; discard.textContent=meta.messages.cancel;
+        const panel = document.getElementById('processing-loading-template').content.firstElementChild.cloneNode(true);
+        const notice=panel.querySelector('[data-processing-message]');
+        const spinner=panel.querySelector('.processing-spinner');
+        const elapsed=panel.querySelector('[data-processing-elapsed]');
+        const retry=panel.querySelector('[data-flow-retry]');
+        const discard=panel.querySelector('[data-flow-cancel]');
+        const state=current;
+        state.previewUrl=URL.createObjectURL(file);
+        panel.querySelector('[data-flow-filename]').textContent=file.name;
+        panel.querySelector('[data-flow-filesize]').textContent=`${(file.size/1048576).toLocaleString(document.documentElement.lang,{maximumFractionDigits:2})} MB · ${file.type==='application/pdf'?'PDF':file.type.replace('image/','').toUpperCase()}`;
+        const preview=panel.querySelector('[data-local-preview]');preview.href=state.previewUrl;preview.hidden=false;
         discard.addEventListener('click',()=>{discard.disabled=true;cancel().catch(()=>{notice.textContent=meta.messages.failed;discard.disabled=false;});});
-        panel.append(title,spinner,notice,status,elapsed,retry,discard); main.replaceChildren(panel); history.replaceState(null,'',sameOrigin(meta.show_url));
+        main.replaceChildren(panel); history.replaceState(null,'',sameOrigin(meta.show_url)); window.scrollTo(0,0);
+        thumbnail(panel,state);
         let count=0;
         const poll=async()=>{
             if(stopped || !current)return;
@@ -94,7 +118,8 @@
                 if([401,403,404,410].includes(response.status)){clear();location.reload();return;}
                 if(!response.ok)throw new Error('status');
                 const data=await response.json();
-                status.textContent=`${meta.messages.ocr}: ${data.ocr_label} · ${meta.messages.ai}: ${data.ai_label}`;
+                if(stopped || current!==state)return;
+                updateProcessing(panel,data);
                 const seconds=Math.max(0,Number(data.elapsed_seconds)||0); elapsed.textContent=`${Math.floor(seconds/60)}:${String(seconds%60).padStart(2,'0')}`;
                 if(!data.pending){await render(data.ready_for_review && meta.review_requested?meta.review_url:meta.edit_url);return;}
             } catch(_) { notice.textContent=meta.messages.failed; }
@@ -149,7 +174,7 @@
     });
     adopt();
     window.addEventListener('beforeunload',event=>{if(current){event.preventDefault();event.returnValue='';}});
-    window.VaultUploadFlow = {start};
+    window.VaultUploadFlow = {start,updateProcessing};
     window.addEventListener('pagehide',clear);
     window.addEventListener('pageshow',event=>{if(event.persisted)location.reload();});
 })();

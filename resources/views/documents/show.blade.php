@@ -1,5 +1,9 @@
 @extends('layouts.workspace')
 @section('content')
+@php($isProcessing = !$document->trashed() && (in_array($document->ocr_status, ['queued', 'running']) || in_array($document->ai_status, ['queued', 'running']) || ($document->ai_requested && $document->ocr_status === 'ready' && $document->ai_status === 'idle')))
+@if($isProcessing)
+    @include('documents.processing-loading', ['loadingDocument' => $document])
+@else
 <a class="action-button" href="{{ route('documents.index') }}" data-action="back"><x-icon name="back" :size="18"/>{{ __('documents.back') }}</a>
 <div class="library-heading"><div><span class="eyebrow">{{ $workspace->name }}</span><h1>{{ $document->title }}</h1>@if($document->summary)<p class="document-short-summary">{{ $document->summary }}</p>@endif<span class="stored-status"><i></i>{{ $document->isDraft() ? __('processing.draft') : __('documents.stored') }}</span></div><div class="library-actions">@unless($document->trashed())@unless($document->source_released_at)<x-button :href="route('documents.download', ['document' => $document->id])" variant="outline" icon="arrow">{{ __('documents.download') }}</x-button>@endunless @can('update', $document)<x-button :href="route('documents.edit', ['document' => $document->id])">{{ __('documents.edit') }}</x-button>@endcan @endunless</div></div>
 @if($document->isDraft())<div class="security-notice"><p>{{ __('processing.draft_notice') }}</p><form method="POST" action="{{ route('documents.discard', ['document' => $document->id]) }}">@csrf @method('DELETE')<button type="submit" class="action-button action-button-danger">{{ __('documents.cancel') }}</button></form></div>@endif
@@ -28,6 +32,7 @@
     </div>
 </div>
 @unless($document->trashed()) @include('documents.processing') @endunless
+@endif
 @endsection
 
-@push('scripts')<script src="{{ asset('js/document-processing.js') }}" defer></script>@endpush
+@push('scripts')<script src="{{ asset('js/document-processing.js') }}?v={{ filemtime(public_path('js/document-processing.js')) }}" defer></script>@endpush

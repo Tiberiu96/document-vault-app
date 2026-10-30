@@ -1,6 +1,17 @@
 <?php
 
 return [
+    'loading_title' => 'Processing your document',
+    'loading_intro' => 'We extract the text, analyze the content and organize the information for you.',
+    'upload_step' => 'Upload',
+    'upload_complete' => 'Your document was uploaded successfully',
+    'ocr_step_hint' => 'Extracting text from the document',
+    'ai_step_hint' => 'Analyzing and organizing information',
+    'loading_hint' => 'We extract text with OCR. If you selected AI analysis, we also prepare suggestions for your review.',
+    'upload_complete_short' => 'Upload complete',
+    'elapsed' => 'Elapsed time:',
+    'view_details' => 'View details',
+
     'ai_failed_title' => 'AI analysis failed',
     'ai_failed_hint' => 'We could not obtain suggestions from the AI service. You can enter the details manually. This error does not indicate a problem with the document.',
     'upload_failed' => 'We could not upload the file. Check the limit and connection, then try again.',

@@ -208,3 +208,29 @@ fisierelor. WASM/XFA sunt dezactivate pentru miniatura. Prima pagina
 se deseneaza in canvas numai din File-ul local si nu se salveaza pe server.
 Daca randarea nu este suportata, pictograma si deschiderea originalului raman
 disponibile. Workerul este distrus dupa randare sau la anularea fluxului.
+
+
+## Loading dupa incarcare - 30 octombrie 2026
+
+Loading-ul existent din `VaultUploadFlow.start` a fost inlocuit vizual dupa
+referinta furnizata. Se afiseaza in acelasi loc, dupa incarcarea pozei/PDF-ului
+sau confirmarea scanarii, pana la formularul de verificare. Nu exista ruta noua,
+pas suplimentar sau al doilea loading. `documents/processing-loading.blade.php`
+este partialul comun clonat dintr-un template inert; la reload este randat direct
+numai cat timp documentul are procesare in asteptare sau activa.
+
+Compozitie: trei etape (incarcare/OCR/AI), bara de activitate, statusuri din
+endpointul autorizat existent, preview lateral, timp scurs, detalii si anularea
+incarcarii draft prin actiunea existenta. Fara procent sau estimare de timp
+inventate. AI optional ramane optional; niciun job sau limita nu se modifica.
+Miniatura din fluxul activ foloseste exclusiv File-ul retinut in memoria paginii,
+inclusiv PDF.js local. La reload, preview numai prin ruta privata autorizata,
+daca sursa este inca disponibila. Eliberarea sursei elimina preview-ul de server
+din loading la urmatoarea actualizare. Originalul nu se persista suplimentar.
+
+Stiluri izolate pentru loading, adaptare desktop/mobil si reduced-motion.
+Texte in ro/en/hu/bg; romana fara diacritice. Fisiere: partialul de loading,
+show/layout workspace, componenta icon, scripturile upload-flow/processing,
+CSS si traduceri. CSS recompilat cu `composer run css:build`; fara teste locale,
+conform preferintei utilizatorului. Verificarea vizuala in browser ramane
+indisponibila: browserul local este dezactivat in setarile Work.

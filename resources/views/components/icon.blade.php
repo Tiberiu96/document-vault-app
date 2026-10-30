@@ -1,6 +1,8 @@
 @props(['name', 'size' => 20])
 @php
     $paths = [
+        'eye' => '<path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/>',
+        'close' => '<path d="m6 6 12 12M6 18 18 6"/>',
         'camera' => '<path d="M4 6h4l2-3h4l2 3h4a1 1 0 0 1 1 1v12H3V7a1 1 0 0 1 1-1Z"/><circle cx="12" cy="12" r="4"/>',
         'play' => '<circle cx="12" cy="12" r="9"/><path d="m10 8 6 4-6 4Z"/>',
         'lock' => '<rect x="5" y="10" width="14" height="11" rx="1"/><path d="M8 10V6a4 4 0 0 1 8 0v4M12 14v3"/>',
