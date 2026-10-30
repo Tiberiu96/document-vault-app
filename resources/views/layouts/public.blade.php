@@ -44,7 +44,7 @@
     <script type="application/ld+json">{!! json_encode(['@context' => 'https://schema.org', '@type' => 'WebPage', 'name' => $title, 'description' => $description, 'url' => $canonical, 'inLanguage' => app()->getLocale()], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}</script>
     @endif
 </head>
-<body id="top">
+<body id="top" @class(['home-page' => $page === 'home'])>
 @include('admin.partials.impersonation-banner')
     <a href="#main" class="skip-link">{{ __('site.a11y.skip') }}</a>
     <header class="site-header wrap">
@@ -57,16 +57,16 @@
         <div class="header-actions">
             <x-language-switcher :languages="$languages"/>
             @guest
-                <a class="auth-link" href="{{ route('login') }}">{{ __('site.nav.login') }}</a>
+                <a class="{{ $page === 'home' ? 'account-control' : 'auth-link' }}" href="{{ route('login') }}" aria-label="{{ __('site.nav.login') }}" title="{{ __('site.nav.login') }}">@if($page === 'home')<x-icon name="user" :size="21"/>@else{{ __('site.nav.login') }}@endif</a>
             @endguest
             @auth
                 <x-account-link :active="$page === 'dashboard'"/>
             @else
-                <x-button :href="route('register')" icon="arrow" class="header-primary">{{ __('registration.create') }}</x-button>
+                @if($page !== 'home')<x-button :href="route('register')" icon="arrow" class="header-primary">{{ __('registration.create') }}</x-button>@endif
             @endauth
         </div>
         <div class="mobile-header-actions">
-            @auth<x-account-link :active="$page === 'dashboard'"/>@else<a class="auth-link" href="{{ route('login') }}">{{ __('site.nav.login') }}</a>@endauth
+            @auth<x-account-link :active="$page === 'dashboard'"/>@else<a class="{{ $page === 'home' ? 'account-control' : 'auth-link' }}" href="{{ route('login') }}" aria-label="{{ __('site.nav.login') }}" title="{{ __('site.nav.login') }}">@if($page === 'home')<x-icon name="user" :size="21"/>@else{{ __('site.nav.login') }}@endif</a>@endauth
             <x-mobile-menu :languages="$languages" :page="$page"/>
         </div>
     </header>

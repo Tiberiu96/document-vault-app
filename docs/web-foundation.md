@@ -49,3 +49,22 @@ DM Serif Display si DM Sans sunt gazduite local, cu licente SIL OFL incluse. Sur
 Verificarea vizuala automata in browser a ramas blocata de o permisiune salvata a domeniului, inclusiv dupa confirmarea utilizatorului de a repermite accesul. Nu este raportata ca efectuata. Captura furnizata de utilizator a fost folosita pentru identificarea defectului de traduceri. CSS contine breakpoints responsive; verificarea vizuala desktop/mobil ramane necesara dupa deblocarea browserului.
 
 Inregistrarea PF/PJ si actiunile tranzactionale sunt acum livrate (registration.md). Verificarea emailului este livrata; urmeaza MFA admin si managementul complet al limbilor/documentelor. Configureaza ghidat emailul inaintea livrarii reale de mesaje; nu afisa credentiale.
+
+
+## Home - referinta vizuala actualizata (30 octombrie 2026)
+
+Hero-ul din `resources/views/pages/home.blade.php` reproduce compozitia din
+fotografia furnizata: titlu pe trei randuri, badge introductiv, actiuni de
+scanare/prezentare, nota de autentificare, beneficii si card de scanare suprapus
+peste miniatura produsului. Telefonul si documentul sunt ilustratii HTML/CSS,
+fara date personale. Butoanele de scanare trimit la ruta protejata existenta;
+prezentarea duce la beneficiile de pe aceeasi pagina. Antetul home foloseste
+acces circular la cont. Textele sunt localizate in ro/en/hu/bg, romana fara
+diacritice. Stilurile sunt limitate la home, cu adaptare pentru mobil.
+
+Fisiere: pagina home, layout public, componenta icon, `lang/*/site.php` si
+`resources/css/app.css`. Recompilare: `composer run css:build` (Tailwind standalone).
+Buildul CSS a reusit. Nu au fost rulate teste, conform preferintei de lucru.
+Verificarea vizuala desktop/mobil ramane necesara: browserul local este dezactivat
+in setarile Work. Nu se afirma potrivire pixel cu pixel fara aceasta verificare.
+Nu este necesara configurarea unui serviciu extern.
