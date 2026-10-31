@@ -16,8 +16,8 @@ Planul nu este mass-assignable din formularele clientului.
   urmatoare se aplica Free, fara cron suplimentar. Dezactivarea sablonului Pro are
   acelasi efect. Nu se sterg fisiere, nu se reseteaza consumul si nu se anuleaza
   automat rezervarile deja admise. Reducerea sub consumul existent opreste noi rezervari.
-- Fara checkout, facturare, preturi inventate sau incasari. Atribuirea manuala nu este
-  dovada unei plati. Integrarea comerciala ramane in TODO dupa pregatirea productiei.
+- Atribuirea manuala nu genereaza checkout sau incasari si nu este dovada unei plati.
+  Stripe foloseste un flux separat, oprit implicit, descris mai jos si in docs/stripe.md.
 
 Migrarea 000017 adauga enabled in platform_plan_limits si plan_code, plan_expires_at,
 plan_version pe workspaces. Workspace-urile existente raman Free; nu se suprascriu
@@ -109,13 +109,11 @@ expirarea/revocarea, izolarea, fallback-ul si acordarea administrativa.
 Migrarea locala, compilarea Blade/CSS si route:cache sunt verificate separat;
 testele automate nu au fost rulate local, conform preferintei utilizatorului.
 
-## Decizii pentru integrarea ulterioara Stripe
+## Integrarea Stripe
 
-Stripe este numai planificat; nu este instalat/configurat si nu exista apeluri,
-checkout, incasari, facturi comerciale sau credentiale Stripe folosite aici.
-Utilizatorul are deja un cont. Va fi confirmat sandbox-ul separat al proiectului
-si configuratia privata inaintea integrarii. Abonamente recurente, cu planul de
-baza si locuri suplimentare ca pozitii ale aceluiasi abonament.
+Stripe Checkout/Billing este implementat, oprit implicit si configurabil numai prin
+variabile private. Abonamentele recurente au planul de baza si locurile suplimentare
+ca pozitii ale aceluiasi abonament. Detaliile operationale sunt in docs/stripe.md.
 
 Cerinta aprobata pentru etapa de plati inlocuieste plata numai in RON: moneda
 implicita este ro=RON, en=EUR, hu=HUF, bg=EUR. Clientul poate alege explicit RON,
@@ -127,10 +125,9 @@ rate inventate sau conversii aproximative facturate. Actualul camp RON este
 configurare manuala pregatitoare; nu reprezinta implementare multicurrency.
 
 Webhook: validarea semnaturii pe body brut, persistenta durabila in MySQL inainte
-de raspuns 2xx, deduplicare pe eveniment/cont/mediu si payload minim criptat.
-Procesarea efectiva pe joburi, cu reluare din inbox/outbox durabil daca Redis sau
-workerul cade. Tranzitii idempotente, protectie la evenimente neordonate, retry
-limitat/backoff, monitorizare sanitizata si reconciliere periodica cu Stripe.
+de raspuns 2xx, deduplicare pe eveniment/mediu si payload criptat. Procesarea efectiva
+ruleaza pe high, cu tranzitii idempotente, protectie la evenimente neordonate si retry
+limitat/backoff.
 Niciun acces platit acordat exclusiv pe baza redirectului de succes din browser.
 Sandbox si credentiale live separate; local se vor testa plata initiala,
 reinnoirea cu ceas simulat, esecul, autentificarea suplimentara, anularea,
@@ -171,7 +168,7 @@ cereri pending, pe lista paginata existenta. Pagina planului arata cererea.
 Atribuirea manuala Pro, cu MFA/parola verificata/confirmare/versiune/audit, o
 marcheaza approved numai daca si locurile solicitate sunt acordate. Refuzul
 cere confirmare si este auditat. Istoricul approved/rejected ramane in baza.
-Nu se trimit emailuri si nu exista integrare Stripe in aceasta etapa.
+Nu se trimit emailuri. Cererile manuale raman separate de abonamentele Stripe.
 
 Textele sunt localizate in ro/en/hu/bg, cu romana fara diacritice. Interfata
 respecta minimum 16px si se adapteaza pe mobil. WorkspaceUpgradeTest acopera

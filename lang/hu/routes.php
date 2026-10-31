@@ -6,6 +6,9 @@ return [
     'profile.password' => 'fiokom/jelszo',
 
     'usage' => 'csomag-es-hasznalat',
+    'billing.summary' => 'elofizetes/osszegzes',
+    'billing.checkout' => 'elofizetes/fizetes',
+    'billing.result' => 'elofizetes/eredmeny',
     'members' => 'tagok',
     'invitations' => 'meghivasok',
     'notifications' => 'ertesitesek',

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\AdminPlanRequest;
+use App\Models\PlatformPlanPrice;
 use App\Models\Workspace;
 use App\Services\Admin\AdminAudit;
 use App\Services\PlanLimitsService;
@@ -21,7 +22,8 @@ class AdminPlanController extends Controller
         $plan = $request->validate(['plan' => ['sometimes', 'in:free,pro']])['plan'] ?? 'free';
         $definition = $limits->definition($plan);
 
-        return view('admin.plans', ['plan' => $plan, 'limits' => $definition['limits'], 'version' => $definition['version'], 'enabled' => $definition['enabled'], 'extraMemberPriceBani' => $definition['extra_member_price_bani']]);
+        return view('admin.plans', ['plan' => $plan, 'limits' => $definition['limits'], 'version' => $definition['version'], 'enabled' => $definition['enabled'], 'extraMemberPriceBani' => $definition['extra_member_price_bani'],
+            'billingPrices' => PlatformPlanPrice::query()->orderBy('workspace_type')->orderBy('currency')->get()->keyBy(fn ($price) => $price->workspace_type.'.'.$price->currency)]);
     }
 
     public function update(AdminPlanRequest $request)

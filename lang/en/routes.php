@@ -6,6 +6,9 @@ return [
     'profile.password' => 'my-account/password',
 
     'usage' => 'plan-and-usage',
+    'billing.summary' => 'subscription/summary',
+    'billing.checkout' => 'subscription/checkout',
+    'billing.result' => 'subscription/result',
     'members' => 'members',
     'invitations' => 'invitations',
     'notifications' => 'notifications',

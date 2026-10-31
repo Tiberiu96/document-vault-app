@@ -1393,6 +1393,9 @@
 @media(max-width:400px) { .member-header .brand img { width:132px; height:44px; }.member-header-actions { gap:10px; } }
 @media(max-width:340px) { .member-header .brand img { width:112px; height:40px; }.member-header-actions { gap:8px; }.member-header-bar { gap:8px; } }
 
+.billing-options { display:flex; flex-wrap:wrap; align-items:end; gap:18px; font-size:16px; }.billing-options h2 { width:100%; margin:0; }.billing-options label { min-width:220px; }.billing-summary,.billing-result { font-size:16px; }.billing-summary dl { display:grid; gap:12px; margin:20px 0; }.billing-summary dl>div { display:flex; justify-content:space-between; gap:20px; padding-bottom:12px; border-bottom:1px solid var(--color-line); }.billing-summary dd { margin:0; text-align:right; font-weight:600; }.billing-summary .billing-total { font-size:19px; }.billing-admin-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:18px; }.billing-admin-grid form { padding:18px; border:1px solid var(--color-line); border-radius:8px; }.billing-admin-grid h3 { margin:0 0 12px; }
+@media(max-width:800px) { .billing-options { display:grid; }.billing-options label { min-width:0; }.billing-summary dl>div { align-items:start; }.billing-admin-grid { grid-template-columns:1fr; } }
+
 /* Asistent privat: panou lateral pe desktop, bottom sheet pe mobil. */
 .assistant-widget { position:relative; z-index:70; }
 .assistant-launcher { position:fixed; right:28px; bottom:28px; z-index:70; display:flex; align-items:center; gap:10px; min-height:52px; padding:12px 18px; border:1px solid #806548; border-radius:999px; background:#76593a; color:#fff; box-shadow:0 12px 28px #3325102e; font:600 16px var(--font-interface); cursor:pointer; }

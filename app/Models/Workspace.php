@@ -36,4 +36,9 @@ class Workspace extends Model
     {
         return $this->hasMany(WorkspaceInvitation::class);
     }
+
+    public function billingSubscription(): HasOne
+    {
+        return $this->hasOne(WorkspaceBillingSubscription::class);
+    }
 }

@@ -1,6 +1,6 @@
 # Moneda — plan
 
-Pretul de baza al abonamentului este price_ron_minor integer, de exemplu 2990 = 29.90 RON. Fara FLOAT. ro afiseaza RON, en EUR, hu HUF, bg EUR. Conversii cu aritmetica precisa si rotunjire dupa exponentul monedei, formatare prin locale; conversiile abonamentelor sunt aproximative, checkout RON.
+Preturile abonamentelor sunt intregi in unitatea minima a monedei, de exemplu 2990 = 29.90 RON. Fara FLOAT. ro preselecteaza RON, en EUR, hu HUF, bg EUR. Checkout foloseste preturi explicite si versionate RON/EUR/HUF, fara conversie sau rate inventate; suma si moneda din sumar trebuie sa coincida cu Stripe.
 
 Frankfurter prin ExchangeRateProviderInterface, FrankfurterExchangeRateProvider, ExchangeRateService si UpdateExchangeRatesJob zilnic. Providerul va fi verificat la integrare, inclusiv endpoint, monede si eventuale credentiale. Rate istorice DECIMAL cu data publicarii/sursa in MySQL; Redis pentru ultima rata valida. Weekend/sarbatori: ultima publicata; esec: retry limitat si data ratei vizibila. Daca nu exista rata valida, afiseaza RON si indisponibilitatea conversiei; nu inventa rata.
 

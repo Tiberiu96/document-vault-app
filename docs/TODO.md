@@ -7,15 +7,17 @@
 - Activare Turnstile si backup R2/Restic numai dupa configurare si verificare restaurare.
 - Validare upload/OCR/AI, limite infrastructura, notificari si securitate in staging/productie.
 
-## Plati si abonamente comerciale — amanat la cererea utilizatorului
+## Plati si abonamente comerciale
 
-Dupa mutarea pe productie si alegerea procesatorului de plati:
+Stripe Checkout/Billing este implementat, oprit implicit. Inainte de activarea productiei:
 
 - Stabilire preturi si limite comerciale Free/Pro; preturi in bani RON intregi.
-- Configurare cont/credentiale local, fara secrete in conversatii sau Git.
-- Checkout, webhookuri semnate, idempotenta, reconciliere si evidenta abonamentului real.
-- Reinnoire, anulare, expirare, incasari esuate, facturi si drepturi verificate server-side.
+- Configurare credentiale sandbox/live si endpoint webhook separat, fara secrete in Git.
+- Verificare completa sandbox pentru checkout, reinnoire, esec si evenimente duplicate.
+- Workflow self-service pentru modificarea/anularea abonamentului, cu proratare explicita.
+- Reconciliere periodica cu Stripe si monitorizare operationala a inboxului webhook.
 - Separarea granturilor administrative de abonamentele confirmate de procesator.
 - Evidenta costurilor/tokens AI si politica de retry pentru erori care pot genera costuri.
 
-Nu activa plati sau abonamente recurente doar pe baza unei atribuiri manuale Pro.
+Nu activa productia pana la finalizarea acestor verificari. Atribuirea manuala Pro nu
+este dovada unei plati si ramane separata de starea Stripe.
