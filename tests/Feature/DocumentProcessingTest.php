@@ -481,7 +481,7 @@ class DocumentProcessingTest extends TestCase
         $draft = Document::where('title', 'private-draft')->sole();
         $this->assertSame('draft', $draft->status);
         $this->get('/ro/documente')->assertOk()->assertDontSee('private-draft');
-        $this->get('/ro/panou')->assertViewHas('documentCount', 1);
+        $this->get('/ro/panou')->assertViewHas('documentCount', 1)->assertViewHas('pageCount', 1);
         Queue::assertPushedOn('low', ExpireDocumentDraft::class);
         $this->get('/ro/documente/'.$draft->id.'/editeaza')->assertOk()->assertSee('Confirma si salveaza')->assertSee('form="discard-upload"', false);
         $this->workspace->forceFill(['type' => 'business'])->save();

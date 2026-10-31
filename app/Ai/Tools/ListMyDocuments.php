@@ -22,13 +22,15 @@ class ListMyDocuments implements Tool
     {
         $workspace = $this->workspace();
         $documents = Document::where('workspace_id', $workspace->id)->where('status', 'stored')
-            ->with('category')->latest()->limit(20)->get()
+            ->with('category')
+            ->withExists(['reminder as has_active_reminder' => fn ($query) => $query->where('status', 'active')])
+            ->latest()->limit(20)->get()
             ->map(fn (Document $document) => [
                 'id' => $document->id,
                 'title' => $document->title,
                 'category' => $document->category?->name,
                 'expires_on' => $document->expires_on?->toDateString(),
-                'has_reminder' => $document->reminder()->where('status', 'active')->exists(),
+                'has_reminder' => (bool) $document->has_active_reminder,
             ])->all();
 
         return json_encode(['documents' => $documents], JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
