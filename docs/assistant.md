@@ -4,6 +4,18 @@ Asistentul privat foloseste `laravel/ai` 1.3, Blade si JavaScript fara Vite/Node
 Este oprit implicit si apare numai utilizatorilor autentificati, cu email confirmat
 si workspace activ. Conversatia ramane exclusiv in memoria paginii; nu se salveaza.
 
+Componenta comuna `assistant-widget` este inclusa in layout-urile public si de
+workspace: apare si pe paginile publice vizitate dupa autentificare. Verifica
+workspace-ul activ prin apartenenta si Policy; nu apare vizitatorilor, conturilor
+neconfirmate, fara workspace autorizat sau in modul administrativ de consultare.
+Schimbarea paginii sau a workspace-ului inchide conversatia din memoria paginii.
+
+Panoul foloseste un dialog nativ, cu focus retinut in dialog, inchidere prin
+Escape si fundal sub panou. Pe desktop este lateral; pe mobil ocupa zona vizibila,
+inclusiv la deschiderea tastaturii. Continutul se deruleaza separat de antet si
+formular, cu spatiu pentru marginile sigure ale dispozitivului. Textul functional
+ramane de minimum 16px.
+
 ## Configurare
 
 ```dotenv

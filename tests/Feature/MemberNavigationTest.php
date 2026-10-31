@@ -50,6 +50,47 @@ class MemberNavigationTest extends TestCase
         return $workspace;
     }
 
+    public function test_assistant_is_available_once_on_public_and_private_member_pages(): void
+    {
+        config(['ai.enabled' => true, 'assistant.enabled' => true]);
+        $user = User::factory()->create();
+        $workspace = $this->workspace($user, 'Personal');
+        $this->actingAs($user)->withSession(['active_workspace_id' => $workspace->id]);
+
+        foreach (['/ro', '/ro/functionalitati', '/ro/contul-meu', '/ro/plan-si-consum', '/ro/documente'] as $url) {
+            $html = $this->get($url)->assertOk()->getContent();
+            $this->assertSame(1, substr_count($html, 'data-assistant-open'), $url);
+            $this->assertSame(1, substr_count($html, 'id="assistant-panel"'), $url);
+            $this->assertSame(1, substr_count($html, '/js/assistant.js'), $url);
+        }
+    }
+
+    public function test_assistant_stays_hidden_for_guests_unverified_accounts_and_disabled_feature(): void
+    {
+        config(['ai.enabled' => true, 'assistant.enabled' => true]);
+        $this->get('/ro')->assertOk()->assertDontSee('data-assistant-open', false);
+
+        $unverified = User::factory()->unverified()->create();
+        $workspace = $this->workspace($unverified, 'Neverificat');
+        $this->actingAs($unverified)->withSession(['active_workspace_id' => $workspace->id])
+            ->get('/ro')->assertOk()->assertDontSee('data-assistant-open', false);
+
+        $verified = User::factory()->create();
+        $workspace = $this->workspace($verified, 'Verificat');
+        config(['assistant.enabled' => false]);
+        $this->actingAs($verified)->withSession(['active_workspace_id' => $workspace->id])
+            ->get('/ro')->assertOk()->assertDontSee('data-assistant-open', false);
+    }
+
+    public function test_assistant_widget_does_not_expose_an_unauthorized_workspace(): void
+    {
+        config(['ai.enabled' => true, 'assistant.enabled' => true]);
+        $user = User::factory()->create();
+        $foreign = $this->workspace(User::factory()->create(), 'Private foreign workspace');
+        $this->actingAs($user)->withSession(['active_workspace_id' => $foreign->id])
+            ->get('/ro')->assertOk()->assertDontSee('data-assistant-open', false)->assertDontSee('Private foreign workspace');
+    }
+
     public function test_signed_in_navigation_has_the_same_links_on_public_and_private_pages(): void
     {
         $user = User::factory()->create();

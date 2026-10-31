@@ -10,21 +10,39 @@
     const sendButton = form.querySelector('[type="submit"]');
     const stopButton = root.querySelector('[data-assistant-stop]');
     const messagesNode = root.querySelector('[data-assistant-messages]');
+    const scrollNode = root.querySelector('[data-assistant-scroll]');
     const suggestions = root.querySelector('[data-assistant-suggestions]');
     const status = root.querySelector('[data-assistant-status]');
     const conversation = [];
     let controller = null;
     let retryText = '';
 
+    const updateViewport = () => {
+        const viewport = window.visualViewport;
+        panel.style.setProperty('--assistant-viewport-height', `${viewport?.height ?? window.innerHeight}px`);
+        panel.style.setProperty('--assistant-viewport-top', `${viewport?.offsetTop ?? 0}px`);
+    };
     const setOpen = (open) => {
-        panel.hidden = !open;
+        updateViewport();
+        if (open && !panel.open) panel.showModal();
+        if (!open && panel.open) panel.close();
         openButton.setAttribute('aria-expanded', String(open));
         document.body.classList.toggle('assistant-open', open);
-        if (open) input.focus();
+        if (open && window.matchMedia('(min-width:801px)').matches) input.focus({ preventScroll: true });
     };
+    panel.addEventListener('close', () => {
+        openButton.setAttribute('aria-expanded', 'false');
+        document.body.classList.remove('assistant-open');
+    });
+    panel.addEventListener('click', (event) => {
+        const bounds = panel.getBoundingClientRect();
+        if (event.target === panel && (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom)) setOpen(false);
+    });
+    window.visualViewport?.addEventListener('resize', updateViewport);
+    window.visualViewport?.addEventListener('scroll', updateViewport);
+    window.addEventListener('resize', updateViewport);
     openButton.addEventListener('click', () => setOpen(true));
     closeButton.addEventListener('click', () => setOpen(false));
-    document.addEventListener('keydown', (event) => { if (event.key === 'Escape' && !panel.hidden) setOpen(false); });
 
     const addMessage = (role, text, pending = false) => {
         root.querySelector('[data-assistant-welcome]')?.remove();
@@ -33,7 +51,7 @@
         item.textContent = text;
         if (pending) item.dataset.pending = 'true';
         messagesNode.append(item);
-        messagesNode.scrollTop = messagesNode.scrollHeight;
+        scrollNode.scrollTop = scrollNode.scrollHeight;
         return item;
     };
     const setStatus = (text) => {
@@ -44,7 +62,7 @@
         input.disabled = busy;
         sendButton.hidden = busy;
         stopButton.hidden = !busy;
-        suggestions.hidden = busy;
+        suggestions.hidden = busy || conversation.length > 0;
     };
     const statusForTool = (name) => ({
         list_my_documents: root.dataset.listStatus,
@@ -75,7 +93,7 @@
                 if (event.type === 'text') {
                     if (!started) { assistantNode.textContent = ''; started = true; setStatus(''); }
                     assistantNode.textContent += event.text || '';
-                    messagesNode.scrollTop = messagesNode.scrollHeight;
+                    scrollNode.scrollTop = scrollNode.scrollHeight;
                 }
                 if (event.type === 'error') throw new Error(event.message || root.dataset.failed);
                 if (event.type === 'done') return assistantNode.textContent;
@@ -122,7 +140,7 @@
             setBusy(false);
             setStatus('');
             input.disabled = false;
-            input.focus();
+            if (panel.open && window.matchMedia('(min-width:801px)').matches) input.focus({ preventScroll: true });
         }
     };
     form.addEventListener('submit', (event) => { event.preventDefault(); const text = input.value; input.value = ''; send(text); });

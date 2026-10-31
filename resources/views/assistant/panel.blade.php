@@ -5,12 +5,13 @@
     <button class="assistant-launcher" type="button" data-assistant-open aria-controls="assistant-panel" aria-expanded="false" aria-label="{{ __('assistant.open') }}" title="{{ __('assistant.open') }}">
         <x-icon name="sparkle" :size="24"/><span>{{ __('assistant.title') }}</span>
     </button>
-    <section id="assistant-panel" class="assistant-panel" hidden aria-label="{{ __('assistant.title') }}">
+    <dialog id="assistant-panel" class="assistant-panel" aria-labelledby="assistant-title">
         <header class="assistant-header">
             <span class="assistant-mark"><x-icon name="sparkle" :size="22"/></span>
-            <div><h2>{{ __('assistant.title') }}</h2><p>{{ $workspace->name }}</p></div>
+            <div><h2 id="assistant-title">{{ __('assistant.title') }}</h2><p>{{ $workspace->name }}</p></div>
             <button type="button" class="assistant-icon-button" data-assistant-close aria-label="{{ __('assistant.close') }}" title="{{ __('assistant.close') }}"><x-icon name="close" :size="24"/></button>
         </header>
+        <div class="assistant-content" data-assistant-scroll>
         <div class="assistant-scope"><x-icon name="document"/><span>{{ __('assistant.all_documents') }}</span></div>
         <p class="assistant-scope-note">{{ __('assistant.sources_note') }}</p>
         @if(config('assistant.provider') === 'gemini')<p class="assistant-remote-note"><x-icon name="info"/>{{ __('assistant.remote_notice') }}</p>@endif
@@ -20,10 +21,12 @@
                 <p>{{ __('assistant.welcome') }}</p>
             </div>
         </div>
-        <div class="assistant-status" data-assistant-status hidden role="status"></div>
         <div class="assistant-suggestions" data-assistant-suggestions>
             @foreach(__('assistant.suggestions') as $suggestion)<button type="button" data-assistant-suggestion>{{ $suggestion }}</button>@endforeach
         </div>
+        <div class="assistant-status" data-assistant-status hidden role="status"></div>
+        </div>
+        <div class="assistant-footer">
         <form class="assistant-composer" data-assistant-form>
             <label class="sr-only" for="assistant-message">{{ __('assistant.placeholder') }}</label>
             <textarea id="assistant-message" name="message" maxlength="{{ config('assistant.max_message_characters') }}" rows="2" placeholder="{{ __('assistant.placeholder') }}" required></textarea>
@@ -31,5 +34,6 @@
             <button type="button" class="assistant-stop" data-assistant-stop hidden>{{ __('assistant.stop') }}</button>
         </form>
         <p class="assistant-helper">{{ __('assistant.helper') }}</p>
-    </section>
+        </div>
+    </dialog>
 </div>

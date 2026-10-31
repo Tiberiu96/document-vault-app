@@ -81,6 +81,7 @@
         <div class="footer-links"><a href="{{ route('faq') }}">{{ __('site.nav.faq') }}</a><a href="#top">{{ __('site.footer.top') }} ↑</a><span class="status-note"><i></i>{{ __('site.footer.status') }}</span></div>
         <div class="footer-bottom"><span>© {{ date('Y') }} {{ $brand }}</span><span>{{ $languages->pluck('locale')->map(fn ($code) => strtoupper($code))->implode(' · ') }}</span></div>
     </footer>
+<x-assistant-widget/>
 @stack('scripts')
 @auth @livewireScripts @endauth
 </body>
