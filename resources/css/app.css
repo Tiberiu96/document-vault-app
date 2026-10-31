@@ -1086,6 +1086,7 @@
 
 /* Home: compozitia editoriala din referinta, cu scanner suprapus. */
 .home-page { background:#f9f7f2; overflow-x:clip; }
+.home-page main { overflow-x:clip; }
 .home-page .site-header { gap:48px; min-height:96px; }
 .home-page .site-header .brand img { width:174px; height:58px; }
 .home-page .header-actions { gap:30px; }
@@ -1100,7 +1101,7 @@
 .hero-trust { display:flex; align-items:center; flex-wrap:wrap; gap:24px; padding:0; margin:48px 0 0; list-style:none; color:var(--color-secondary); font-size:16px; }
 .hero-trust li { display:flex; align-items:center; gap:10px; }
 .hero-trust svg { color:#a18d73; }
-.home-hero .hero-visual { padding:8px 0 146px; max-width:none; min-width:0; }
+.home-hero .hero-visual { padding:8px 0 146px; max-width:none; min-width:0; overflow-x:clip; }
 .home-hero .product-preview { position:relative; z-index:1; box-shadow:0 0 9px #3832240c,0 16px 44px #38322412; border-radius:18px; background:#fcfbf9; }
 .home-hero .preview-chrome { padding:17px 22px; gap:9px; }
 .home-hero .preview-chrome>span { width:12px; height:12px; background:#38a178; }
