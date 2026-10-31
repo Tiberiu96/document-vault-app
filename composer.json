@@ -20,7 +20,8 @@
         "livewire/livewire": "^4.0",
         "niels-numbers/laravel-localizer": "^1.4",
         "pragmarx/google2fa": "^9.1",
-        "setasign/fpdf": "^1.9"
+        "setasign/fpdf": "^1.9",
+        "stripe/stripe-php": "^22.1"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",

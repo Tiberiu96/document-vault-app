@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Contracts\Ai\AiProviderInterface;
+use App\Contracts\Billing\StripeBillingGateway;
 use App\Contracts\Ocr\OcrProviderInterface;
 use App\Http\Middleware\EnsureActiveWorkspace;
 use App\Http\Middleware\EnsureAvailableLanguage;
@@ -13,6 +14,7 @@ use App\Services\Ai\GeminiProvider;
 use App\Services\Ai\GroqProvider;
 use App\Services\Ai\OllamaProvider;
 use App\Services\Backup\BackupBarrier;
+use App\Services\Billing\StripeGateway;
 use App\Services\Ocr\LocalOcrProvider;
 use App\Services\WebsiteContext;
 use Illuminate\Auth\Middleware\EnsureEmailIsVerified;
@@ -46,6 +48,7 @@ class AppServiceProvider extends ServiceProvider
             default => throw new AiProviderException('UNSUPPORTED_AI_PROVIDER'),
         });
         $this->app->bind(OcrProviderInterface::class, LocalOcrProvider::class);
+        $this->app->bind(StripeBillingGateway::class, StripeGateway::class);
     }
 
     /**
@@ -82,6 +85,8 @@ class AppServiceProvider extends ServiceProvider
             return [Limit::perHour(3)->by('reset-account:'.hash('sha256', $email)), Limit::perHour(20)->by('reset-ip:'.hash('sha256', (string) $request->ip()))];
         });
         RateLimiter::for('plan.requests', fn (Request $request) => Limit::perMinute(config('vault.rate_limits.plan_requests_per_minute'))->by('plan-requests:'.$request->user()->id));
+        RateLimiter::for('billing', fn (Request $request) => Limit::perMinute(config('vault.rate_limits.billing_per_minute'))->by('billing:'.$request->user()->id));
+        RateLimiter::for('stripe.webhook', fn (Request $request) => Limit::perMinute(config('vault.rate_limits.billing_webhooks_per_minute'))->by('stripe-webhook:'.$request->ip()));
         RateLimiter::for('profile.update', fn (Request $request) => Limit::perMinute(config('vault.rate_limits.profile_updates_per_minute'))->by('profile:'.$request->user()->id));
         RateLimiter::for('profile.password', fn (Request $request) => Limit::perMinute(config('vault.rate_limits.profile_password_per_minute'))->by('profile-password:'.$request->user()->id));
         RateLimiter::for('profile.avatar', fn (Request $request) => Limit::perMinute(config('vault.rate_limits.profile_avatar_per_minute'))->by('profile-avatar:'.$request->user()->id));

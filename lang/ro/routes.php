@@ -6,6 +6,9 @@ return [
     'profile.password' => 'contul-meu/parola',
 
     'usage' => 'plan-si-consum',
+    'billing.summary' => 'abonament/sumar',
+    'billing.checkout' => 'abonament/checkout',
+    'billing.result' => 'abonament/rezultat',
     'members' => 'membri',
     'invitations' => 'invitatii',
     'notifications' => 'notificari',

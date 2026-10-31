@@ -40,7 +40,7 @@ php artisan serve --host=127.0.0.1 --port=8000
 
 Pagina: http://vaulty.test:8000/ro; login: /ro/autentificare; demo: /ro/demo; cont: /ro/panou. Domeniul fara port necesita activarea Nginx din local-hosting.md. APP_URL este http://vaulty.test; paginile servite pe 8000 sunt numai pentru verificare locala. Fonturile sunt locale si CSS se construieste cu binarul Tailwind ignorat din .tools (instructiuni/checksum in web-foundation.md).
 
-75 teste / 1038 asertiuni au trecut inclusiv cu route cache; nu exista apeluri AI platite. Pentru verificare: composer test, Pint --test, composer validate, composer check-platform-reqs, route:cache, php artisan test --compact, route:clear. Testele standard folosesc SQLite in memorie si mocks externe; nu executa migrate:fresh pe baza reala.
+340 teste / 3299 asertiuni au trecut inclusiv cu route cache; nu exista apeluri AI sau Stripe platite. Pentru verificare: composer test, Pint --test, composer validate, composer check-platform-reqs, route:cache, php artisan test --compact, route:clear. Testele standard folosesc SQLite in memorie si mocks externe; nu executa migrate:fresh pe baza reala.
 
 ## Windows 10 fara Docker
 

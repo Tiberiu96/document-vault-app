@@ -3,6 +3,7 @@
 use App\Http\Controllers\AccountSecurityController;
 use App\Http\Controllers\AssistantController;
 use App\Http\Controllers\AuthenticatedSessionController;
+use App\Http\Controllers\BillingController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\DocumentProcessingController;
@@ -14,6 +15,7 @@ use App\Http\Controllers\PublicDiscoveryController;
 use App\Http\Controllers\PublicPageController;
 use App\Http\Controllers\RegisteredUserController;
 use App\Http\Controllers\ReminderController;
+use App\Http\Controllers\StripeWebhookController;
 use App\Http\Controllers\SwitchWorkspaceController;
 use App\Http\Controllers\TaxonomyController;
 use App\Http\Controllers\WorkspaceInvitationController;
@@ -31,6 +33,7 @@ Route::get('/', fn () => redirect('/'.app(LanguageCatalog::class)->defaultLocale
 Route::get('/sitemap.xml', [PublicDiscoveryController::class, 'sitemap'])->name('sitemap');
 Route::get('/robots.txt', [PublicDiscoveryController::class, 'robots'])->name('robots');
 Route::get('/llms.txt', [PublicDiscoveryController::class, 'llms'])->name('llms');
+Route::post('/stripe/webhook', StripeWebhookController::class)->middleware('throttle:stripe.webhook')->name('stripe.webhook');
 
 Route::translate(function () {
     Route::middleware(EnsureAvailableLanguage::class)->group(function () {
@@ -70,6 +73,9 @@ Route::translate(function () {
                 Route::post(Localizer::url('assistant'), AssistantController::class)->name('assistant.stream');
                 Route::get(Localizer::url('usage'), WorkspaceUsageController::class)->name('usage');
                 Route::post(Localizer::url('usage'), [WorkspaceUsageController::class, 'requestUpgrade'])->middleware('throttle:plan.requests')->name('usage.upgrade');
+                Route::get(Localizer::url('billing.summary'), [BillingController::class, 'summary'])->middleware('throttle:billing')->name('billing.summary');
+                Route::post(Localizer::url('billing.checkout'), [BillingController::class, 'checkout'])->middleware('throttle:billing')->name('billing.checkout');
+                Route::get(Localizer::url('billing.result').'/{attempt}', [BillingController::class, 'result'])->whereUuid('attempt')->middleware('throttle:billing')->name('billing.result');
                 Route::get(Localizer::url('members'), [WorkspaceMemberController::class, 'index'])->name('members.index');
                 Route::post(Localizer::url('members'), [WorkspaceMemberController::class, 'store'])->middleware('throttle:invitations')->name('members.invite');
                 Route::post(Localizer::url('members').'/invitations/{invitation}/{action}', [WorkspaceMemberController::class, 'invitation'])->whereUuid('invitation')->where('action', 'resend|revoke')->middleware('throttle:invitations')->name('members.invitation');

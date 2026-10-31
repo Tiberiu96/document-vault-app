@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\WorkspaceUpgradeRequest;
 use App\Models\Workspace;
+use App\Services\Billing\BillingPriceService;
 use App\Services\PlanLimitsService;
 use App\Services\WebsiteContext;
 use Illuminate\Http\Request;
@@ -13,13 +14,17 @@ use Illuminate\Validation\ValidationException;
 
 class WorkspaceUsageController extends Controller
 {
-    public function __invoke(Request $request, PlanLimitsService $limits)
+    public function __invoke(Request $request, PlanLimitsService $limits, BillingPriceService $prices)
     {
         $workspace = $request->attributes->get('workspace');
         Gate::authorize('view', $workspace);
 
+        $currencies = $prices->enabledCurrencies($workspace);
+        $defaultCurrency = in_array($prices->defaultCurrency(), $currencies, true) ? $prices->defaultCurrency() : ($currencies[0] ?? null);
+
         return view('account.usage', [...app(WebsiteContext::class)->forPage($request, 'dashboard'), 'section' => 'usage', 'workspace' => $workspace,
-            'workspaces' => $request->user()->workspaces()->get()->filter(fn ($w) => Gate::allows('view', $w)), 'usage' => $limits->usage($workspace), 'upgradeRequest' => DB::table('workspace_upgrade_requests')->where('workspace_id', $workspace->id)->where('status', 'pending')->first()]);
+            'workspaces' => $request->user()->workspaces()->get()->filter(fn ($w) => Gate::allows('view', $w)), 'usage' => $limits->usage($workspace), 'upgradeRequest' => DB::table('workspace_upgrade_requests')->where('workspace_id', $workspace->id)->where('status', 'pending')->first(),
+            'billingCurrency' => $defaultCurrency, 'billingQuote' => $defaultCurrency ? $prices->quote($workspace, $defaultCurrency) : null, 'billingPrices' => $prices]);
     }
 
     public function requestUpgrade(WorkspaceUpgradeRequest $request, PlanLimitsService $limits)

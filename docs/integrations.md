@@ -12,9 +12,10 @@ Pentru fiecare serviciu: scop, provider recomandat, free tier adecvat, costuri/l
 | OpenAI/OpenRouter | AI optional ulterior | Dezactivat; OPENAI_API_KEY, OPENROUTER_API_KEY |
 | Ollama | AI local optional | Neconfigurat; OLLAMA_BASE_URL |
 | Frankfurter | Curs valutar | Neintegrat; verifica API-ul si conditiile la etapa 8 |
-| Analytics/plati/hosting | Crestere si productie | Fara configurare; decizie ghidata cand devin necesare |
+| Stripe | Checkout si abonamente | Implementat, oprit implicit; STRIPE_ENABLED, STRIPE_ENVIRONMENT, STRIPE_KEY, STRIPE_SECRET, STRIPE_WEBHOOK_SECRET |
+| Analytics/hosting | Crestere si productie | Fara configurare; decizie ghidata cand devin necesare |
 
-MAIL_MAILER=array este transport local fara livrare externa; nu pretinde ca emailul real functioneaza. Toate cheile de provideri sunt goale si activarile sunt false. Campurile viitoare din .env.example sunt rezervari, nu integrari implementate.
+MAIL_MAILER=array este transport local fara livrare externa; nu pretinde ca emailul real functioneaza. Cheile de provideri raman goale si activarile false implicit. Stripe are implementare locala, dar nu este activ fara configurare confirmata.
 
 Analytics: contract independent de provider, consimtamant inainte de dispatch, oprit implicit. Evenimente planificate: sign_up, login, document_uploaded, document_scanned, ocr_completed, reminder_created, subscription_started, purchase. Payload allowlist cu event_id pentru deduplicare, timestamp si proprietati nesensibile strict necesare; purchase foloseste identificator de tranzactie opac pentru deduplicare. Fara nume de fisiere, continut, OCR, date personale sau identificatori workspace/user exportati implicit catre ads. Schema si teste de consimtamant se implementeaza inaintea primului provider.
 

@@ -30,6 +30,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->append(PreventFoundationIndexing::class);
         $middleware->web(remove: [SubstituteBindings::class]);
         $middleware->web(append: [SetLocale::class, RedirectLocale::class, SubstituteBindings::class, ProtectAdminImpersonation::class]);
+        $middleware->validateCsrfTokens(except: ['stripe/webhook']);
         $middleware->redirectGuestsTo(fn (Request $request) => route('login'));
         $middleware->redirectUsersTo(fn (Request $request) => route('dashboard'));
     })

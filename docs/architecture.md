@@ -88,8 +88,8 @@ acceptare; vezi workspace-invitations.md.
 
 Checkpoint cote: migrarea 000017, plan efectiv per workspace, sablon Pro dezactivat,
 atribuire manuala auditata si pagina de consum ro/en/hu/bg. Upload/scanner/confirmare
-si rezervarile OCR/AI folosesc acelasi plan. Vezi plans-and-usage.md; integrarea platilor
-este amanata pana dupa mutarea pe productie, conform TODO.md.
+si rezervarile OCR/AI folosesc acelasi plan. Vezi plans-and-usage.md; integrarea Stripe
+este livrata ulterior, oprita implicit si separata de atribuirile manuale.
 
 Checkpoint cont: sectiunea privata Contul meu, nume editabil, email blocat,
 schimbare parola cu parola actuala si avatar unic privat de maximum 5 MiB.
@@ -98,9 +98,9 @@ Migrarea 000018, GD pentru reencodare si cleanup low; vezi account-profile.md.
 Checkpoint Business: cinci locuri incluse cu proprietarul si invitatiile active
 rezervate; capacitate suplimentara manuala Pro / Business din admin, cu pret
 lunar in bani RON configurabil, MFA/confirmare/audit. Migrarea 000019.
-Stripe ramane o etapa separata, numai planificata. Pentru ea s-a aprobat plata
-in RON/EUR/HUF, preselectie dupa limba si alegere explicita a altei monede
-acceptate, pret final egal cu suma facturata si inbox durabil pentru webhookuri.
+Stripe este o etapa separata livrata prin migrarea 000022: plata in RON/EUR/HUF,
+preselectie dupa limba, alegere explicita, pret final egal cu suma facturata si
+inbox durabil pentru webhookuri.
 Detalii si restrictii: plans-and-usage.md.
 
 Checkpoint upgrade: Plan si consum ofera solicitari private adaptate planului
@@ -119,3 +119,8 @@ Checkpoint asistent: `laravel/ai` cu Ollama/Gemini configurabil, unelte strict
 scopate la utilizatorul si workspace-ul autentificat, SSE sanitizat, limite Redis,
 consum de tokenuri si panou Blade/JavaScript localizat. Conversatia nu este
 persistata. Configurare si operare: docs/assistant.md.
+
+Checkpoint Stripe: SDK oficial, preturi lunare explicite RON/EUR/HUF administrate cu
+MFA, sumar server-side, Checkout si inbox webhook criptat/idempotent. Drepturile Pro si
+locurile platite se sincronizeaza numai din webhookuri. Integrarea este oprita implicit;
+configurare, politici si verificare sandbox in docs/stripe.md.

@@ -6,6 +6,9 @@ return [
     'profile.password' => 'moyat-profil/parola',
 
     'usage' => 'plan-i-potreblenie',
+    'billing.summary' => 'abonament/obobshtenie',
+    'billing.checkout' => 'abonament/plashtane',
+    'billing.result' => 'abonament/rezultat',
     'members' => 'chlenove',
     'invitations' => 'pokani',
     'notifications' => 'izvestiya',

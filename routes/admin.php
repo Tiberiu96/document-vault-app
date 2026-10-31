@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\AdminAuthController;
 use App\Http\Controllers\Admin\AdminBackupController;
+use App\Http\Controllers\Admin\AdminBillingPriceController;
 use App\Http\Controllers\Admin\AdminCatalogController;
 use App\Http\Controllers\Admin\AdminClientController;
 use App\Http\Controllers\Admin\AdminDashboardController;
@@ -46,6 +47,7 @@ Route::prefix('admin')->name('admin.')->middleware([AdminSecurity::class, 'throt
             Route::post('mfa/coduri-recuperare', [AdminAuthController::class, 'regenerate'])->middleware('throttle:admin.mfa')->name('mfa.regenerate');
             Route::get('limite', [AdminPlanController::class, 'index'])->name('plans');
             Route::patch('limite', [AdminPlanController::class, 'update'])->name('plans.update');
+            Route::patch('preturi-abonamente', [AdminBillingPriceController::class, 'update'])->name('billing-prices.update');
             Route::get('limbi', [AdminLanguageController::class, 'index'])->name('languages');
             Route::post('limbi', [AdminLanguageController::class, 'save'])->name('languages.store');
             Route::patch('limbi/{language}', [AdminLanguageController::class, 'save'])->whereNumber('language')->name('languages.update');
