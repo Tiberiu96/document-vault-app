@@ -11,6 +11,7 @@ return [
     'notifications' => 'ertesitesek',
     'notifications.read-all' => 'mind-olvasott',
     'notifications.preferences' => 'beallitasok',
+    'assistant' => 'asszisztens',
 
     'source.received' => 'eredeti-atveve',
     'documents.scan' => 'dokumentumok/szkenneles',

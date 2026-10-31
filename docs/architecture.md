@@ -114,3 +114,8 @@ unic declansator al meniului pe desktop si mobil.
 Dropdown-urile independente au fost eliminate din layouturile autentificate;
 paginile publice personalizate folosesc auth.session si cache privat. Detalii
 si verificari in web-foundation.md.
+
+Checkpoint asistent: `laravel/ai` cu Ollama/Gemini configurabil, unelte strict
+scopate la utilizatorul si workspace-ul autentificat, SSE sanitizat, limite Redis,
+consum de tokenuri si panou Blade/JavaScript localizat. Conversatia nu este
+persistata. Configurare si operare: docs/assistant.md.

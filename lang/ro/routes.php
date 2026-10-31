@@ -11,6 +11,7 @@ return [
     'notifications' => 'notificari',
     'notifications.read-all' => 'citeste-toate',
     'notifications.preferences' => 'preferinte',
+    'assistant' => 'asistent',
 
     'source.received' => 'original-primit',
     'documents.scan' => 'documente/scaneaza',
