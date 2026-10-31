@@ -2,6 +2,8 @@
 
 Tokenuri si componente in resources/css/app.css, compilate cu Tailwind 4.3.3 standalone. Pagini publice, demo, login si panou privat sunt implementate; detalii in web-foundation.md.
 
+Butoanele scurte din tabelele administrative raman pe un singur rand. Actiunile cu text lung pot defini explicit impachetarea la nivelul tabelului lor.
+
 | Rol | Valoare |
 | --- | --- |
 | Background | #F7F5F0 |
