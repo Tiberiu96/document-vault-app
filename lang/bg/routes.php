@@ -11,6 +11,7 @@ return [
     'notifications' => 'izvestiya',
     'notifications.read-all' => 'procheti-vsichki',
     'notifications.preferences' => 'predpochitaniya',
+    'assistant' => 'asistent',
 
     'source.received' => 'poluchen-original',
     'documents.scan' => 'dokumenti/skanirane',

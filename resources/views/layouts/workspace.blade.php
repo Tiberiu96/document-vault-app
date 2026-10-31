@@ -49,6 +49,10 @@
     <a href="{{ route('documents.index') }}"><x-icon name="document"/><span>{{ __('documents.title') }}</span></a>
 </nav>
 <template id="processing-loading-template">@include('documents.processing-loading', ['loadingDocument' => null])</template>
+@if($workspace && auth()->user()->hasVerifiedEmail() && config('assistant.enabled') && config('ai.enabled'))
+@include('assistant.panel')
+<script src="{{ asset('js/assistant.js') }}?v={{ filemtime(public_path('js/assistant.js')) }}" defer></script>
+@endif
 <script src="{{ asset('js/document-upload-flow.js') }}?v={{ filemtime(public_path('js/document-upload-flow.js')) }}" defer></script>
 @stack('scripts')
 @livewireScripts

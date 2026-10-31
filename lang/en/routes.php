@@ -11,6 +11,7 @@ return [
     'notifications' => 'notifications',
     'notifications.read-all' => 'read-all',
     'notifications.preferences' => 'preferences',
+    'assistant' => 'assistant',
 
     'source.received' => 'source-received',
     'documents.scan' => 'documents/scan',

@@ -65,3 +65,5 @@ Bulgara: [pagina publica](http://vaulty.test/bg), [inregistrare](http://vaulty.t
 Emailuri de cont: [confirmare/resetare si securitate](docs/account-email.md), [Mailpit si servicii locale](docs/integrations.md). Notificarile folosesc Redis/high si Horizon.
 
 Biblioteca privata: [documente, cote si catalog](docs/document-library.md). AI local: [Ollama/Qwen si pagina de test](docs/local-ai.md).
+
+Asistent privat optional: [configurare, securitate si pool PHP-FPM separat](docs/assistant.md). Streamingul nu trebuie rulat in productie pe acelasi pool limitat care serveste restul aplicatiei.

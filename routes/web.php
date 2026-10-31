@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AccountSecurityController;
+use App\Http\Controllers\AssistantController;
 use App\Http\Controllers\AuthenticatedSessionController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DocumentController;
@@ -66,6 +67,7 @@ Route::translate(function () {
                 Route::post(Localizer::url('invitations').'/{invitation}', [WorkspaceInvitationController::class, 'accept'])->whereUuid('invitation')->middleware('throttle:invitations')->name('invitations.accept');
             });
             Route::middleware(['verified', EnsureActiveWorkspace::class])->group(function () {
+                Route::post(Localizer::url('assistant'), AssistantController::class)->name('assistant.stream');
                 Route::get(Localizer::url('usage'), WorkspaceUsageController::class)->name('usage');
                 Route::post(Localizer::url('usage'), [WorkspaceUsageController::class, 'requestUpgrade'])->middleware('throttle:plan.requests')->name('usage.upgrade');
                 Route::get(Localizer::url('members'), [WorkspaceMemberController::class, 'index'])->name('members.index');
