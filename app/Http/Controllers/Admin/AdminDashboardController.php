@@ -26,13 +26,13 @@ class AdminDashboardController extends Controller
     public function index(Request $request, OperationalSummary $operations)
     {
         $filters = $request->validate(['failed_kind' => ['nullable', 'in:ocr,ai'], 'failed_workspace' => ['nullable', 'integer', 'min:1'], 'audit_actor' => ['nullable', 'integer', 'min:1']]);
-        $runs = ProcessingRun::where('status', 'failed')
+        $runs = ProcessingRun::with('document:id,workspace_id,uploaded_by,status')->where('status', 'failed')
             ->when($filters['failed_kind'] ?? null, fn ($q, $kind) => $q->where('kind', $kind))
             ->when($filters['failed_workspace'] ?? null, fn ($q, $id) => $q->where('workspace_id', $id))
             ->latest()->orderByDesc('id')->paginate(15, ['id', 'document_id', 'workspace_id', 'kind', 'attempts', 'duration_ms', 'error_code', 'created_at'], 'failed_page')->withQueryString();
         $actor = Auth::guard('admin')->user();
         foreach ($runs as $run) {
-            $doc = Document::find($run->document_id, ['id', 'workspace_id', 'uploaded_by', 'status']);
+            $doc = $run->document;
             $run->setAttribute('can_retry', $actor->hasVerifiedEmail() && $doc && $doc->status === 'stored' && Gate::forUser($actor)->allows('update', $doc) && OperationalSummary::retryable($run->error_code));
         }
 

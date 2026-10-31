@@ -6,6 +6,7 @@ use App\Ai\Agents\VaultyAssistant;
 use App\Ai\Tools\GetDocument;
 use App\Ai\Tools\ListMyDocuments;
 use App\Models\Document;
+use App\Models\Reminder;
 use App\Models\User;
 use App\Models\Workspace;
 use Database\Seeders\LanguageSeeder;
@@ -77,6 +78,40 @@ class AssistantTest extends TestCase
 
         $this->expectException(ModelNotFoundException::class);
         (new GetDocument)->handle(new ToolRequest(['document_id' => $foreign->id]));
+    }
+
+    public function test_document_list_loads_active_reminder_flags_without_per_document_queries(): void
+    {
+        $active = $this->document($this->workspace, $this->user, 'Cu reminder');
+        $inactive = $this->document($this->workspace, $this->user, 'Fara reminder activ');
+        Reminder::forceCreate([
+            'workspace_id' => $this->workspace->id,
+            'document_id' => $active->id,
+            'user_id' => $this->user->id,
+            'due_on' => now()->addMonth()->toDateString(),
+            'locale' => 'ro',
+            'status' => 'active',
+        ]);
+        Reminder::forceCreate([
+            'workspace_id' => $this->workspace->id,
+            'document_id' => $inactive->id,
+            'user_id' => $this->user->id,
+            'due_on' => now()->addMonth()->toDateString(),
+            'locale' => 'ro',
+            'status' => 'resolved',
+        ]);
+        $this->bindToolRequest();
+        DB::flushQueryLog();
+        DB::enableQueryLog();
+
+        $list = json_decode((new ListMyDocuments)->handle(new ToolRequest), true, flags: JSON_THROW_ON_ERROR);
+        $queries = DB::getQueryLog();
+        DB::disableQueryLog();
+        $documents = collect($list['documents'])->keyBy('id');
+
+        $this->assertTrue($documents[$active->id]['has_reminder']);
+        $this->assertFalse($documents[$inactive->id]['has_reminder']);
+        $this->assertLessThanOrEqual(3, count($queries));
     }
 
     public function test_daily_user_lock_and_global_concurrency_limits_return_stable_statuses(): void

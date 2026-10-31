@@ -24,6 +24,10 @@ class WorkspacePolicy
             return false;
         }
 
+        if ($workspace->relationLoaded('pivot')) {
+            return (int) $workspace->pivot->user_id === $user->id;
+        }
+
         return $workspace->members()->whereKey($user->id)->exists();
     }
 }
