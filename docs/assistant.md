@@ -52,7 +52,20 @@ explicita esueaza fara taiere tacita.
 Limitele sunt configurate in `config/assistant.php`: limita zilnica per utilizator
 si plan, un raspuns activ per utilizator, maximum cinci raspunsuri globale si
 timeout. Lockurile folosesc store-ul Redis configurat. Consumul de tokenuri se
-scrie in `assistant_usage`, fara prompturi, continut sau nume de fisiere.
+scrie in `assistant_usage`, fara prompturi, continut sau nume de fisiere. Pentru
+cererile noi se pastreaza providerul si modelul raportate la pornirea efectiva a
+fluxului, starea finalizata/esuat/intrerupt si consumul cumulat raportat de
+`StreamEnd`. Laravel AI cumuleaza in acel eveniment toti pasii agentului, inclusiv
+pasii care au cerut unelte; aplicatia nu insumeaza separat evenimentele si evita
+dublarea. Cand providerul nu raporteaza consum, valorile raman nule, nu zero.
+
+Panoul `/admin/consum-asistent` este disponibil numai prin guard-ul admin si MFA.
+Filtreaza perioada, utilizatorul si workspace-ul, apoi foloseste agregari SQL
+paginate pe utilizator/workspace/provider/model. Totalurile partiale indica exact
+cate cereri au consum cunoscut. Inregistrarile istorice cu stare, provider, model
+sau consum imposibil de demonstrat se afiseaza ca indisponibile. Numarul din panou
+reprezinta cereri inregistrate dupa pornirea fluxului, nu toate incercarile respinse
+inainte de acesta. Nu sunt calculate costuri monetare.
 
 ## Operare
 

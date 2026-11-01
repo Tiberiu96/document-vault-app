@@ -117,8 +117,10 @@ si verificari in web-foundation.md.
 
 Checkpoint asistent: `laravel/ai` cu Ollama/Gemini configurabil, unelte strict
 scopate la utilizatorul si workspace-ul autentificat, SSE sanitizat, limite Redis,
-consum de tokenuri si panou Blade/JavaScript localizat. Conversatia nu este
-persistata. Configurare si operare: docs/assistant.md.
+consum de tokenuri si panou Blade/JavaScript localizat. Administrarea consumului
+foloseste agregari SQL filtrate si paginate, cu provider/model si stare pentru
+cererile noi; istoricul necunoscut nu este completat artificial. Conversatia nu
+este persistata. Configurare si operare: docs/assistant.md.
 
 Checkpoint Stripe: SDK oficial, preturi lunare explicite RON/EUR/HUF administrate cu
 MFA, sumar server-side, Checkout si inbox webhook criptat/idempotent. Drepturile Pro si

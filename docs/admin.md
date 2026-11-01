@@ -76,6 +76,10 @@ inrolarea MFA in browser. Protejeaza accesul SSH si backupurile serverului.
   fallback sigur daca baza a fost copiata din local. Uploadul ramane plafonat la
   5 MiB pana la ajustarea explicita a infrastructurii Nginx/PHP. Setarile DB au
   prioritate fata de configuratia initiala, inclusiv pentru workerii persistenti.
+- Consum asistent AI: filtre validate pe perioada, utilizator si workspace,
+  totaluri care disting consumul complet, partial si necunoscut, stari separate
+  pentru cereri finalizate, esuate si intrerupte si agregare paginata pe
+  utilizator/workspace/provider/model. Nu afiseaza continut privat sau costuri.
 
 Horizon brut ramane inchis: payloadurile si exceptiile sale pot contine date
 private. Panoul propriu afiseaza numai ID-uri si coduri de eroare cunoscute.

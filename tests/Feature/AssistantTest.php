@@ -18,7 +18,11 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\RateLimiter;
+use Laravel\Ai\Responses\Data\Meta;
+use Laravel\Ai\Responses\Data\TextUsage;
+use Laravel\Ai\Responses\TextResponse;
 use Laravel\Ai\Tools\Request as ToolRequest;
+use RuntimeException;
 use Tests\TestCase;
 
 class AssistantTest extends TestCase
@@ -49,7 +53,11 @@ class AssistantTest extends TestCase
 
     public function test_stream_is_private_sanitized_and_records_usage_without_persisting_messages(): void
     {
-        VaultyAssistant::fake(['Raspuns sigur.']);
+        VaultyAssistant::fake([new TextResponse(
+            'Raspuns sigur.',
+            new TextUsage(inputTokens: 17, outputTokens: 6),
+            new Meta('ollama', 'test-model'),
+        )]);
 
         $response = $this->postJson('/ro/asistent', ['messages' => [['role' => 'user', 'content' => 'Ce documente am?']]])->assertOk()
             ->assertHeader('Content-Type', 'text/event-stream; charset=UTF-8')
@@ -61,8 +69,33 @@ class AssistantTest extends TestCase
         $this->assertStringContainsString(' sigur.', $content);
         $this->assertStringContainsString('"type":"done"', $content);
         $this->assertDatabaseCount('assistant_usage', 1);
+        $this->assertDatabaseHas('assistant_usage', [
+            'user_id' => $this->user->id,
+            'workspace_id' => $this->workspace->id,
+            'provider' => 'ollama',
+            'model' => config('ai.providers.ollama.models.text.default'),
+            'status' => 'completed',
+            'input_tokens' => 17,
+            'output_tokens' => 6,
+        ]);
         $this->assertDatabaseMissing('assistant_usage', ['user_id' => 999999]);
         $this->assertFalse(DB::getSchemaBuilder()->hasTable('agent_conversations'));
+    }
+
+    public function test_failed_stream_is_recorded_without_invented_usage_or_runtime_details(): void
+    {
+        VaultyAssistant::fake(fn () => throw new RuntimeException('Private provider failure'));
+
+        $content = $this->postJson('/ro/asistent', ['messages' => [['role' => 'user', 'content' => 'Salut']]])
+            ->assertOk()->streamedContent();
+
+        $this->assertStringContainsString('"type":"error"', $content);
+        $usage = DB::table('assistant_usage')->sole();
+        $this->assertSame('failed', $usage->status);
+        $this->assertNull($usage->provider);
+        $this->assertNull($usage->model);
+        $this->assertNull($usage->input_tokens);
+        $this->assertNull($usage->output_tokens);
     }
 
     public function test_tools_cannot_read_a_foreign_workspace_even_with_an_explicit_document_id(): void
