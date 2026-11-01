@@ -52,7 +52,7 @@ class MemberNavigationTest extends TestCase
 
     public function test_assistant_is_available_once_on_public_and_private_member_pages(): void
     {
-        config(['ai.enabled' => true, 'assistant.enabled' => true]);
+        config(['ai.enabled' => true, 'assistant.enabled' => true, 'assistant.provider' => 'gemini']);
         $user = User::factory()->create();
         $workspace = $this->workspace($user, 'Personal');
         $this->actingAs($user)->withSession(['active_workspace_id' => $workspace->id]);
@@ -62,7 +62,8 @@ class MemberNavigationTest extends TestCase
             $this->assertSame(1, substr_count($html, 'data-assistant-open'), $url);
             $this->assertSame(1, substr_count($html, 'id="assistant-panel"'), $url);
             $this->assertSame(1, substr_count($html, '/js/assistant.js'), $url);
-            $this->assertStringNotContainsString('assistant-helper', $html, $url);
+            $this->assertStringNotContainsString('assistant-remote-note', $html, $url);
+            $this->assertStringContainsString('Verifica informatiile in documentul sursa.', $html, $url);
         }
     }
 
