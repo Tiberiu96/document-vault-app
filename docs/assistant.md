@@ -14,7 +14,9 @@ Panoul foloseste un dialog nativ, cu focus retinut in dialog, inchidere prin
 Escape si fundal sub panou. Pe desktop este lateral; pe mobil ocupa zona vizibila,
 inclusiv la deschiderea tastaturii. Continutul se deruleaza separat de antet si
 formular, cu spatiu pentru marginile sigure ale dispozitivului. Textul functional
-ramane de minimum 16px.
+ramane de minimum 16px. Oprirea manuala elibereaza imediat formularul; cererea
+oprita nu ramane in istoricul trimis providerului si finalizarea ei intarziata nu
+poate reseta starea unei cereri noi.
 
 ## Configurare
 
