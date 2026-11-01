@@ -1370,6 +1370,16 @@
 .member-header .notification-bell { margin:0; }
 .member-header .notification-dropdown>summary { width:44px; height:44px; }
 .member-header .notification-popover { top:calc(100% + 22px); }
+.member-language-menu { display:none; position:relative; }
+.member-language-menu>summary { display:flex; align-items:center; justify-content:center; gap:5px; min-width:58px; height:44px; padding:0 8px; border:1px solid #cbbba5; border-radius:999px; background:#fdfbf7; color:var(--color-action); cursor:pointer; list-style:none; font:600 16px var(--font-interface); }
+.member-language-menu>summary::-webkit-details-marker { display:none; }
+.member-language-menu>summary .icon:last-child { width:12px; transition:transform .2s ease; }
+.member-language-menu[open]>summary { background:#eae2d4; border-color:#8b7355; box-shadow:0 0 0 2px #eae2d4; }
+.member-language-menu[open]>summary .icon:last-child { transform:rotate(90deg); }
+.member-language-menu>summary:focus-visible { outline:3px solid #987852; outline-offset:3px; }
+.member-language-panel { position:absolute; z-index:50; right:0; top:calc(100% + 12px); width:244px; padding:12px 16px; border:1px solid #e1dacf; border-radius:12px; background:#fff; box-shadow:0 12px 32px #302b1b14; }
+.member-language-panel .language-switcher { justify-content:space-between; gap:8px; font-size:16px; }
+.member-language-panel .language-switcher>.icon { display:none; }
 .member-menu>summary { display:flex; align-items:center; justify-content:center; width:44px; height:44px; padding:0; overflow:hidden; border:1px solid #cbbba5; border-radius:50%; background:#fdfbf7; color:var(--color-action); cursor:pointer; list-style:none; }
 .member-menu>summary::-webkit-details-marker { display:none; }
 .member-menu>summary .user-avatar { width:100%; height:100%; font-size:18px; }
@@ -1397,6 +1407,9 @@
 @media(max-width:800px) {
  .member-header-bar { min-height:88px; padding-top:max(16px,env(safe-area-inset-top)); padding-bottom:16px; gap:12px; }
  .member-header-actions { gap:12px; }
+ .member-language-menu { display:block; }
+ .member-language-panel { position:fixed; top:100px; left:20px; right:20px; width:auto; }
+ .member-menu-languages { display:none; }
  .member-header .notification-popover { position:fixed; top:100px; left:20px; right:20px; width:auto; max-width:none; }
  .member-menu-panel { max-height:calc(100dvh - 112px - env(safe-area-inset-top)); padding:18px; }
  .workspace-tools { padding:16px 20px; }.library-body .library-shell { min-height:calc(100dvh - 88px); }
