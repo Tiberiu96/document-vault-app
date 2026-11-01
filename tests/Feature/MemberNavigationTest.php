@@ -62,6 +62,7 @@ class MemberNavigationTest extends TestCase
             $this->assertSame(1, substr_count($html, 'data-assistant-open'), $url);
             $this->assertSame(1, substr_count($html, 'id="assistant-panel"'), $url);
             $this->assertSame(1, substr_count($html, '/js/assistant.js'), $url);
+            $this->assertStringNotContainsString('assistant-helper', $html, $url);
         }
     }
 

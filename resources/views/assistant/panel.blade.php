@@ -33,7 +33,6 @@
             <button type="submit" class="assistant-send" aria-label="{{ __('assistant.send') }}" title="{{ __('assistant.send') }}"><x-icon name="arrow" :size="22"/></button>
             <button type="button" class="assistant-stop" data-assistant-stop hidden>{{ __('assistant.stop') }}</button>
         </form>
-        <p class="assistant-helper">{{ __('assistant.helper') }}</p>
         </div>
     </dialog>
 </div>
