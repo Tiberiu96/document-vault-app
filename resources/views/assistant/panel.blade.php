@@ -14,7 +14,6 @@
         <div class="assistant-content" data-assistant-scroll>
         <div class="assistant-scope"><x-icon name="document"/><span>{{ __('assistant.all_documents') }}</span></div>
         <p class="assistant-scope-note">{{ __('assistant.sources_note') }}</p>
-        @if(config('assistant.provider') === 'gemini')<p class="assistant-remote-note"><x-icon name="info"/>{{ __('assistant.remote_notice') }}</p>@endif
         <div class="assistant-messages" data-assistant-messages aria-live="polite" aria-relevant="additions text">
             <div class="assistant-welcome" data-assistant-welcome>
                 <span class="assistant-mark"><x-icon name="sparkle"/></span>
@@ -33,6 +32,7 @@
             <button type="submit" class="assistant-send" aria-label="{{ __('assistant.send') }}" title="{{ __('assistant.send') }}"><x-icon name="arrow" :size="22"/></button>
             <button type="button" class="assistant-stop" data-assistant-stop hidden>{{ __('assistant.stop') }}</button>
         </form>
+        <p class="assistant-helper">{{ __('assistant.helper') }}</p>
         </div>
     </dialog>
 </div>
