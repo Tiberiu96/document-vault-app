@@ -14,7 +14,7 @@
     const suggestions = root.querySelector('[data-assistant-suggestions]');
     const status = root.querySelector('[data-assistant-status]');
     const conversation = [];
-    let controller = null;
+    let activeRequest = null;
     let retryText = '';
 
     const updateViewport = () => {
@@ -104,21 +104,23 @@
     };
     const send = async (text) => {
         text = text.trim();
-        if (!text || controller) return;
+        if (!text || activeRequest) return;
         retryText = text;
         addMessage('user', text);
-        conversation.push({ role: 'user', content: text });
+        const userMessage = { role: 'user', content: text };
+        conversation.push(userMessage);
         const assistantNode = addMessage('assistant', '', true);
         setBusy(true);
         setStatus(root.dataset.thinking);
-        controller = new AbortController();
+        const request = { controller: new AbortController(), assistantNode, userMessage };
+        activeRequest = request;
         try {
             const response = await fetch(root.dataset.endpoint, {
                 method: 'POST',
                 headers: { 'Accept': 'text/event-stream', 'Content-Type': 'application/json', 'X-CSRF-TOKEN': root.dataset.csrf },
                 credentials: 'same-origin',
                 body: JSON.stringify({ messages: conversation.slice(-10) }),
-                signal: controller.signal,
+                signal: request.controller.signal,
             });
             const answer = await parseResponse(response, assistantNode);
             assistantNode.removeAttribute('data-pending');
@@ -136,15 +138,27 @@
                 errorNode.append(document.createElement('br'), retry);
             }
         } finally {
-            controller = null;
-            setBusy(false);
-            setStatus('');
-            input.disabled = false;
-            if (panel.open && window.matchMedia('(min-width:801px)').matches) input.focus({ preventScroll: true });
+            if (activeRequest === request) {
+                activeRequest = null;
+                setBusy(false);
+                setStatus('');
+                if (panel.open && window.matchMedia('(min-width:801px)').matches) input.focus({ preventScroll: true });
+            }
         }
     };
     form.addEventListener('submit', (event) => { event.preventDefault(); const text = input.value; input.value = ''; send(text); });
     input.addEventListener('keydown', (event) => { if (event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); form.requestSubmit(); } });
-    stopButton.addEventListener('click', () => controller?.abort());
+    stopButton.addEventListener('click', () => {
+        const request = activeRequest;
+        if (!request) return;
+        activeRequest = null;
+        request.assistantNode.remove();
+        const messageIndex = conversation.indexOf(request.userMessage);
+        if (messageIndex !== -1) conversation.splice(messageIndex, 1);
+        request.controller.abort();
+        setBusy(false);
+        setStatus('');
+        if (panel.open && window.matchMedia('(min-width:801px)').matches) input.focus({ preventScroll: true });
+    });
     root.querySelectorAll('[data-assistant-suggestion]').forEach((button) => button.addEventListener('click', () => send(button.textContent)));
 })();

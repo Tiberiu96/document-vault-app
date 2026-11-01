@@ -82,6 +82,18 @@ class MemberNavigationTest extends TestCase
             ->get('/ro')->assertOk()->assertDontSee('data-assistant-open', false);
     }
 
+    public function test_assistant_stop_releases_the_active_client_request_before_aborting_it(): void
+    {
+        $script = file_get_contents(public_path('js/assistant.js'));
+        $stopHandler = substr($script, strpos($script, "stopButton.addEventListener('click'"));
+
+        $this->assertStringContainsString('activeRequest = null;', $stopHandler);
+        $this->assertStringContainsString('request.controller.abort();', $stopHandler);
+        $this->assertStringContainsString('setBusy(false);', $stopHandler);
+        $this->assertLessThan(strpos($stopHandler, 'request.controller.abort();'), strpos($stopHandler, 'activeRequest = null;'));
+        $this->assertLessThan(strpos($stopHandler, 'setBusy(false);'), strpos($stopHandler, 'request.controller.abort();'));
+    }
+
     public function test_assistant_widget_does_not_expose_an_unauthorized_workspace(): void
     {
         config(['ai.enabled' => true, 'assistant.enabled' => true]);
