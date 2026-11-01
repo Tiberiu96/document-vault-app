@@ -1,9 +1,9 @@
 (() => {
     const header = document.querySelector('[data-member-header]');
     if (!header) return;
-    const panels = () => header.querySelectorAll('[data-member-menu], .notification-dropdown');
+    const panels = () => header.querySelectorAll('[data-member-menu], [data-member-language-menu], .notification-dropdown');
     header.addEventListener('toggle', event => {
-        if (!(event.target instanceof HTMLDetailsElement) || !event.target.open || !event.target.matches('[data-member-menu], .notification-dropdown')) return;
+        if (!(event.target instanceof HTMLDetailsElement) || !event.target.open || !event.target.matches('[data-member-menu], [data-member-language-menu], .notification-dropdown')) return;
         panels().forEach(panel => { if (panel !== event.target) panel.open = false; });
     }, true);
     document.addEventListener('click', event => {

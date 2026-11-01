@@ -13,6 +13,7 @@
     <div class="member-header-bar wrap">
         <x-brand/>
         <div class="member-header-actions">
+            <x-member-language-menu :languages="$languages"/>
             @if($workspace && $navigationUser->hasVerifiedEmail())<livewire:notification-bell :workspace-id="$workspace->id" :key="'bell-'.$workspace->id"/>@endif
             <x-member-menu :languages="$languages" :workspace="$workspace" :workspaces="$workspaces"/>
         </div>

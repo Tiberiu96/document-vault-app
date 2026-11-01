@@ -19,6 +19,12 @@ class MemberNavigationTest extends TestCase
         $xpath = new \DOMXPath($dom);
         $this->assertSame(1, $xpath->query('//*[@data-member-header]')->length);
         $this->assertSame(1, $xpath->query('//*[@data-member-menu]')->length);
+        $this->assertSame(1, $xpath->query('//*[@data-member-language-menu]')->length);
+        $languageSummary = $xpath->query('//*[@data-member-language-menu]/summary')->item(0);
+        $this->assertNotSame('', $languageSummary->getAttribute('aria-label'));
+        $this->assertSame($languageSummary->getAttribute('aria-label'), $languageSummary->getAttribute('title'));
+        $this->assertSame(strtoupper(app()->getLocale()), trim($languageSummary->textContent));
+        $this->assertSame(4, $xpath->query('//*[@data-member-language-menu]//nav[contains(@class,"language-switcher")]/a')->length);
         $this->assertSame(1, $xpath->query('//*[@data-member-menu]/summary//*[contains(concat(" ", normalize-space(@class), " "), " user-avatar ")]')->length);
         $this->assertSame(0, $xpath->query('//*[@data-member-menu]/summary//*[contains(concat(" ", normalize-space(@class), " "), " icon ")]')->length);
         $this->assertSame(0, $xpath->query('//*[@data-member-header]//*[contains(concat(" ", normalize-space(@class), " "), " account-control ")]')->length);
@@ -155,5 +161,25 @@ class MemberNavigationTest extends TestCase
         $this->assertNotContains('/ro/documente', $paths);
         $this->assertNotContains('/ro/plan-si-consum', $paths);
         $this->assertNotContains('/ro/notificari', $paths);
+    }
+
+    public function test_mobile_language_dropdown_keeps_the_current_page_in_every_locale(): void
+    {
+        $user = User::factory()->create();
+        $workspace = $this->workspace($user, 'Language workspace');
+        $this->actingAs($user)->withSession(['active_workspace_id' => $workspace->id]);
+
+        foreach (['ro' => 'RO', 'en' => 'EN', 'hu' => 'HU', 'bg' => 'BG'] as $locale => $label) {
+            $html = $this->get('/'.$locale.'/'.trans('routes.pricing', [], $locale))->assertOk()->getContent();
+            $dom = new \DOMDocument;
+            @$dom->loadHTML('<?xml encoding="UTF-8">'.$html);
+            $xpath = new \DOMXPath($dom);
+            $menu = $xpath->query('//*[@data-member-language-menu]')->item(0);
+
+            $this->assertNotNull($menu, $locale);
+            $this->assertSame($label, trim($xpath->query('./summary', $menu)->item(0)->textContent), $locale);
+            $this->assertSame(4, $xpath->query('.//nav[contains(@class,"language-switcher")]/a', $menu)->length, $locale);
+            $this->assertSame(1, $xpath->query('.//a[@aria-current="true" and @lang="'.$locale.'"]', $menu)->length, $locale);
+        }
     }
 }
