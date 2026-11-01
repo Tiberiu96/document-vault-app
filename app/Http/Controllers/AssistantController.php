@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\RateLimiter;
 use Laravel\Ai\Messages\Message;
 use Laravel\Ai\Streaming\Events\StreamEnd;
+use Laravel\Ai\Streaming\Events\StreamStart;
 use Laravel\Ai\Streaming\Events\TextDelta;
 use Laravel\Ai\Streaming\Events\ToolCall;
 use Laravel\Ai\Streaming\Events\ToolResult;
@@ -69,12 +70,20 @@ class AssistantController extends Controller
         }
 
         return response()->stream(function () use ($stream, $user, $workspace, $userLock, $slot) {
-            $inputTokens = 0;
-            $outputTokens = 0;
+            $inputTokens = null;
+            $outputTokens = null;
+            $actualProvider = null;
+            $actualModel = null;
+            $status = 'failed';
             try {
                 foreach ($stream as $event) {
                     if (connection_aborted()) {
+                        $status = 'interrupted';
                         break;
+                    }
+                    if ($event instanceof StreamStart) {
+                        $actualProvider = $event->provider;
+                        $actualModel = $event->model;
                     }
                     $payload = match (true) {
                         $event instanceof ToolCall => ['type' => 'tool_call', 'name' => $event->toolCall->name],
@@ -86,23 +95,38 @@ class AssistantController extends Controller
                         $this->send($payload);
                     }
                     if ($event instanceof StreamEnd) {
-                        $inputTokens += $event->usage->inputTokens;
-                        $outputTokens += $event->usage->outputTokens;
+                        $inputTokens = $event->usage->inputTokens;
+                        $outputTokens = $event->usage->outputTokens;
+                        if ($inputTokens + $outputTokens === 0) {
+                            $inputTokens = null;
+                            $outputTokens = null;
+                        }
+                        $status = 'completed';
                     }
                 }
-                DB::table('assistant_usage')->insert([
-                    'user_id' => $user->id,
-                    'workspace_id' => $workspace->id,
-                    'input_tokens' => $inputTokens,
-                    'output_tokens' => $outputTokens,
-                    'created_at' => now(),
-                ]);
-                $this->send(['type' => 'done']);
+                if ($status !== 'interrupted') {
+                    $this->send(['type' => 'done']);
+                }
             } catch (Throwable $exception) {
+                $status = 'failed';
                 Log::warning('Assistant stream failed.', ['exception' => $exception::class]);
                 $this->send(['type' => 'error', 'message' => __('assistant.failed')]);
                 $this->send(['type' => 'done']);
             } finally {
+                try {
+                    DB::table('assistant_usage')->insert([
+                        'user_id' => $user->id,
+                        'workspace_id' => $workspace->id,
+                        'provider' => $actualProvider,
+                        'model' => $actualModel,
+                        'status' => $status,
+                        'input_tokens' => $inputTokens,
+                        'output_tokens' => $outputTokens,
+                        'created_at' => now(),
+                    ]);
+                } catch (Throwable $exception) {
+                    Log::error('Assistant usage could not be recorded.', ['exception' => $exception::class]);
+                }
                 $slot->release();
                 $userLock->release();
             }

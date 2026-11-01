@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\AdminAssistantUsageController;
 use App\Http\Controllers\Admin\AdminAuthController;
 use App\Http\Controllers\Admin\AdminBackupController;
 use App\Http\Controllers\Admin\AdminBillingPriceController;
@@ -31,6 +32,7 @@ Route::prefix('admin')->name('admin.')->middleware([AdminSecurity::class, 'throt
             Route::post('backup/restaureaza', [AdminBackupController::class, 'restore'])->middleware('throttle:admin.mfa')->name('backup.restore');
             Route::get('backup', [AdminDashboardController::class, 'backup'])->name('backup');
             Route::get('notificari', [AdminDashboardController::class, 'notifications'])->name('notifications');
+            Route::get('consum-asistent', AdminAssistantUsageController::class)->name('assistant-usage');
             Route::get('utilizatori', [AdminDashboardController::class, 'users'])->name('users');
             Route::get('utilizatori/creeaza', [AdminClientController::class, 'create'])->name('users.create');
             Route::post('utilizatori', [AdminClientController::class, 'save'])->name('users.store');

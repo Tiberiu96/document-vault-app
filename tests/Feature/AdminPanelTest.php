@@ -195,7 +195,7 @@ class AdminPanelTest extends TestCase
         ProcessingRun::forceCreate(['workspace_id' => $document->workspace_id, 'document_id' => $document->id, 'requested_by' => $document->uploaded_by, 'provider' => 'fake', 'kind' => 'ai', 'status' => 'failed', 'period' => now()->startOfMonth()->toDateString(), 'units' => 1, 'base_version' => 0, 'locale' => 'ro', 'error_code' => 'PRIVATE-ERROR', 'result' => ['text' => 'PRIVATE-OCR']]);
         DB::table('failed_jobs')->insert(['uuid' => 'fake-failure-uuid', 'connection' => 'redis', 'queue' => 'ai', 'payload' => 'PRIVATE-PAYLOAD', 'exception' => 'PRIVATE-EXCEPTION', 'failed_at' => now()]);
         $this->enter($user);
-        foreach (['/admin', '/admin/backup', '/admin/notificari', '/admin/utilizatori', '/admin/spatii', '/admin/categorii', '/admin/etichete', '/admin/limbi', '/admin/limite', '/admin/securitate'] as $path) {
+        foreach (['/admin', '/admin/backup', '/admin/notificari', '/admin/consum-asistent', '/admin/utilizatori', '/admin/spatii', '/admin/categorii', '/admin/etichete', '/admin/limbi', '/admin/limite', '/admin/securitate'] as $path) {
             $this->get($path)->assertOk()->assertSee('lang="ro"', false)->assertDontSee('PRIVATE-')->assertDontSee('private-sensitive-path');
         }
         $this->get('/admin/horizon')->assertForbidden();
@@ -461,6 +461,59 @@ class AdminPanelTest extends TestCase
         $this->get('/admin/notificari?status=uncertain&workspace_id=1&to=2026-12-31')->assertOk();
         $this->get('/admin/notificari?status=invalid')->assertSessionHasErrors('status');
         $this->get('/admin/notificari?from=2026-12-31&to=2026-01-01')->assertSessionHasErrors('to');
+    }
+
+    public function test_assistant_usage_requires_admin_mfa_and_aggregates_only_filtered_records(): void
+    {
+        $owner = User::factory()->create(['name' => 'Utilizator raport']);
+        $workspace = Workspace::forceCreate(['owner_id' => $owner->id, 'type' => 'personal', 'name' => 'Spatiu raport']);
+        $workspace->members()->attach($owner, ['role' => 'owner']);
+        $otherOwner = User::factory()->create();
+        $otherWorkspace = Workspace::forceCreate(['owner_id' => $otherOwner->id, 'type' => 'personal', 'name' => 'Alt spatiu']);
+        $otherWorkspace->members()->attach($otherOwner, ['role' => 'owner']);
+
+        DB::table('assistant_usage')->insert([
+            ['user_id' => $owner->id, 'workspace_id' => $workspace->id, 'provider' => 'ollama', 'model' => 'model-local', 'status' => 'completed', 'input_tokens' => 10, 'output_tokens' => 4, 'created_at' => '2026-10-15 08:00:00'],
+            ['user_id' => $owner->id, 'workspace_id' => $workspace->id, 'provider' => 'ollama', 'model' => 'model-local', 'status' => 'failed', 'input_tokens' => null, 'output_tokens' => null, 'created_at' => '2026-10-16 08:00:00'],
+            ['user_id' => $otherOwner->id, 'workspace_id' => $otherWorkspace->id, 'provider' => null, 'model' => null, 'status' => 'unknown', 'input_tokens' => null, 'output_tokens' => null, 'created_at' => '2026-09-01 08:00:00'],
+        ]);
+
+        $this->get('/admin/consum-asistent')->assertRedirect('/admin/autentificare');
+        $admin = $this->administrator();
+        $this->enter($admin, false)->get('/admin/consum-asistent')->assertRedirect('/admin/mfa/verificare');
+        $response = $this->enter($admin)->get('/admin/consum-asistent?from=2026-10-01&to=2026-10-31&user_id='.$owner->id.'&workspace_id='.$workspace->id)
+            ->assertOk()->assertSee('Consum asistent AI')->assertSee('Total partial: 1 din 2 cereri.')
+            ->assertSee('Utilizator raport')->assertSee('Spatiu raport')->assertDontSee('Alt spatiu');
+
+        $totals = $response->viewData('totals');
+        $this->assertSame(2, (int) $totals->requests_count);
+        $this->assertSame(10, (int) $totals->input_tokens);
+        $this->assertSame(4, (int) $totals->output_tokens);
+        $this->assertSame(14, (int) $totals->total_tokens);
+        $this->assertSame(1, (int) $totals->completed_count);
+        $this->assertSame(1, (int) $totals->failed_count);
+    }
+
+    public function test_assistant_usage_filters_and_group_pagination_are_stable(): void
+    {
+        $owner = User::factory()->create();
+        $workspace = Workspace::forceCreate(['owner_id' => $owner->id, 'type' => 'personal', 'name' => 'Spatiu paginat']);
+        $workspace->members()->attach($owner, ['role' => 'owner']);
+        for ($index = 1; $index <= 26; $index++) {
+            DB::table('assistant_usage')->insert([
+                'user_id' => $owner->id, 'workspace_id' => $workspace->id, 'provider' => 'ollama',
+                'model' => 'model-'.str_pad((string) $index, 2, '0', STR_PAD_LEFT), 'status' => 'completed',
+                'input_tokens' => $index, 'output_tokens' => 1, 'created_at' => now()->addSeconds($index),
+            ]);
+        }
+
+        $this->enter($this->administrator());
+        $query = '/admin/consum-asistent?user_id='.$owner->id.'&workspace_id='.$workspace->id;
+        $response = $this->get($query)->assertOk()->assertViewHas('usage', fn ($rows) => $rows->total() === 26 && $rows->count() === 25);
+        $this->assertStringContainsString('user_id='.$owner->id, $response->viewData('usage')->nextPageUrl());
+        $this->get($query.'&usage_page=2')->assertOk()->assertViewHas('usage', fn ($rows) => $rows->count() === 1);
+        $this->get('/admin/consum-asistent?from=2026-12-31&to=2026-01-01')->assertSessionHasErrors('to');
+        $this->get('/admin/consum-asistent?user_id=999999')->assertSessionHasErrors('user_id');
     }
 
     public function test_restore_requires_global_admin_mfa_and_production(): void

@@ -1048,6 +1048,17 @@
 
 /* Tabele admin: textul nu depaseste celula; pe ecrane inguste se deruleaza tabelul. */
 .admin-table th,.admin-table td{white-space:normal;overflow-wrap:anywhere;word-break:normal}.admin-table .action-button{white-space:nowrap;overflow-wrap:normal;word-break:normal}.admin-workspace-table{table-layout:fixed;min-width:1050px}.admin-workspace-table th,.admin-workspace-table td{min-width:0;max-width:none}.admin-workspace-table .action-button{max-width:100%;white-space:normal;text-align:center}.admin-filters{padding:20px;display:flex;gap:16px;flex-wrap:wrap;align-items:end;margin-bottom:24px}.admin-filters label{display:grid;gap:8px;flex:1 1 170px;min-width:0;font-size:16px}.admin-filters input,.admin-filters select{width:100%;min-width:0;min-height:46px;padding:10px 12px;border:1px solid var(--color-line);border-radius:5px;background:white;font-size:16px}.admin-filter-actions{display:flex;gap:10px;flex-wrap:wrap}.library-pagination{flex-wrap:wrap}
+.admin-assistant-stats { grid-template-columns:repeat(4,minmax(0,1fr)); }
+.admin-assistant-stats small,.admin-cell-detail { display:block; color:#77766f; font-size:16px; line-height:1.5; }
+.admin-usage-statuses dl { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:16px; margin-top:18px; }
+.admin-usage-statuses dl>div { padding:16px; border:1px solid var(--color-line); border-radius:6px; }
+.admin-usage-statuses dt,.admin-usage-statuses dd { font-size:16px; }
+.admin-usage-statuses dd { margin:8px 0 0; font-size:24px; font-weight:600; }
+.admin-assistant-table { min-width:1120px; table-layout:fixed; }
+.admin-assistant-table th,.admin-assistant-table td { min-width:0; max-width:none; }
+.admin-assistant-table th:nth-child(1){width:18%}.admin-assistant-table th:nth-child(2){width:16%}.admin-assistant-table th:nth-child(3){width:16%}.admin-assistant-table th:nth-child(4){width:18%}.admin-assistant-table th:nth-child(5){width:22%}.admin-assistant-table th:nth-child(6){width:10%}
+@media(max-width:1100px){.admin-assistant-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.admin-usage-statuses dl{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:560px){.admin-assistant-stats,.admin-usage-statuses dl{grid-template-columns:minmax(0,1fr)}}
 .taxonomy-create>div,.taxonomy-row>form:first-child{align-items:center}.taxonomy-create input,.taxonomy-row input{flex:1 1 0;min-width:0;width:auto;min-height:48px}.taxonomy-create button,.taxonomy-row button{flex:0 0 auto;white-space:nowrap;word-break:normal;min-height:48px;align-self:center}@media(max-width:480px){.taxonomy-create>div{align-items:stretch}.taxonomy-create input{flex-basis:100%;width:100%}.taxonomy-create button{width:100%}}
 
 /* Fundalul antetului si hoverul acopera intreaga latime scrollabila. */
